@@ -113,6 +113,7 @@ body {
   border-bottom: 3px dashed #BBDEFB;
 }
 
+/* 単一画像コンテナ */
 .photo-container {
   position: relative;
   margin: 1.2rem 0;
@@ -123,6 +124,60 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 複数画像コンテナ（⑤みため専用） */
+.multi-photo-container {
+  display: flex;
+  gap: 15px;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.multi-photo-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.multi-photo-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.photo-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(50% - 8px);
+  min-width: 250px;
+  border-radius: 15px;
+  overflow: hidden;
+  background: #f5f5f5;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* GIF画像の特別なスタイル */
+.gif-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(45deg, #FF9800, #FF5722);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 5;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.photo-wrapper img[src$=".gif"] {
+  border: 3px solid #FF9800;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
 }
 
 .step-image {
@@ -176,6 +231,149 @@ body {
   background: #E3F2FD;
   border-left-color: #2196F3;
   font-size: 1.3rem;
+}
+
+/* お気に入り機能 */
+.favorite-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.favorite-btn.active {
+  background: #FFD700;
+  color: #333;
+  animation: pulse 0.3s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.show-favorites {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #FFD700, #FFA000);
+  color: #333;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.show-favorites .count {
+  background: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.favorites-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60vh;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+  z-index: 1000;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.favorites-panel.show {
+  transform: translateY(0);
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.favorites-header h3 {
+  margin: 0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-favorites {
+  width: 40px;
+  height: 40px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+  height: calc(60vh - 80px);
+  overflow-y: auto;
+}
+
+.favorite-item {
+  position: relative;
+}
+
+.favorite-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.3s;
+}
+
+.favorite-item img:hover {
+  border-color: #FFD700;
+}
+
+.favorite-item small {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
 }
 
 /* オーバーレイ設定 */
@@ -279,6 +477,15 @@ body {
     height: 4rem;
     font-size: 2rem;
   }
+  
+  .multi-photo-container {
+    justify-content: center;
+  }
+  
+  .photo-wrapper {
+    width: calc(50% - 8px);
+    max-width: 350px;
+  }
 }
 
 /* 小さなスマホ向け設定 */
@@ -296,6 +503,21 @@ body {
   .status-box {
     font-size: 1.1rem;
     padding: 1rem;
+  }
+  
+  .photo-wrapper {
+    min-width: 200px;
+  }
+  
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .show-favorites {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    top: 10px;
+    right: 10px;
   }
 }
 
@@ -334,17 +556,34 @@ body {
      ============================================================================ -->
 <main class="main-content" id="content"></main>
 
+<!-- ============================================================================
+     お気に入り表示ボタン
+     ============================================================================ -->
+<button class="show-favorites" id="showFavorites">
+  <span>⭐</span>
+  <span>保存した写真</span>
+  <span class="count" id="favoriteCount">0</span>
+</button>
+
+<!-- ============================================================================
+     お気に入り写真パネル
+     ============================================================================ -->
+<div class="favorites-panel" id="favoritesPanel">
+  <div class="favorites-header">
+    <h3><span>⭐</span> 保存した写真</h3>
+    <button class="close-favorites">×</button>
+  </div>
+  <div class="favorites-grid" id="favoritesGrid">
+    <!-- ここに保存した写真が表示 -->
+  </div>
+</div>
+
 <script>
 // ============================================================================
 //     工程データ定義
 //     ----------------------------------------------------------------------------
-//     nav:  ナビゲーションボタン表示テキスト
-//     title: 工程タイトル
-//     img:   画像ファイルパス
-//     ok:    OK確認テキスト
-//     note:  注意事項テキスト
-//     danger:危険工程フラグ（trueの場合警告表示）
-//     final: 最終工程フラグ（trueの場合特別表示）
+//     ⑤みため: GIFとJPGの2枚を配列で指定
+//     他: 単一画像を文字列で指定
 // ============================================================================
 const steps = [
   { 
@@ -378,7 +617,10 @@ const steps = [
   { 
     nav: "⑤ みため", 
     title: "⑤ 見た目完成（実験中）", 
-    img: "images/car_complete.jpg",
+    img: [
+      "images/car_complete.gif",
+      "images/car_complete.jpg"
+    ],
     ok: "つなぎ方をためそう！", 
     note: "前後が逆なら入れ替えてみよう。", 
     danger: true 
@@ -395,20 +637,65 @@ const steps = [
 
 // ============================================================================
 //     グローバル変数宣言
-//     ----------------------------------------------------------------------------
-//     currentStep: 現在表示中の工程インデックス
-//     navButtons:  ナビゲーションボタンコンテナ要素
-//     content:     メインコンテンツ表示要素
 // ============================================================================
 let currentStep = 0;
 const navButtons = document.getElementById('navButtons');
 const content = document.getElementById('content');
 
+// お気に入り管理
+const favoriteManager = {
+  key: 'rc_car_favorites',
+  
+  getFavorites() {
+    return JSON.parse(localStorage.getItem(this.key) || '[]');
+  },
+  
+  saveFavorites(favorites) {
+    localStorage.setItem(this.key, JSON.stringify(favorites));
+    this.updateCount();
+  },
+  
+  toggleFavorite(imgSrc, title) {
+    let favorites = this.getFavorites();
+    const index = favorites.findIndex(f => f.img === imgSrc);
+    
+    if (index === -1) {
+      // 追加
+      favorites.push({
+        img: imgSrc,
+        title: title,
+        date: new Date().toISOString()
+      });
+    } else {
+      // 削除
+      favorites.splice(index, 1);
+    }
+    
+    this.saveFavorites(favorites);
+    return index === -1; // 追加されたらtrue
+  },
+  
+  updateCount() {
+    const count = this.getFavorites().length;
+    document.getElementById('favoriteCount').textContent = count;
+  },
+  
+  clearFavorites() {
+    localStorage.removeItem(this.key);
+    this.updateCount();
+  }
+};
+
+// オーバーレイ変数
+let scale = 1;
+let posX = 0;
+let posY = 0;
+let pointers = {};
+let initialDistance = 0;
+let lastScale = 1;
+
 // ============================================================================
 //     ナビゲーションボタン作成関数
-//     ----------------------------------------------------------------------------
-//     機能: 6つの工程ボタンを生成し、クリックイベントを設定
-//     特徴: アクティブなボタンは視覚的に強調表示
 // ============================================================================
 function renderNavigation() {
   navButtons.innerHTML = '';
@@ -426,11 +713,6 @@ function renderNavigation() {
   });
 }
 
-// ============================================================================
-//     ナビゲーションボタン更新関数
-//     ----------------------------------------------------------------------------
-//     機能: アクティブなボタンのスタイルを更新
-// ============================================================================
 function updateNavigation() {
   Array.from(navButtons.children).forEach((button, index) => {
     button.classList.toggle('active', index === currentStep);
@@ -439,10 +721,6 @@ function updateNavigation() {
 
 // ============================================================================
 //     メインコンテンツ表示関数
-//     ----------------------------------------------------------------------------
-//     機能: 現在の工程の詳細情報を表示
-//     表示内容: 工程タイトル、写真、OK確認、注意事項
-//     状態別表示: 危険工程(danger)、最終工程(final)でスタイル変更
 // ============================================================================
 function renderContent() {
   const step = steps[currentStep];
@@ -451,49 +729,153 @@ function renderContent() {
   if (step.danger) cardClass += ' card-danger';
   if (step.final) cardClass += ' card-final';
   
-  content.innerHTML = `
-    <div class="${cardClass}">
-      <div class="step-title">${step.title}</div>
+  // 写真表示HTMLの生成（⑤みためは複数画像、他は単一画像）
+  let photoHTML = '';
+  if (Array.isArray(step.img)) {
+    // 複数画像の場合（⑤みため）
+    photoHTML = `
+      <div class="multi-photo-container">
+        ${step.img.map((imgSrc, index) => {
+          const isGif = imgSrc.endsWith('.gif');
+          return `
+            <div class="photo-wrapper" data-index="${index}">
+              ${isGif ? '<div class="gif-badge">GIF</div>' : ''}
+              <img src="${imgSrc}" alt="${step.title}" class="step-image">
+              <div class="photo-label">タップで拡大</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else {
+    // 単一画像の場合（他のステップ）
+    photoHTML = `
       <div class="photo-container">
         <img src="${step.img}" alt="${step.title}" class="step-image">
         <div class="photo-label">タップで拡大</div>
       </div>
+    `;
+  }
+  
+  content.innerHTML = `
+    <div class="${cardClass}">
+      <div class="step-title">${step.title}</div>
+      ${photoHTML}
       <div class="status-box status-ok">${step.ok}</div>
       <div class="status-box status-note">${step.note}</div>
     </div>
   `;
   
-  const stepImage = content.querySelector('.step-image');
-  stepImage.addEventListener('click', openOverlay);
+  // すべての画像にイベントリスナーを追加
+  document.querySelectorAll('.step-image').forEach(img => {
+    img.removeEventListener('click', openOverlay);
+    img.addEventListener('click', openOverlay);
+    
+    // お気に入りボタンを追加
+    addFavoriteButtonToPhoto(img);
+  });
 }
 
 // ============================================================================
-//     オーバーレイ変数宣言
-//     ----------------------------------------------------------------------------
-//     scale:          画像拡大率 (1〜5倍)
-//     posX, posY:     画像位置オフセット
-//     pointers:       アクティブなポインター管理オブジェクト
-//     initialDistance:ピンチ開始時の指間距離
-//     lastScale:      前回の拡大率（ピンチ計算用）
+//     お気に入り機能
 // ============================================================================
-let scale = 1;
-let posX = 0;
-let posY = 0;
-let pointers = {};
-let initialDistance = 0;
-let lastScale = 1;
+function initFavorites() {
+  // カウント表示更新
+  favoriteManager.updateCount();
+  
+  // お気に入り表示ボタン
+  document.getElementById('showFavorites').addEventListener('click', showFavorites);
+  
+  // パネル閉じる
+  document.querySelector('.close-favorites').addEventListener('click', hideFavorites);
+  
+  // 背景タップで閉じる
+  document.getElementById('favoritesPanel').addEventListener('click', function(e) {
+    if (e.target === this) {
+      hideFavorites();
+    }
+  });
+}
+
+function addFavoriteButtonToPhoto(imgElement) {
+  const container = imgElement.closest('.photo-wrapper, .photo-container');
+  if (!container) return;
+  
+  // 既にお気に入りボタンがあればスキップ
+  if (container.querySelector('.favorite-btn')) return;
+  
+  const btn = document.createElement('button');
+  btn.className = 'favorite-btn';
+  btn.innerHTML = '☆';
+  
+  // 既にお気に入りならアクティブ表示
+  const favorites = favoriteManager.getFavorites();
+  const isFavorite = favorites.some(f => f.img === imgElement.src);
+  if (isFavorite) {
+    btn.classList.add('active');
+    btn.innerHTML = '⭐';
+  }
+  
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    
+    const title = document.querySelector('.step-title')?.textContent || '写真';
+    const added = favoriteManager.toggleFavorite(imgElement.src, title);
+    
+    this.classList.toggle('active', added);
+    this.innerHTML = added ? '⭐' : '☆';
+    
+    // 視覚的フィードバック
+    this.style.animation = 'none';
+    setTimeout(() => {
+      this.style.animation = 'pulse 0.3s';
+    }, 10);
+  });
+  
+  container.appendChild(btn);
+}
+
+function showFavorites() {
+  const panel = document.getElementById('favoritesPanel');
+  const grid = document.getElementById('favoritesGrid');
+  const favorites = favoriteManager.getFavorites();
+  
+  if (favorites.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-message">
+        <p style="font-size:1.2rem;margin-bottom:10px;">📸</p>
+        <p>保存した写真はまだありません</p>
+        <p style="font-size:0.9rem;color:#aaa;margin-top:10px;">気になる写真の⭐ボタンを押して保存</p>
+      </div>
+    `;
+  } else {
+    grid.innerHTML = favorites.map(f => `
+      <div class="favorite-item">
+        <img src="${f.img}" alt="${f.title}" 
+             onclick="openFavoritePhoto('${f.img}')">
+        <small>${f.title.split(' ')[0]}</small>
+      </div>
+    `).join('');
+  }
+  
+  panel.classList.add('show');
+}
+
+function openFavoritePhoto(imgSrc) {
+  // 既存の拡大機能を再利用
+  if (typeof openOverlay === 'function') {
+    openOverlay({ target: { src: imgSrc } });
+  }
+}
+
+function hideFavorites() {
+  document.getElementById('favoritesPanel').classList.remove('show');
+}
 
 // ============================================================================
-//     オーバーレイ表示関数
-//     ----------------------------------------------------------------------------
-//     機能: 写真を全画面で拡大表示
-//     処理:
-//       1. オーバーレイ要素を作成・追加
-//       2. 画像のピンチズーム・ドラッグ機能を設定
-//       3. スマホ縦向きの場合、90度回転して表示
+//     オーバーレイ拡大機能
 // ============================================================================
 function openOverlay(e) {
-  // オーバーレイ要素の作成
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   
@@ -509,7 +891,7 @@ function openOverlay(e) {
   closeBtn.textContent = '×';
   closeBtn.addEventListener('click', () => closeOverlay(overlay));
   
-  // 要素の追加
+  // 要素の追加（要件通りの順序）
   contentDiv.appendChild(img);
   overlay.appendChild(contentDiv);
   overlay.appendChild(closeBtn);
@@ -530,26 +912,15 @@ function openOverlay(e) {
   const isMobile = window.innerHeight > window.innerWidth;
   updateOverlayTransform(img, isMobile);
   
-  // ==========================================================================
-  //     ポインターイベント設定
-  //     ----------------------------------------------------------------------
-  //     要件通り: pointerイベントの伝播を遮断
-  //     処理内容: 
-  //       - 1本指: ドラッグ移動 (scale > 1.01 の場合のみ)
-  //       - 2本指: ピンチズーム (最大5倍まで)
-  // ==========================================================================
-  
-  // ポインター開始
+  // ポインターイベント設定（要件通り）
   img.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
     
     if (Object.keys(pointers).length === 1) {
-      // 1本指: ドラッグ開始位置を記録
       startX = e.clientX - posX;
       startY = e.clientY - posY;
     } else if (Object.keys(pointers).length === 2) {
-      // 2本指: 初期距離を記録
       const ids = Object.keys(pointers);
       const p1 = pointers[ids[0]];
       const p2 = pointers[ids[1]];
@@ -558,7 +929,6 @@ function openOverlay(e) {
     }
   });
   
-  // ポインター移動
   img.addEventListener('pointermove', (e) => {
     e.stopPropagation();
     if (!pointers[e.pointerId]) return;
@@ -567,18 +937,16 @@ function openOverlay(e) {
     const ids = Object.keys(pointers);
     
     if (ids.length === 2) {
-      // 2本指ピンチズーム
       const p1 = pointers[ids[0]];
       const p2 = pointers[ids[1]];
       const currentDistance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       
       if (initialDistance > 0) {
-        // 拡大率計算 (1〜5倍に制限)
         scale = Math.min(5, Math.max(1, lastScale * (currentDistance / initialDistance)));
         updateOverlayTransform(img, isMobile);
       }
     } else if (ids.length === 1) {
-      // 1本指ドラッグ (要件通り: scale <= 1.01 の場合は無効)
+      // 要件通り: scale <= 1.01 の場合は無効
       if (scale <= 1.01) return;
       posX = e.clientX - startX;
       posY = e.clientY - startY;
@@ -586,13 +954,11 @@ function openOverlay(e) {
     }
   });
   
-  // ポインター終了
   const handlePointerUp = (e) => {
     e.stopPropagation();
     delete pointers[e.pointerId];
     
     if (Object.keys(pointers).length === 1) {
-      // 2本指→1本指になった場合、残りの指を基準に設定
       const remainingId = Object.keys(pointers)[0];
       startX = pointers[remainingId].x - posX;
       startY = pointers[remainingId].y - posY;
@@ -606,7 +972,7 @@ function openOverlay(e) {
   img.addEventListener('pointerup', handlePointerUp);
   img.addEventListener('pointercancel', handlePointerUp);
   
-  // 背景タップで閉じる (要件通り: overlayのみ)
+  // 背景タップで閉じる（要件通り: overlayのみ）
   overlay.addEventListener('pointerdown', (e) => {
     if (e.target === overlay) {
       closeOverlay(overlay);
@@ -620,14 +986,6 @@ function openOverlay(e) {
   img.addEventListener('pointercancel', e => e.stopPropagation());
 }
 
-// ============================================================================
-//     オーバーレイ画像変形関数
-//     ----------------------------------------------------------------------------
-//     機能: 画像の位置・拡大率・回転を更新
-//     要件: transform順序を厳守
-//         スマホ: translate → scale → rotate(90deg)
-//         PC:     translate → scale
-// ============================================================================
 function updateOverlayTransform(imgElement, isMobile) {
   if (isMobile) {
     imgElement.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
@@ -636,15 +994,6 @@ function updateOverlayTransform(imgElement, isMobile) {
   }
 }
 
-// ============================================================================
-//     オーバーレイ閉じる関数
-//     ----------------------------------------------------------------------------
-//     機能: オーバーレイを閉じて状態をリセット
-//     処理: 
-//       1. オーバーレイを非表示
-//       2. 変数を初期値にリセット
-//       3. スクロールを有効化
-// ============================================================================
 function closeOverlay(overlay) {
   overlay.classList.remove('active');
   setTimeout(() => {
@@ -660,13 +1009,11 @@ function closeOverlay(overlay) {
 
 // ============================================================================
 //     初期化処理
-//     ----------------------------------------------------------------------------
-//     機能: アプリケーションの初期表示を設定
-//     実行: ページ読み込み時に自動実行
 // ============================================================================
 function initializeApp() {
   renderNavigation();
   renderContent();
+  initFavorites();
 }
 
 // ページ読み込み完了時に初期化
@@ -679,6 +1026,25 @@ window.addEventListener('resize', () => {
     const isMobile = window.innerHeight > window.innerWidth;
     updateOverlayTransform(img, isMobile);
   }
+});
+
+// 新しい写真が表示されたらお気に入りボタンを追加
+const observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    mutation.addedNodes.forEach(function(node) {
+      if (node.nodeType === 1 && node.querySelector) {
+        const images = node.querySelectorAll('.step-image');
+        images.forEach(img => addFavoriteButtonToPhoto(img));
+      }
+    });
+  });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
+// ページ離脱時にお気に入りを保存
+window.addEventListener('beforeunload', function() {
+  favoriteManager.updateCount();
 });
 </script>
 </body>
