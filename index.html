@@ -6,38 +6,67 @@
 <title>👀みてつくるシート🚗</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px;overflow-x:hidden}
+body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px}
+
+/* ヘッダーのレイアウト修正 */
 .header{background:#4CAF50;color:#fff;text-align:center;padding:1rem;position:sticky;top:0;z-index:100}
-.header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
-.header-text{flex:1;min-width:200px}
-.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;position:relative}
-.header-album-btn{background:#FF9800;color:#fff;border:none;border-radius:1rem;padding:.5rem 1rem;font-size:1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;box-shadow:0 2px 5px rgba(0,0,0,.2);transition:all .2s;white-space:nowrap;margin-left:1rem}
-.header-album-btn:hover{transform:scale(1.05)}
+.header-title-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 0.5rem;
+}
+h1{font-size: 1.4rem; margin-bottom: 0;} /* ボタンと並ぶため余白調整 */
+
 .nav-container{background:#fff;padding:.5rem;overflow-x:auto;border-bottom:2px solid #ddd}
 .nav-scroll{display:flex;gap:.5rem;padding-bottom:.5rem;min-width:max-content}
 .nav-btn{flex:0 0 auto;padding:1rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;font-weight:bold;min-width:100px}
 .nav-btn.active{background:#FF9800}
+
 .content{padding:1rem}
 .card{background:#fff;border-radius:1rem;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 5px rgba(0,0,0,.1)}
 .step-title{font-size:1.3rem;color:#1565C0;margin-bottom:1rem;border-bottom:2px solid #BBDEFB;padding-bottom:.5rem}
+
 .photo-container{position:relative;margin:1rem 0;border-radius:.5rem;overflow:hidden;background:#eee;min-height:200px;display:flex;align-items:center;justify-content:center}
-.photo-container.multi{display:flex;flex-direction:column;gap:1rem}
-.photo-container.multi .photo-wrapper{width:100% !important;min-height:200px}
+.photo-container.multi{display:flex;gap:.5rem;overflow-x:auto}
 .photo-wrapper{position:relative;flex:0 0 auto;width:calc(50% - .25rem);min-width:150px;background:#fff;border-radius:.5rem;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .photo-wrapper.gif{border:2px dashed #FF9800}
 .gif-badge{position:absolute;top:.5rem;left:.5rem;background:#FF9800;color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-size:.7rem;font-weight:bold;z-index:2}
 .step-img{width:100%;display:block;cursor:pointer}
 .tap-label{position:absolute;bottom:.5rem;right:.5rem;background:rgba(0,0,0,.7);color:#fff;padding:.5rem;border-radius:.5rem;font-size:.8rem;z-index:2}
+
 .ok-box{background:#E8F5E9;padding:1rem;margin:1rem 0;border-radius:.5rem;font-weight:bold;color:#2E7D32}
 .note-box{background:#FFF3E0;padding:1rem;margin:1rem 0;border-radius:.5rem;color:#E65100}
 .card.danger .note-box{background:#FFEBEE;border-left:4px solid #F44336}
 .card.final .ok-box{background:#E3F2FD;border-left:4px solid #2196F3}
+
 .favorite-btn{position:absolute;top:.5rem;right:.5rem;width:35px;height:35px;background:rgba(255,255,255,.9);border:none;border-radius:50%;font-size:1.2rem;cursor:pointer;z-index:3}
 .favorite-btn.active{background:#FFD700}
+
 .overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:1000;display:none;align-items:center;justify-content:center;touch-action:none}
 .overlay.active{display:flex}
-.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center;transition:transform 0.1s}
+.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center}
 .close-btn{position:fixed;top:1rem;right:1rem;width:45px;height:45px;background:#fff;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
+
+/* 📚ボタンをヘッダー用にカスタマイズ */
+.reference-btn{
+    position: static; /* 固定配置を解除 */
+    width: 44px;
+    height: 44px;
+    background: #fff;
+    color: #4CAF50;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
 .reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
 .reference-overlay.active{display:flex}
 .reference-header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #ddd}
@@ -47,384 +76,300 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 .reference-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
 .reference-item img{width:100%;height:100px;object-fit:cover;border-radius:.5rem;cursor:pointer}
 .reference-item .title{font-size:.8rem;margin-top:.25rem;text-align:center}
+
 .favorites-bar{position:fixed;bottom:0;left:0;right:0;background:#FFD700;z-index:99;padding:.5rem;transform:translateY(0);transition:transform .3s}
 .favorites-bar.hidden{transform:translateY(100%)}
 .show-favorites{background:#fff;border:none;border-radius:1rem;padding:.5rem 1rem;font-weight:bold;display:flex;align-items:center;gap:.5rem;margin:0 auto}
+
 .first-visit{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:3000;display:flex;align-items:center;justify-content:center}
 .first-visit-content{background:#fff;padding:1.5rem;border-radius:1rem;max-width:90%;text-align:center}
 .first-visit h3{margin-bottom:1rem;color:#333}
 .first-visit p{margin-bottom:1rem;color:#666}
 .first-visit-btn{background:#4CAF50;color:#fff;border:none;border-radius:.5rem;padding:.75rem 1.5rem;font-size:1rem;cursor:pointer}
+
 @media(min-width:768px){
-.nav-scroll{flex-wrap:wrap;justify-content:center}
-.nav-btn{flex:1;min-width:auto}
-.photo-container.multi{flex-direction:row;justify-content:center}
-.photo-container.multi .photo-wrapper{width:calc(50% - .5rem) !important}
-.reference-grid{grid-template-columns:repeat(4,1fr)}
-}
-@media(max-width:480px){
-.header h1{flex-direction:column;align-items:center;gap:1rem}
-.header-album-btn{margin-left:0;margin-top:.5rem}
-.photo-container.multi .photo-wrapper{min-height:150px}
-}
-@media(orientation: landscape){
-.overlay-img{max-width:90vh;max-height:90vw}
+    .nav-scroll{flex-wrap:wrap;justify-content:center}
+    .nav-btn{flex:1;min-width:auto}
+    .photo-container.multi{justify-content:center}
+    .reference-grid{grid-template-columns:repeat(4,1fr)}
 }
 </style>
 </head>
 <body>
+
 <div class="header">
-  <div class="header-content">
-    <div class="header-text">
-      <h1>👀みてつくるシート🚗
-        <button class="header-album-btn" id="headerReferenceBtn">📚 参考アルバム</button>
-      </h1>
-      <p>リモコンカーの作り方を写真で確認</p>
+    <div class="header-title-wrap">
+        <h1>👀みてつくるシート🚗</h1>
+        <button class="reference-btn" id="referenceBtn">📚</button>
     </div>
-  </div>
+    <p>リモコンカーの作り方を写真で確認</p>
 </div>
+
 <div class="nav-container">
-<div class="nav-scroll" id="nav"></div>
+    <div class="nav-scroll" id="nav"></div>
 </div>
+
 <main class="content" id="content"></main>
+
 <div class="favorites-bar hidden" id="favoritesBar">
-<button class="show-favorites" id="showFavorites">
-<span>⭐</span>
-<span>保存した写真を見る</span>
-</button>
+    <button class="show-favorites" id="showFavorites">
+        <span>⭐</span>
+        <span>保存した写真を見る</span>
+    </button>
 </div>
+
 <div class="reference-overlay" id="referenceOverlay">
-<div class="reference-header">
-<h3>📚 参考アルバム</h3>
-<button class="close-btn" id="closeReference">×</button>
+    <div class="reference-header">
+        <h3>📚 参考アルバム</h3>
+        <button class="close-btn" id="closeReference">×</button>
+    </div>
+    <div class="reference-content" id="referenceContent"></div>
 </div>
-<div class="reference-content" id="referenceContent"></div>
-</div>
+
 <div class="first-visit" id="firstVisit">
-<div class="first-visit-content">
-<h3>👋 使い方のヒント</h3>
-<p>1. 上のボタンで工程を選びます</p>
-<p>2. 写真をタップすると大きく見られます</p>
-<p>3. ⭐ボタンで気になる写真を保存できます</p>
-<p>4. 📚ボタンで参考写真を見られます</p>
-<button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
+    <div class="first-visit-content">
+        <h3>👋 使い方のヒント</h3>
+        <p>1. 上のボタンで工程を選びます</p>
+        <p>2. 写真をタップすると大きく見られます</p>
+        <p>3. ⭐ボタンで気になる写真を保存できます</p>
+        <p>4. 右上の📚ボタンで参考写真を見られます</p>
+        <button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
+    </div>
 </div>
-</div>
+
 <script>
 const steps=[
-{nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
-{nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
-{nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
-{nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
-{nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:["images/car_complete.jpg","images/3ami.gif"],ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
-{nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
+    {nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
+    {nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
+    {nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
+    {nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
+    {nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:["images/car_complete.jpg","images/3ami.gif"],ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
+    {nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
 ];
 
 const referenceAlbum={
-"電池関連":[
-{img:"reference/battery_types.jpg",title:"電池の種類",desc:"単1〜単4の違い"},
-{img:"reference/battery_safety.jpg",title:"安全な扱い方",desc:"熱・ショート防止"}
-],
-"モーター関連":[
-{img:"reference/motor_check.jpg",title:"モーター検査",desc:"回転チェックのコツ"},
-{img:"reference/motor_trouble.jpg",title:"よくある不具合",desc:"回らない時の確認点"}
-],
-"完成例":[
-{img:"reference/advanced_car.jpg",title:"応用例",desc:"改造アイデア"},
-{img:"reference/3ami.gif",title:"三つ編み接続",desc:"コード整理の動画"}
-]
+    "電池関連":[
+        {img:"reference/battery_types.jpg",title:"電池の種類",desc:"単1〜単4の違い"},
+        {img:"reference/battery_safety.jpg",title:"安全な扱い方",desc:"熱・ショート防止"}
+    ],
+    "モーター関連":[
+        {img:"reference/motor_check.jpg",title:"モーター検査",desc:"回転チェックのコツ"},
+        {img:"reference/motor_trouble.jpg",title:"よくある不具合",desc:"回らない時の確認点"}
+    ],
+    "完成例":[
+        {img:"reference/advanced_car.jpg",title:"応用例",desc:"改造アイデア"},
+        {img:"reference/3ami.gif",title:"三つ編み接続",desc:"コード整理の動画"}
+    ]
 };
 
 let currentStep=0;
 const nav=document.getElementById('nav');
 const content=document.getElementById('content');
 const favoritesBar=document.getElementById('favoritesBar');
+let scale=1,posX=0,posY=0,pointers={};
 
 if(!localStorage.getItem('firstVisitShown')){
-document.getElementById('firstVisit').style.display='flex';
+    document.getElementById('firstVisit').style.display='flex';
 }
 document.getElementById('closeFirstVisit').onclick=()=>{
-document.getElementById('firstVisit').style.display='none';
-localStorage.setItem('firstVisitShown','true');
+    document.getElementById('firstVisit').style.display='none';
+    localStorage.setItem('firstVisitShown','true');
 };
 
 steps.forEach((s,i)=>{
-const b=document.createElement('button');
-b.className='nav-btn';
-b.textContent=s.nav;
-b.onclick=()=>showStep(i);
-nav.appendChild(b);
+    const b=document.createElement('button');
+    b.className='nav-btn';
+    b.textContent=s.nav;
+    b.onclick=()=>showStep(i);
+    nav.appendChild(b);
 });
 
 function showStep(i){
-currentStep=i;
-[...nav.children].forEach((b,idx)=>b.classList.toggle('active',idx===i));
-const s=steps[i];
-let photoHTML='';
-if(Array.isArray(s.img)){
-photoHTML=`<div class="photo-container multi">${s.img.map((img,idx)=>`
-<div class="photo-wrapper ${img.endsWith('.gif')?'gif':''}">
-${img.endsWith('.gif')?'<div class="gif-badge">動画</div>':''}
-<img src="${img}" class="step-img">
-<div class="tap-label">タップで拡大</div>
-</div>`).join('')}</div>`;
-}else{
-photoHTML=`<div class="photo-container"><img src="${img}" class="step-img"><div class="tap-label">タップで拡大</div></div>`;
-}
-let cardClass='card';
-if(s.danger) cardClass+=' danger';
-if(s.final) cardClass+=' final';
-content.innerHTML=`
-<div class="${cardClass}">
-<div class="step-title">${s.title}</div>
-${photoHTML}
-<div class="ok-box">${s.ok}</div>
-<div class="note-box">${s.note}</div>
-</div>`;
-document.querySelectorAll('.step-img').forEach(img=>{
-img.onclick=()=>openOverlay(img.src);
-const btn=document.createElement('button');
-btn.className='favorite-btn';
-btn.innerHTML='☆';
-if(isFavorite(img.src)) btn.classList.add('active');
-btn.onclick=e=>{
-e.stopPropagation();
-toggleFavorite(img.src,getPhotoTitle(img));
-btn.classList.toggle('active');
-btn.innerHTML=btn.classList.contains('active')?'⭐':'☆';
-updateFavoritesBar();
-};
-img.parentElement.appendChild(btn);
-});
-updateFavoritesBar();
+    currentStep=i;
+    [...nav.children].forEach((b,idx)=>b.classList.toggle('active',idx===i));
+    const s=steps[i];
+    let photoHTML='';
+    if(Array.isArray(s.img)){
+        photoHTML=`<div class="photo-container multi">${s.img.map((img,idx)=>`
+        <div class="photo-wrapper ${img.endsWith('.gif')?'gif':''}">
+        ${img.endsWith('.gif')?'<div class="gif-badge">動画</div>':''}
+        <img src="${img}" class="step-img">
+        <div class="tap-label">タップで拡大</div>
+        </div>`).join('')}</div>`;
+    }else{
+        photoHTML=`<div class="photo-container"><img src="${s.img}" class="step-img"><div class="tap-label">タップで拡大</div></div>`;
+    }
+    let cardClass='card';
+    if(s.danger) cardClass+=' danger';
+    if(s.final) cardClass+=' final';
+    content.innerHTML=`
+    <div class="${cardClass}">
+    <div class="step-title">${s.title}</div>
+    ${photoHTML}
+    <div class="ok-box">${s.ok}</div>
+    <div class="note-box">${s.note}</div>
+    </div>`;
+    document.querySelectorAll('.step-img').forEach(img=>{
+        img.onclick=()=>openOverlay(img.src);
+        const btn=document.createElement('button');
+        btn.className='favorite-btn';
+        btn.innerHTML='☆';
+        if(isFavorite(img.src)) btn.classList.add('active');
+        btn.onclick=e=>{
+            e.stopPropagation();
+            toggleFavorite(img.src,getPhotoTitle(img));
+            btn.classList.toggle('active');
+            btn.innerHTML=btn.classList.contains('active')?'⭐':'☆';
+            updateFavoritesBar();
+        };
+        img.parentElement.appendChild(btn);
+    });
+    updateFavoritesBar();
 }
 
 function getPhotoTitle(img){
-const stepTitle=document.querySelector('.step-title').textContent;
-const isGif=img.src.endsWith('.gif');
-const stepNames=['電池BOX','電線接続','スイッチ','モーター','見た目完成','完成'];
-const stepName=stepNames[currentStep]||`工程${currentStep+1}`;
-if(img.src.includes('3ami.gif')) return '三つ編み接続（動画）';
-if(img.closest('.multi-photo-container')){
-return isGif?`${stepName}・動画`:`${stepName}・写真`;
-}
-return stepName;
+    const stepTitle=document.querySelector('.step-title').textContent;
+    const isGif=img.src.endsWith('.gif');
+    const stepNames=['電池BOX','電線接続','スイッチ','モーター','見た目完成','完成'];
+    const stepName=stepNames[currentStep]||`工程${currentStep+1}`;
+    if(img.src.includes('3ami.gif')) return '三つ編み接続（動画）';
+    return stepName;
 }
 
 function toggleFavorite(img,title){
-let favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
-const index=favorites.findIndex(f=>f.img===img);
-if(index===-1){
-favorites.push({img,title,date:new Date().toISOString()});
-}else{
-favorites.splice(index,1);
-}
-localStorage.setItem('favorites',JSON.stringify(favorites));
-return index===-1;
+    let favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+    const index=favorites.findIndex(f=>f.img===img);
+    if(index===-1){
+        favorites.push({img,title,date:new Date().toISOString()});
+    }else{
+        favorites.splice(index,1);
+    }
+    localStorage.setItem('favorites',JSON.stringify(favorites));
+    return index===-1;
 }
 
 function isFavorite(img){
-const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
-return favorites.some(f=>f.img===img);
+    const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+    return favorites.some(f=>f.img===img);
 }
 
 function updateFavoritesBar(){
-const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
-if(favorites.length>0){
-favoritesBar.classList.remove('hidden');
-}else{
-favoritesBar.classList.add('hidden');
-}
+    const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+    if(favorites.length>0){
+        favoritesBar.classList.remove('hidden');
+    }else{
+        favoritesBar.classList.add('hidden');
+    }
 }
 
 let lastScroll=0;
 window.addEventListener('scroll',()=>{
-const currentScroll=window.pageYOffset;
-if(currentScroll>lastScroll&&currentScroll>100){
-favoritesBar.classList.add('hidden');
-}else if(currentScroll<lastScroll){
-favoritesBar.classList.remove('hidden');
-}
-lastScroll=currentScroll;
+    const currentScroll=window.pageYOffset;
+    if(currentScroll>lastScroll&&currentScroll>100){
+        favoritesBar.classList.add('hidden');
+    }else if(currentScroll<lastScroll){
+        favoritesBar.classList.remove('hidden');
+    }
+    lastScroll=currentScroll;
 });
 
 document.getElementById('showFavorites').onclick=()=>{
-const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
-if(favorites.length===0) return;
-const overlay=document.createElement('div');
-overlay.className='overlay active';
-overlay.innerHTML=`
-<div style="background:#fff;border-radius:1rem;padding:1.5rem;max-width:90%;max-height:80%;overflow-y:auto">
-<h3 style="margin-bottom:1rem">⭐ 保存した写真</h3>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
-${favorites.map(f=>`
-<div style="text-align:center">
-<img src="${f.img}" style="width:100%;height:100px;object-fit:cover;border-radius:.5rem;cursor:pointer" onclick="openOverlay('${f.img}')">
-<div style="font-size:.8rem;margin-top:.25rem">${f.title}</div>
-</div>`).join('')}
-</div>
-<button onclick="this.closest('.overlay').remove()" style="margin-top:1rem;background:#ccc;border:none;border-radius:.5rem;padding:.5rem 1rem">閉じる</button>
-</div>`;
-document.body.appendChild(overlay);
+    const favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+    if(favorites.length===0) return;
+    const overlay=document.createElement('div');
+    overlay.className='overlay active';
+    overlay.innerHTML=`
+    <div style="background:#fff;border-radius:1rem;padding:1.5rem;max-width:90%;max-height:80%;overflow-y:auto">
+    <h3 style="margin-bottom:1rem">⭐ 保存した写真</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+    ${favorites.map(f=>`
+    <div style="text-align:center">
+    <img src="${f.img}" style="width:100%;height:100px;object-fit:cover;border-radius:.5rem;cursor:pointer" onclick="openOverlay('${f.img}')">
+    <div style="font-size:.8rem;margin-top:.25rem">${f.title}</div>
+    </div>`).join('')}
+    </div>
+    <button onclick="this.closest('.overlay').remove()" style="margin-top:1rem;background:#ccc;border:none;border-radius:.5rem;padding:.5rem 1rem">閉じる</button>
+    </div>`;
+    document.body.appendChild(overlay);
 };
 
 function openOverlay(src){
-const overlay=document.createElement('div');
-overlay.className='overlay active';
-const img=document.createElement('img');
-img.className='overlay-img';
-img.src=src;
-const close=document.createElement('button');
-close.className='close-btn';
-close.textContent='×';
-close.onclick=()=>{
-overlay.remove();
-document.body.style.overflow='auto';
+    const overlay=document.createElement('div');
+    overlay.className='overlay active';
+    const img=document.createElement('img');
+    img.className='overlay-img';
+    img.src=src;
+    const close=document.createElement('button');
+    close.className='close-btn';
+    close.textContent='×';
+    close.onclick=()=>overlay.remove();
+    overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+    overlay.appendChild(img);
+    overlay.appendChild(close);
+    document.body.appendChild(overlay);
+    document.body.style.overflow='hidden';
+    
+    // 以下、ズーム・移動ロジック
+    const update=()=>{img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;}
+    let startX,startY,initialDistance;
+    img.onpointerdown=e=>{
+        e.stopPropagation();
+        pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+        const ids=Object.keys(pointers);
+        if(ids.length===1){
+            startX=e.clientX-posX;
+            startY=e.clientY-posY;
+        }else if(ids.length===2){
+            const p1=pointers[ids[0]],p2=pointers[ids[1]];
+            initialDistance=Math.hypot(p2.x-p1.x,p2.y-p1.y);
+        }
+    };
+    img.onpointermove=e=>{
+        e.stopPropagation();
+        if(!pointers[e.pointerId])return;
+        pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+        const ids=Object.keys(pointers);
+        if(ids.length===2){
+            const p1=pointers[ids[0]],p2=pointers[ids[1]];
+            const dist=Math.hypot(p2.x-p1.x,p2.y-p1.y);
+            if(initialDistance&&dist>0){
+                scale=Math.min(5,Math.max(1,scale*dist/initialDistance));
+                update();
+            }
+            initialDistance=dist;
+        }else if(ids.length===1){
+            if(scale<=1.01)return;
+            posX=e.clientX-startX;
+            posY=e.clientY-startY;
+            update();
+        }
+    };
+    const up=e=>{
+        delete pointers[e.pointerId];
+        if(Object.keys(pointers).length<2)initialDistance=0;
+    };
+    img.onpointerup=up;
+    img.onpointercancel=up;
+}
+
+document.getElementById('referenceBtn').onclick=()=>{
+    document.getElementById('referenceOverlay').classList.add('active');
+    const rContent=document.getElementById('referenceContent');
+    rContent.innerHTML=Object.entries(referenceAlbum).map(([category,items])=>`
+    <div class="reference-category">
+    <h4>${category}</h4>
+    <div class="reference-grid">
+    ${items.map(item=>`
+    <div class="reference-item">
+    <img src="${item.img}" onclick="openOverlay('${item.img}')">
+    <div class="title">${item.title}</div>
+    </div>`).join('')}
+    </div>
+    </div>`).join('');
 };
-overlay.onclick=e=>{
-if(e.target===overlay){
-overlay.remove();
-document.body.style.overflow='auto';
-}
-};
-overlay.appendChild(img);
-overlay.appendChild(close);
-document.body.appendChild(overlay);
-document.body.style.overflow='hidden';
-
-// スマホ用の拡大・移動機能（状態を保持）
-let scale = 1;
-let posX = 0;
-let posY = 0;
-let isDragging = false;
-let startX, startY;
-let initialDistance = null;
-let lastScale = 1;
-
-function updateTransform() {
-img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-}
-
-// タッチイベント
-img.addEventListener('touchstart', (e) => {
-e.preventDefault();
-if (e.touches.length === 2) {
-// ピンチ操作
-const touch1 = e.touches[0];
-const touch2 = e.touches[1];
-initialDistance = Math.hypot(
-touch2.clientX - touch1.clientX,
-touch2.clientY - touch1.clientY
-);
-lastScale = scale;
-} else if (e.touches.length === 1) {
-// ドラッグ操作
-isDragging = true;
-startX = e.touches[0].clientX - posX;
-startY = e.touches[0].clientY - posY;
-}
-});
-
-img.addEventListener('touchmove', (e) => {
-e.preventDefault();
-if (e.touches.length === 2 && initialDistance !== null) {
-// ピンチ操作で拡大縮小
-const touch1 = e.touches[0];
-const touch2 = e.touches[1];
-const currentDistance = Math.hypot(
-touch2.clientX - touch1.clientX,
-touch2.clientY - touch1.clientY
-);
-if (initialDistance > 0) {
-scale = Math.max(1, Math.min(5, lastScale * (currentDistance / initialDistance)));
-updateTransform();
-}
-} else if (e.touches.length === 1 && isDragging && scale > 1) {
-// ドラッグ操作で移動（拡大時のみ）
-posX = e.touches[0].clientX - startX;
-posY = e.touches[0].clientY - startY;
-updateTransform();
-}
-});
-
-img.addEventListener('touchend', (e) => {
-e.preventDefault();
-if (e.touches.length < 2) {
-// ピンチ操作終了時、拡大状態を保持
-initialDistance = null;
-}
-if (e.touches.length === 0) {
-isDragging = false;
-}
-});
-
-// ダブルタップで拡大縮小切り替え
-let lastTap = 0;
-let doubleTapTimeout;
-img.addEventListener('touchend', (e) => {
-e.preventDefault();
-const currentTime = new Date().getTime();
-const tapLength = currentTime - lastTap;
-if (tapLength < 300 && tapLength > 0) {
-// ダブルタップで拡大縮小切り替え
-if (scale === 1) {
-scale = 2;
-posX = 0;
-posY = 0;
-} else {
-scale = 1;
-posX = 0;
-posY = 0;
-}
-updateTransform();
-clearTimeout(doubleTapTimeout);
-}
-lastTap = currentTime;
-});
-
-// 横画面対応
-function handleOrientation() {
-if (window.innerHeight < window.innerWidth) {
-// 横画面
-img.style.maxWidth = '90vh';
-img.style.maxHeight = '90vw';
-} else {
-// 縦画面
-img.style.maxWidth = '100%';
-img.style.maxHeight = '100%';
-}
-}
-
-handleOrientation();
-window.addEventListener('resize', handleOrientation);
-updateTransform();
-}
-
-// ヘッダーの📚ボタン機能
-document.getElementById('headerReferenceBtn').onclick=()=>{
-document.getElementById('referenceOverlay').classList.add('active');
-loadReferenceContent();
-};
-
 document.getElementById('closeReference').onclick=()=>{
-document.getElementById('referenceOverlay').classList.remove('active');
+    document.getElementById('referenceOverlay').classList.remove('active');
 };
-
-// 参考アルバムコンテンツ読み込み関数
-function loadReferenceContent(){
-const content=document.getElementById('referenceContent');
-content.innerHTML=Object.entries(referenceAlbum).map(([category,items])=>`
-<div class="reference-category">
-<h4>${category}</h4>
-<div class="reference-grid">
-${items.map(item=>`
-<div class="reference-item">
-<img src="${item.img}" onclick="openOverlay('${item.img}')">
-<div class="title">${item.title}</div>
-</div>`).join('')}
-</div>
-</div>`).join('');
-}
 
 showStep(0);
 </script>
