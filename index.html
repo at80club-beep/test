@@ -10,9 +10,9 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 .header{background:#4CAF50;color:#fff;text-align:center;padding:1rem;position:sticky;top:0;z-index:100}
 .header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
 .header-text{flex:1;min-width:200px}
-.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;position:relative;padding-right:50px}
-.header-album-btn{background:#fff;color:#4CAF50;border:none;border-radius:50%;width:40px;height:40px;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.2);position:absolute;right:0;top:50%;transform:translateY(-50%);transition:all .2s}
-.header-album-btn:hover{transform:translateY(-50%) scale(1.1)}
+.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;position:relative}
+.header-album-btn{background:#FF9800;color:#fff;border:none;border-radius:1rem;padding:.5rem 1rem;font-size:1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;box-shadow:0 2px 5px rgba(0,0,0,.2);transition:all .2s;white-space:nowrap;margin-left:1rem}
+.header-album-btn:hover{transform:scale(1.05)}
 .nav-container{background:#fff;padding:.5rem;overflow-x:auto;border-bottom:2px solid #ddd}
 .nav-scroll{display:flex;gap:.5rem;padding-bottom:.5rem;min-width:max-content}
 .nav-btn{flex:0 0 auto;padding:1rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;font-weight:bold;min-width:100px}
@@ -21,7 +21,8 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 .card{background:#fff;border-radius:1rem;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 5px rgba(0,0,0,.1)}
 .step-title{font-size:1.3rem;color:#1565C0;margin-bottom:1rem;border-bottom:2px solid #BBDEFB;padding-bottom:.5rem}
 .photo-container{position:relative;margin:1rem 0;border-radius:.5rem;overflow:hidden;background:#eee;min-height:200px;display:flex;align-items:center;justify-content:center}
-.photo-container.multi{display:flex;gap:.5rem;overflow-x:auto}
+.photo-container.multi{display:flex;flex-direction:column;gap:1rem}
+.photo-container.multi .photo-wrapper{width:100% !important;min-height:200px}
 .photo-wrapper{position:relative;flex:0 0 auto;width:calc(50% - .25rem);min-width:150px;background:#fff;border-radius:.5rem;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .photo-wrapper.gif{border:2px dashed #FF9800}
 .gif-badge{position:absolute;top:.5rem;left:.5rem;background:#FF9800;color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-size:.7rem;font-weight:bold;z-index:2}
@@ -35,7 +36,7 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 .favorite-btn.active{background:#FFD700}
 .overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:1000;display:none;align-items:center;justify-content:center;touch-action:none}
 .overlay.active{display:flex}
-.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center;transition:transform .1s}
+.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center;transition:transform 0.1s}
 .close-btn{position:fixed;top:1rem;right:1rem;width:45px;height:45px;background:#fff;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
 .reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
 .reference-overlay.active{display:flex}
@@ -57,13 +58,17 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 @media(min-width:768px){
 .nav-scroll{flex-wrap:wrap;justify-content:center}
 .nav-btn{flex:1;min-width:auto}
-.photo-container.multi{justify-content:center}
+.photo-container.multi{flex-direction:row;justify-content:center}
+.photo-container.multi .photo-wrapper{width:calc(50% - .5rem) !important}
 .reference-grid{grid-template-columns:repeat(4,1fr)}
 }
 @media(max-width:480px){
-.header-content{flex-direction:column;text-align:center}
-.header h1{font-size:1.3rem;padding-right:40px}
-.header-album-btn{width:35px;height:35px;font-size:1.1rem}
+.header h1{flex-direction:column;align-items:center;gap:1rem}
+.header-album-btn{margin-left:0;margin-top:.5rem}
+.photo-container.multi .photo-wrapper{min-height:150px}
+}
+@media(orientation: landscape){
+.overlay-img{max-width:90vh;max-height:90vw}
 }
 </style>
 </head>
@@ -72,7 +77,7 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
   <div class="header-content">
     <div class="header-text">
       <h1>👀みてつくるシート🚗
-        <button class="header-album-btn" id="headerReferenceBtn" title="参考アルバム">📚</button>
+        <button class="header-album-btn" id="headerReferenceBtn">📚 参考アルバム</button>
       </h1>
       <p>リモコンカーの作り方を写真で確認</p>
     </div>
@@ -82,7 +87,6 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 <div class="nav-scroll" id="nav"></div>
 </div>
 <main class="content" id="content"></main>
-<!-- 下の📚ボタンは削除 -->
 <div class="favorites-bar hidden" id="favoritesBar">
 <button class="show-favorites" id="showFavorites">
 <span>⭐</span>
@@ -102,7 +106,7 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 <p>1. 上のボタンで工程を選びます</p>
 <p>2. 写真をタップすると大きく見られます</p>
 <p>3. ⭐ボタンで気になる写真を保存できます</p>
-<p>4. タイトルの📚ボタンで参考写真を見られます</p>
+<p>4. 📚ボタンで参考写真を見られます</p>
 <button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
 </div>
 </div>
@@ -165,7 +169,7 @@ ${img.endsWith('.gif')?'<div class="gif-badge">動画</div>':''}
 <div class="tap-label">タップで拡大</div>
 </div>`).join('')}</div>`;
 }else{
-photoHTML=`<div class="photo-container"><img src="${s.img}" class="step-img"><div class="tap-label">タップで拡大</div></div>`;
+photoHTML=`<div class="photo-container"><img src="${img}" class="step-img"><div class="tap-label">タップで拡大</div></div>`;
 }
 let cardClass='card';
 if(s.danger) cardClass+=' danger';
@@ -288,13 +292,14 @@ overlay.appendChild(close);
 document.body.appendChild(overlay);
 document.body.style.overflow='hidden';
 
-// スマホ用の拡大・移動機能
+// スマホ用の拡大・移動機能（状態を保持）
 let scale = 1;
 let posX = 0;
 let posY = 0;
 let isDragging = false;
 let startX, startY;
 let initialDistance = null;
+let lastScale = 1;
 
 function updateTransform() {
 img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
@@ -311,6 +316,7 @@ initialDistance = Math.hypot(
 touch2.clientX - touch1.clientX,
 touch2.clientY - touch1.clientY
 );
+lastScale = scale;
 } else if (e.touches.length === 1) {
 // ドラッグ操作
 isDragging = true;
@@ -329,11 +335,12 @@ const currentDistance = Math.hypot(
 touch2.clientX - touch1.clientX,
 touch2.clientY - touch1.clientY
 );
-scale = Math.max(1, Math.min(3, (currentDistance / initialDistance) * scale));
-initialDistance = currentDistance;
+if (initialDistance > 0) {
+scale = Math.max(1, Math.min(5, lastScale * (currentDistance / initialDistance)));
 updateTransform();
-} else if (e.touches.length === 1 && isDragging) {
-// ドラッグ操作で移動
+}
+} else if (e.touches.length === 1 && isDragging && scale > 1) {
+// ドラッグ操作で移動（拡大時のみ）
 posX = e.touches[0].clientX - startX;
 posY = e.touches[0].clientY - startY;
 updateTransform();
@@ -343,6 +350,7 @@ updateTransform();
 img.addEventListener('touchend', (e) => {
 e.preventDefault();
 if (e.touches.length < 2) {
+// ピンチ操作終了時、拡大状態を保持
 initialDistance = null;
 }
 if (e.touches.length === 0) {
@@ -350,22 +358,45 @@ isDragging = false;
 }
 });
 
-// ダブルタップでリセット
+// ダブルタップで拡大縮小切り替え
 let lastTap = 0;
+let doubleTapTimeout;
 img.addEventListener('touchend', (e) => {
 e.preventDefault();
 const currentTime = new Date().getTime();
 const tapLength = currentTime - lastTap;
 if (tapLength < 300 && tapLength > 0) {
-// ダブルタップでリセット
+// ダブルタップで拡大縮小切り替え
+if (scale === 1) {
+scale = 2;
+posX = 0;
+posY = 0;
+} else {
 scale = 1;
 posX = 0;
 posY = 0;
+}
 updateTransform();
+clearTimeout(doubleTapTimeout);
 }
 lastTap = currentTime;
 });
 
+// 横画面対応
+function handleOrientation() {
+if (window.innerHeight < window.innerWidth) {
+// 横画面
+img.style.maxWidth = '90vh';
+img.style.maxHeight = '90vw';
+} else {
+// 縦画面
+img.style.maxWidth = '100%';
+img.style.maxHeight = '100%';
+}
+}
+
+handleOrientation();
+window.addEventListener('resize', handleOrientation);
 updateTransform();
 }
 
