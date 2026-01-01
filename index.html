@@ -6,14 +6,13 @@
 <title>👀みてつくるシート🚗</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px}
+body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px;overflow-x:hidden}
 .header{background:#4CAF50;color:#fff;text-align:center;padding:1rem;position:sticky;top:0;z-index:100}
-.header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
 .header-text{flex:1;min-width:200px}
-.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
-.header-buttons{display:flex;gap:.5rem}
-.header-btn{background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-.header-btn:hover{background:rgba(255,255,255,.3)}
+.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;position:relative;padding-right:50px}
+.header-album-btn{background:#fff;color:#4CAF50;border:none;border-radius:50%;width:40px;height:40px;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.2);position:absolute;right:0;top:50%;transform:translateY(-50%);transition:all .2s}
+.header-album-btn:hover{transform:translateY(-50%) scale(1.1)}
 .nav-container{background:#fff;padding:.5rem;overflow-x:auto;border-bottom:2px solid #ddd}
 .nav-scroll{display:flex;gap:.5rem;padding-bottom:.5rem;min-width:max-content}
 .nav-btn{flex:0 0 auto;padding:1rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;font-weight:bold;min-width:100px}
@@ -36,9 +35,8 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 .favorite-btn.active{background:#FFD700}
 .overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:1000;display:none;align-items:center;justify-content:center;touch-action:none}
 .overlay.active{display:flex}
-.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center}
+.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center;transition:transform .1s}
 .close-btn{position:fixed;top:1rem;right:1rem;width:45px;height:45px;background:#fff;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
-.reference-btn{position:fixed;bottom:1rem;left:1rem;width:50px;height:50px;background:#4CAF50;color:#fff;border:none;border-radius:50%;font-size:1.3rem;z-index:90;box-shadow:0 2px 5px rgba(0,0,0,.3)}
 .reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
 .reference-overlay.active{display:flex}
 .reference-header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #ddd}
@@ -64,8 +62,8 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 }
 @media(max-width:480px){
 .header-content{flex-direction:column;text-align:center}
-.header-buttons{justify-content:center}
-.header h1{flex-direction:column;gap:0}
+.header h1{font-size:1.3rem;padding-right:40px}
+.header-album-btn{width:35px;height:35px;font-size:1.1rem}
 }
 </style>
 </head>
@@ -73,7 +71,9 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 <div class="header">
   <div class="header-content">
     <div class="header-text">
-      <h1>👀みてつくるシート🚗 <button class="header-btn" id="headerReferenceBtn" title="参考アルバム">📚</button></h1>
+      <h1>👀みてつくるシート🚗
+        <button class="header-album-btn" id="headerReferenceBtn" title="参考アルバム">📚</button>
+      </h1>
       <p>リモコンカーの作り方を写真で確認</p>
     </div>
   </div>
@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 <div class="nav-scroll" id="nav"></div>
 </div>
 <main class="content" id="content"></main>
-<button class="reference-btn" id="referenceBtn" title="参考アルバム">📚</button>
+<!-- 下の📚ボタンは削除 -->
 <div class="favorites-bar hidden" id="favoritesBar">
 <button class="show-favorites" id="showFavorites">
 <span>⭐</span>
@@ -102,7 +102,7 @@ body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin
 <p>1. 上のボタンで工程を選びます</p>
 <p>2. 写真をタップすると大きく見られます</p>
 <p>3. ⭐ボタンで気になる写真を保存できます</p>
-<p>4. 📚ボタンで参考写真を見られます（画面上下にあります）</p>
+<p>4. タイトルの📚ボタンで参考写真を見られます</p>
 <button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
 </div>
 </div>
@@ -135,7 +135,6 @@ let currentStep=0;
 const nav=document.getElementById('nav');
 const content=document.getElementById('content');
 const favoritesBar=document.getElementById('favoritesBar');
-let scale=1,posX=0,posY=0,pointers={};
 
 if(!localStorage.getItem('firstVisitShown')){
 document.getElementById('firstVisit').style.display='flex';
@@ -274,66 +273,101 @@ img.src=src;
 const close=document.createElement('button');
 close.className='close-btn';
 close.textContent='×';
-close.onclick=()=>overlay.remove();
-overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+close.onclick=()=>{
+overlay.remove();
+document.body.style.overflow='auto';
+};
+overlay.onclick=e=>{
+if(e.target===overlay){
+overlay.remove();
+document.body.style.overflow='auto';
+}
+};
 overlay.appendChild(img);
 overlay.appendChild(close);
 document.body.appendChild(overlay);
 document.body.style.overflow='hidden';
-const isMobile=window.innerHeight>window.innerWidth;
-function update(){img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})${isMobile?' rotate(90deg)':''}`;}
-let startX,startY,initialDistance;
-img.onpointerdown=e=>{
-e.stopPropagation();
-pointers[e.pointerId]={x:e.clientX,y:e.clientY};
-const ids=Object.keys(pointers);
-if(ids.length===1){
-startX=e.clientX-posX;
-startY=e.clientY-posY;
-}else if(ids.length===2){
-const p1=pointers[ids[0]],p2=pointers[ids[1]];
-initialDistance=Math.hypot(p2.x-p1.x,p2.y-p1.y);
-}
-};
-img.onpointermove=e=>{
-e.stopPropagation();
-if(!pointers[e.pointerId])return;
-pointers[e.pointerId]={x:e.clientX,y:e.clientY};
-const ids=Object.keys(pointers);
-if(ids.length===2){
-const p1=pointers[ids[0]],p2=pointers[ids[1]];
-const dist=Math.hypot(p2.x-p1.x,p2.y-p1.y);
-if(initialDistance&&dist>0){
-scale=Math.min(5,Math.max(1,scale*dist/initialDistance));
-update();
-}
-initialDistance=dist;
-}else if(ids.length===1){
-if(scale<=1.01)return;
-posX=e.clientX-startX;
-posY=e.clientY-startY;
-update();
-}
-};
-const up=e=>{
-e.stopPropagation();
-delete pointers[e.pointerId];
-if(Object.keys(pointers).length<2)initialDistance=0;
-};
-img.onpointerup=up;
-img.onpointercancel=up;
-img.onpointerdown=e=>e.stopPropagation();
-img.onpointermove=e=>e.stopPropagation();
-img.onpointerup=e=>e.stopPropagation();
-img.onpointercancel=e=>e.stopPropagation();
-update();
+
+// スマホ用の拡大・移動機能
+let scale = 1;
+let posX = 0;
+let posY = 0;
+let isDragging = false;
+let startX, startY;
+let initialDistance = null;
+
+function updateTransform() {
+img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 }
 
-// 元の📚ボタン機能
-document.getElementById('referenceBtn').onclick=()=>{
-document.getElementById('referenceOverlay').classList.add('active');
-loadReferenceContent();
-};
+// タッチイベント
+img.addEventListener('touchstart', (e) => {
+e.preventDefault();
+if (e.touches.length === 2) {
+// ピンチ操作
+const touch1 = e.touches[0];
+const touch2 = e.touches[1];
+initialDistance = Math.hypot(
+touch2.clientX - touch1.clientX,
+touch2.clientY - touch1.clientY
+);
+} else if (e.touches.length === 1) {
+// ドラッグ操作
+isDragging = true;
+startX = e.touches[0].clientX - posX;
+startY = e.touches[0].clientY - posY;
+}
+});
+
+img.addEventListener('touchmove', (e) => {
+e.preventDefault();
+if (e.touches.length === 2 && initialDistance !== null) {
+// ピンチ操作で拡大縮小
+const touch1 = e.touches[0];
+const touch2 = e.touches[1];
+const currentDistance = Math.hypot(
+touch2.clientX - touch1.clientX,
+touch2.clientY - touch1.clientY
+);
+scale = Math.max(1, Math.min(3, (currentDistance / initialDistance) * scale));
+initialDistance = currentDistance;
+updateTransform();
+} else if (e.touches.length === 1 && isDragging) {
+// ドラッグ操作で移動
+posX = e.touches[0].clientX - startX;
+posY = e.touches[0].clientY - startY;
+updateTransform();
+}
+});
+
+img.addEventListener('touchend', (e) => {
+e.preventDefault();
+if (e.touches.length < 2) {
+initialDistance = null;
+}
+if (e.touches.length === 0) {
+isDragging = false;
+}
+});
+
+// ダブルタップでリセット
+let lastTap = 0;
+img.addEventListener('touchend', (e) => {
+e.preventDefault();
+const currentTime = new Date().getTime();
+const tapLength = currentTime - lastTap;
+if (tapLength < 300 && tapLength > 0) {
+// ダブルタップでリセット
+scale = 1;
+posX = 0;
+posY = 0;
+updateTransform();
+}
+lastTap = currentTime;
+});
+
+updateTransform();
+}
 
 // ヘッダーの📚ボタン機能
 document.getElementById('headerReferenceBtn').onclick=()=>{
