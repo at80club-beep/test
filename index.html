@@ -1,1 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>👀みてつくるシート🚗</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 4px solid #4CAF50;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #2E7D32;
+        }
+        .nav-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+        .nav-scroll {
+            display: inline-flex;
+            gap: 10px;
+            padding: 0 5px;
+        }
+        .nav-btn {
+            flex-shrink: 0;
+            padding: 18px 22px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            min-width: 120px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .nav-btn:active {
+            transform: scale(0.97);
+        }
+        .nav-btn.active {
+            background-color: #FF9800;
+            box-shadow: 0 0 0 4px rgba(255,152,0,0.3);
+        }
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+        .step-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #1565C0;
+            border-bottom: 3px dashed #BBDEFB;
+            padding-bottom: 10px;
+        }
+        .photo-wrap {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #eee;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+        .tap-label {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .ok-box {
+            background-color: #E8F5E9;
+            border-left: 6px solid #4CAF50;
+            padding: 18px;
+            margin: 22px 0;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .note-box {
+            background-color: #FFF3E0;
+            border-left: 6px solid #FF9800;
+            padding: 18px;
+            margin: 22px 0;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.2rem;
+        }
+        .danger .note-box {
+            background-color: #FFEBEE;
+            border-left-color: #F44336;
+        }
+        .final .ok-box {
+            background-color: #E3F2FD;
+            border-left-color: #2196F3;
+            font-size: 1.4rem;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            touch-action: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .overlay.active {
+            opacity: 1;
+        }
+        .overlay-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            touch-action: none;
+            transform-origin: center center;
+        }
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background-color: rgba(255,255,255,0.9);
+            color: #333;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            .nav-container {
+                overflow-x: visible;
+            }
+            .nav-scroll {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .nav-btn {
+                flex-grow: 1;
+                min-width: auto;
+                padding: 20px 10px;
+                font-size: 1.4rem;
+            }
+            h1 {
+                font-size: 2.8rem;
+            }
+            .step-title {
+                font-size: 2.2rem;
+            }
+            .ok-box, .note-box {
+                font-size: 1.4rem;
+                padding: 22px;
+            }
+            .close-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>👀みてつくるシート🚗</h1>
+        <p>リモコンカーの作り方を写真で確認</p>
+    </header>
 
+    <div class="nav-container">
+        <div class="nav-scroll" id="navButtons"></div>
+    </div>
+
+    <main>
+        <div class="card" id="stepContent">
+            <div class="step-title" id="stepTitle">① でんち（BOX）</div>
+            <div class="photo-wrap">
+                <img src="images/battery_box.jpg" alt="工程写真" class="step-img" id="stepImage">
+                <div class="tap-label">タップで拡大</div>
+            </div>
+            <div class="ok-box" id="okText">電池の向きOK！</div>
+            <div class="note-box" id="noteText">＋と－を確認します。</div>
+        </div>
+    </main>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-content" id="overlayContent"></div>
+        <button class="close-btn" id="closeBtn">×</button>
+    </div>
+
+    <script>
+        const steps = [
+            { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
+                ok:"電池の向きOK！", note:"＋と－を確認します。" },
+            { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
+                ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+            { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
+                ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
+            { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
+                ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
+            { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
+                ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
+            { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
+                ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+        ];
+
+        let currentStep = 0;
+        const navButtons = document.getElementById('navButtons');
+        const stepTitle = document.getElementById('stepTitle');
+        const stepImage = document.getElementById('stepImage');
+        const okText = document.getElementById('okText');
+        const noteText = document.getElementById('noteText');
+        const stepContent = document.getElementById('stepContent');
+        const overlay = document.getElementById('overlay');
+        const overlayContent = document.getElementById('overlayContent');
+        const closeBtn = document.getElementById('closeBtn');
+
+        function renderNavButtons() {
+            navButtons.innerHTML = '';
+            steps.forEach((step, index) => {
+                const button = document.createElement('button');
+                button.className = `nav-btn ${index === currentStep ? 'active' : ''}`;
+                button.textContent = step.nav;
+                button.addEventListener('click', () => {
+                    currentStep = index;
+                    updateContent();
+                    renderNavButtons();
+                });
+                navButtons.appendChild(button);
+            });
+        }
+
+        function updateContent() {
+            const step = steps[currentStep];
+            stepTitle.textContent = step.title;
+            stepImage.src = step.img;
+            stepImage.alt = step.title;
+            okText.textContent = step.ok;
+            noteText.textContent = step.note;
+
+            stepContent.classList.remove('danger', 'final');
+            if (step.danger) stepContent.classList.add('danger');
+            if (step.final) stepContent.classList.add('final');
+        }
+
+        let scale = 1;
+        let posX = 0;
+        let posY = 0;
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let initialDistance = 0;
+        const pointers = {};
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        function updateTransform() {
+            const img = document.querySelector('.overlay-img');
+            if (!img) return;
+            if (isMobile) {
+                img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
+            } else {
+                img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+            }
+        }
+
+        function onPointerDown(e) {
+            if (e.target !== overlay && e.target !== closeBtn) return;
+            if (e.target === overlay) {
+                closeOverlay();
+                return;
+            }
+            e.stopPropagation();
+        }
+
+        function onPointerDownImg(e) {
+            e.stopPropagation();
+            pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+
+            if (Object.keys(pointers).length === 1) {
+                startX = e.clientX - posX;
+                startY = e.clientY - posY;
+            } else if (Object.keys(pointers).length === 2) {
+                const ids = Object.keys(pointers);
+                const p1 = pointers[ids[0]];
+                const p2 = pointers[ids[1]];
+                initialDistance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            }
+        }
+
+        function onPointerMove(e) {
+            e.stopPropagation();
+            if (!pointers[e.pointerId]) return;
+
+            pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+            const currentPointers = Object.values(pointers);
+
+            if (currentPointers.length === 1) {
+                if (scale <= 1.01) return;
+                posX = e.clientX - startX;
+                posY = e.clientY - startY;
+                updateTransform();
+            } else if (currentPointers.length === 2) {
+                const p1 = currentPointers[0];
+                const p2 = currentPointers[1];
+                const currentDistance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                if (initialDistance > 0) {
+                    const newScale = Math.min(Math.max(1, (currentDistance / initialDistance) * scale), 5);
+                    scale = newScale;
+                    updateTransform();
+                }
+            }
+        }
+
+        function onPointerUp(e) {
+            e.stopPropagation();
+            delete pointers[e.pointerId];
+            if (Object.keys(pointers).length === 0) {
+                initialDistance = 0;
+            }
+        }
+
+        function openOverlay() {
+            const img = document.createElement('img');
+            img.className = 'overlay-img';
+            img.src = steps[currentStep].img;
+            img.alt = steps[currentStep].title;
+
+            overlayContent.innerHTML = '';
+            overlayContent.appendChild(img);
+            overlay.appendChild(overlayContent);
+            overlay.appendChild(closeBtn);
+            document.body.appendChild(overlay);
+
+            scale = 1;
+            posX = 0;
+            posY = 0;
+            updateTransform();
+
+            setTimeout(() => overlay.classList.add('active'), 10);
+
+            img.addEventListener('pointerdown', onPointerDownImg);
+            img.addEventListener('pointermove', onPointerMove);
+            img.addEventListener('pointerup', onPointerUp);
+            img.addEventListener('pointercancel', onPointerUp);
+
+            img.addEventListener('pointerdown', e => e.stopPropagation());
+            img.addEventListener('pointermove', e => e.stopPropagation());
+            img.addEventListener('pointerup', e => e.stopPropagation());
+            img.addEventListener('pointercancel', e => e.stopPropagation());
+
+            overlay.addEventListener('pointerdown', onPointerDown);
+            overlay.addEventListener('pointerup', onPointerUp);
+            overlay.addEventListener('pointercancel', onPointerUp);
+            closeBtn.addEventListener('click', closeOverlay);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOverlay() {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        stepImage.addEventListener('click', openOverlay);
+
+        renderNavButtons();
+        updateContent();
+    </script>
+</body>
+</html>
