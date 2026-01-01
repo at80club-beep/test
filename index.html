@@ -8,7 +8,12 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px}
 .header{background:#4CAF50;color:#fff;text-align:center;padding:1rem;position:sticky;top:0;z-index:100}
-h1{font-size:1.5rem;margin-bottom:.5rem}
+.header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.header-text{flex:1;min-width:200px}
+.header h1{font-size:1.5rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.header-buttons{display:flex;gap:.5rem}
+.header-btn{background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.header-btn:hover{background:rgba(255,255,255,.3)}
 .nav-container{background:#fff;padding:.5rem;overflow-x:auto;border-bottom:2px solid #ddd}
 .nav-scroll{display:flex;gap:.5rem;padding-bottom:.5rem;min-width:max-content}
 .nav-btn{flex:0 0 auto;padding:1rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;font-weight:bold;min-width:100px}
@@ -57,18 +62,27 @@ h1{font-size:1.5rem;margin-bottom:.5rem}
 .photo-container.multi{justify-content:center}
 .reference-grid{grid-template-columns:repeat(4,1fr)}
 }
+@media(max-width:480px){
+.header-content{flex-direction:column;text-align:center}
+.header-buttons{justify-content:center}
+.header h1{flex-direction:column;gap:0}
+}
 </style>
 </head>
 <body>
 <div class="header">
-<h1>👀みてつくるシート🚗</h1>
-<p>リモコンカーの作り方を写真で確認</p>
+  <div class="header-content">
+    <div class="header-text">
+      <h1>👀みてつくるシート🚗 <button class="header-btn" id="headerReferenceBtn" title="参考アルバム">📚</button></h1>
+      <p>リモコンカーの作り方を写真で確認</p>
+    </div>
+  </div>
 </div>
 <div class="nav-container">
 <div class="nav-scroll" id="nav"></div>
 </div>
 <main class="content" id="content"></main>
-<button class="reference-btn" id="referenceBtn">📚</button>
+<button class="reference-btn" id="referenceBtn" title="参考アルバム">📚</button>
 <div class="favorites-bar hidden" id="favoritesBar">
 <button class="show-favorites" id="showFavorites">
 <span>⭐</span>
@@ -88,7 +102,7 @@ h1{font-size:1.5rem;margin-bottom:.5rem}
 <p>1. 上のボタンで工程を選びます</p>
 <p>2. 写真をタップすると大きく見られます</p>
 <p>3. ⭐ボタンで気になる写真を保存できます</p>
-<p>4. 📚ボタンで参考写真を見られます</p>
+<p>4. 📚ボタンで参考写真を見られます（画面上下にあります）</p>
 <button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
 </div>
 </div>
@@ -315,8 +329,24 @@ img.onpointercancel=e=>e.stopPropagation();
 update();
 }
 
+// 元の📚ボタン機能
 document.getElementById('referenceBtn').onclick=()=>{
 document.getElementById('referenceOverlay').classList.add('active');
+loadReferenceContent();
+};
+
+// ヘッダーの📚ボタン機能
+document.getElementById('headerReferenceBtn').onclick=()=>{
+document.getElementById('referenceOverlay').classList.add('active');
+loadReferenceContent();
+};
+
+document.getElementById('closeReference').onclick=()=>{
+document.getElementById('referenceOverlay').classList.remove('active');
+};
+
+// 参考アルバムコンテンツ読み込み関数
+function loadReferenceContent(){
 const content=document.getElementById('referenceContent');
 content.innerHTML=Object.entries(referenceAlbum).map(([category,items])=>`
 <div class="reference-category">
@@ -329,10 +359,7 @@ ${items.map(item=>`
 </div>`).join('')}
 </div>
 </div>`).join('');
-};
-document.getElementById('closeReference').onclick=()=>{
-document.getElementById('referenceOverlay').classList.remove('active');
-};
+}
 
 showStep(0);
 </script>
