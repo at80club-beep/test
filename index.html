@@ -2,22 +2,41 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
 <title>👀みてつくるシート🚗</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-bottom:60px}
 
 /* ヘッダーのレイアウト修正 */
-.header{background:#4CAF50;color:#fff;text-align:center;padding:1rem;position:sticky;top:0;z-index:100}
-.header-title-wrap {
+.header{
+    background:#4CAF50;
+    color:#fff;
+    text-align:center;
+    padding:1rem;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.header-text {
+    flex: 1;
+    min-width: 200px;
+}
+h1{
+    font-size: 1.4rem;
+    margin-bottom: 0.3rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 0.5rem;
+    gap: 0.5rem;
 }
-h1{font-size: 1.4rem; margin-bottom: 0;} /* ボタンと並ぶため余白調整 */
 
 .nav-container{background:#fff;padding:.5rem;overflow-x:auto;border-bottom:2px solid #ddd}
 .nav-scroll{display:flex;gap:.5rem;padding-bottom:.5rem;min-width:max-content}
@@ -28,81 +47,369 @@ h1{font-size: 1.4rem; margin-bottom: 0;} /* ボタンと並ぶため余白調整
 .card{background:#fff;border-radius:1rem;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 5px rgba(0,0,0,.1)}
 .step-title{font-size:1.3rem;color:#1565C0;margin-bottom:1rem;border-bottom:2px solid #BBDEFB;padding-bottom:.5rem}
 
+/* ⑤みための写真を縦に並べる */
 .photo-container{position:relative;margin:1rem 0;border-radius:.5rem;overflow:hidden;background:#eee;min-height:200px;display:flex;align-items:center;justify-content:center}
-.photo-container.multi{display:flex;gap:.5rem;overflow-x:auto}
-.photo-wrapper{position:relative;flex:0 0 auto;width:calc(50% - .25rem);min-width:150px;background:#fff;border-radius:.5rem;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.photo-container.multi{
+    display:flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-x: visible;
+}
+.photo-wrapper{
+    position:relative;
+    width: 100%;
+    min-height: 200px;
+    background:#fff;
+    border-radius:.5rem;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 .photo-wrapper.gif{border:2px dashed #FF9800}
-.gif-badge{position:absolute;top:.5rem;left:.5rem;background:#FF9800;color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-size:.7rem;font-weight:bold;z-index:2}
-.step-img{width:100%;display:block;cursor:pointer}
-.tap-label{position:absolute;bottom:.5rem;right:.5rem;background:rgba(0,0,0,.7);color:#fff;padding:.5rem;border-radius:.5rem;font-size:.8rem;z-index:2}
+.gif-badge{
+    position:absolute;
+    top:.5rem;
+    left:.5rem;
+    background:#FF9800;
+    color:#fff;
+    padding:.2rem .5rem;
+    border-radius:.5rem;
+    font-size:.7rem;
+    font-weight:bold;
+    z-index:2
+}
+.step-img{
+    width:100%;
+    height: auto;
+    display:block;
+    cursor:pointer;
+    transition: transform 0.2s ease;
+}
+.step-img:hover{
+    transform: scale(1.02);
+}
+.tap-label{
+    position:absolute;
+    bottom:.5rem;
+    right:.5rem;
+    background:rgba(0,0,0,.7);
+    color:#fff;
+    padding:.5rem;
+    border-radius:.5rem;
+    font-size:.8rem;
+    z-index:2;
+    backdrop-filter: blur(2px);
+}
 
 .ok-box{background:#E8F5E9;padding:1rem;margin:1rem 0;border-radius:.5rem;font-weight:bold;color:#2E7D32}
 .note-box{background:#FFF3E0;padding:1rem;margin:1rem 0;border-radius:.5rem;color:#E65100}
 .card.danger .note-box{background:#FFEBEE;border-left:4px solid #F44336}
 .card.final .ok-box{background:#E3F2FD;border-left:4px solid #2196F3}
 
-.favorite-btn{position:absolute;top:.5rem;right:.5rem;width:35px;height:35px;background:rgba(255,255,255,.9);border:none;border-radius:50%;font-size:1.2rem;cursor:pointer;z-index:3}
-.favorite-btn.active{background:#FFD700}
-
-.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:1000;display:none;align-items:center;justify-content:center;touch-action:none}
-.overlay.active{display:flex}
-.overlay-img{max-width:100%;max-height:100%;touch-action:none;transform-origin:center}
-.close-btn{position:fixed;top:1rem;right:1rem;width:45px;height:45px;background:#fff;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
-
-/* 📚ボタンをヘッダー用にカスタマイズ */
-.reference-btn{
-    position: static; /* 固定配置を解除 */
-    width: 44px;
-    height: 44px;
-    background: #fff;
-    color: #4CAF50;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.3rem;
+.favorite-btn{
+    position:absolute;
+    top:.5rem;
+    right:.5rem;
+    width:35px;
+    height:35px;
+    background:rgba(255,255,255,.9);
+    border:none;
+    border-radius:50%;
+    font-size:1.2rem;
+    cursor:pointer;
+    z-index:3;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.favorite-btn.active{
+    background:#FFD700;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    cursor: pointer;
-    flex-shrink: 0;
 }
 
-.reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
-.reference-overlay.active{display:flex}
-.reference-header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #ddd}
+/* 拡大オーバーレイ - 完全修正版 */
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.95);
+    z-index:2000;
+    display:none;
+    touch-action: none;
+    overflow: hidden;
+}
+.overlay.active{
+    display:block;
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.overlay-content{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+}
+.overlay-img{
+    position: absolute;
+    transform-origin: center center;
+    transition: transform 0.15s cubic-bezier(0.1, 0.7, 0.1, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    max-width: none;
+    max-height: none;
+    will-change: transform;
+    cursor: grab;
+}
+.overlay-img:active{
+    cursor: grabbing;
+}
+.close-btn{
+    position:fixed;
+    top:1rem;
+    right:1rem;
+    width:45px;
+    height:45px;
+    background:#fff;
+    border:none;
+    border-radius:50%;
+    font-size:1.5rem;
+    font-weight:bold;
+    z-index:2001;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+.close-btn:hover{
+    transform: rotate(90deg);
+}
+
+/* 📚ボタンをヘッダー用にカスタマイズ */
+.reference-btn{
+    background: #fff;
+    color: #4CAF50;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.reference-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.reference-overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:#fff;
+    z-index:2000;
+    display:none;
+    flex-direction:column;
+}
+.reference-overlay.active{
+    display:flex;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+.reference-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1rem;
+    border-bottom:1px solid #ddd;
+    background: #4CAF50;
+    color: white;
+}
 .reference-content{flex:1;overflow-y:auto;padding:1rem}
 .reference-category{margin-bottom:1.5rem}
 .reference-category h4{color:#333;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:1px solid #eee}
 .reference-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
-.reference-item img{width:100%;height:100px;object-fit:cover;border-radius:.5rem;cursor:pointer}
+.reference-item img{
+    width:100%;
+    height:100px;
+    object-fit:cover;
+    border-radius:.5rem;
+    cursor:pointer;
+    transition: transform 0.3s ease;
+}
+.reference-item img:hover{
+    transform: scale(1.05);
+}
 .reference-item .title{font-size:.8rem;margin-top:.25rem;text-align:center}
 
-.favorites-bar{position:fixed;bottom:0;left:0;right:0;background:#FFD700;z-index:99;padding:.5rem;transform:translateY(0);transition:transform .3s}
-.favorites-bar.hidden{transform:translateY(100%)}
-.show-favorites{background:#fff;border:none;border-radius:1rem;padding:.5rem 1rem;font-weight:bold;display:flex;align-items:center;gap:.5rem;margin:0 auto}
+.favorites-bar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#FFD700;
+    z-index:99;
+    padding:.5rem;
+    transform:translateY(0);
+    transition:transform .3s;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+.favorites-bar.hidden{
+    transform:translateY(100%);
+}
+.show-favorites{
+    background:#fff;
+    border:none;
+    border-radius:1rem;
+    padding:.5rem 1rem;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    margin:0 auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.show-favorites:hover{
+    transform: translateY(-2px);
+}
 
-.first-visit{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:3000;display:flex;align-items:center;justify-content:center}
-.first-visit-content{background:#fff;padding:1.5rem;border-radius:1rem;max-width:90%;text-align:center}
+.first-visit{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.9);
+    z-index:3000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation: fadeIn 0.5s ease;
+}
+.first-visit-content{
+    background:#fff;
+    padding:1.5rem;
+    border-radius:1rem;
+    max-width:90%;
+    text-align:center;
+    animation: scaleIn 0.3s ease;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
 .first-visit h3{margin-bottom:1rem;color:#333}
 .first-visit p{margin-bottom:1rem;color:#666}
-.first-visit-btn{background:#4CAF50;color:#fff;border:none;border-radius:.5rem;padding:.75rem 1.5rem;font-size:1rem;cursor:pointer}
+.first-visit-btn{
+    background:#4CAF50;
+    color:#fff;
+    border:none;
+    border-radius:.5rem;
+    padding:.75rem 1.5rem;
+    font-size:1rem;
+    cursor:pointer;
+    transition: background 0.3s ease;
+}
+.first-visit-btn:hover{
+    background: #2E7D32;
+}
 
+/* ズームインジケーター */
+.zoom-indicator{
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 2001;
+    backdrop-filter: blur(5px);
+    display: none;
+}
+
+/* 横向き表示時の最適化 */
+@media (orientation: landscape) {
+    .overlay-img {
+        max-width: 80vh;
+        max-height: 80vw;
+    }
+}
+
+/* タブレット以上 */
 @media(min-width:768px){
     .nav-scroll{flex-wrap:wrap;justify-content:center}
     .nav-btn{flex:1;min-width:auto}
-    .photo-container.multi{justify-content:center}
+    .photo-container.multi{
+        flex-direction: row;
+        justify-content: center;
+    }
+    .photo-container.multi .photo-wrapper{
+        width: calc(50% - 0.5rem);
+        min-height: 250px;
+    }
     .reference-grid{grid-template-columns:repeat(4,1fr)}
+}
+
+/* スマホサイズ調整 */
+@media(max-width:480px){
+    .header-content{
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    h1{
+        flex-direction: column;
+        gap: 0.2rem;
+        font-size: 1.2rem;
+    }
+    .reference-btn{
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    .nav-btn{
+        min-width: 85px;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="header-title-wrap">
-        <h1>👀みてつくるシート🚗</h1>
-        <button class="reference-btn" id="referenceBtn">📚</button>
+    <div class="header-content">
+        <div class="header-text">
+            <h1>👀みてつくるシート🚗</h1>
+            <p>リモコンカーの作り方を写真で確認</p>
+        </div>
+        <button class="reference-btn" id="referenceBtn">📚写真</button>
     </div>
-    <p>リモコンカーの作り方を写真で確認</p>
 </div>
 
 <div class="nav-container">
@@ -132,7 +439,7 @@ h1{font-size: 1.4rem; margin-bottom: 0;} /* ボタンと並ぶため余白調整
         <p>1. 上のボタンで工程を選びます</p>
         <p>2. 写真をタップすると大きく見られます</p>
         <p>3. ⭐ボタンで気になる写真を保存できます</p>
-        <p>4. 右上の📚ボタンで参考写真を見られます</p>
+        <p>4. 📚写真ボタンで参考写真を見られます</p>
         <button class="first-visit-btn" id="closeFirstVisit">はじめる</button>
     </div>
 </div>
@@ -166,7 +473,6 @@ let currentStep=0;
 const nav=document.getElementById('nav');
 const content=document.getElementById('content');
 const favoritesBar=document.getElementById('favoritesBar');
-let scale=1,posX=0,posY=0,pointers={};
 
 if(!localStorage.getItem('firstVisitShown')){
     document.getElementById('firstVisit').style.display='flex';
@@ -188,6 +494,8 @@ function showStep(i){
     currentStep=i;
     [...nav.children].forEach((b,idx)=>b.classList.toggle('active',idx===i));
     const s=steps[i];
+    
+    // 写真HTML生成 - ⑤みためは縦に並べる
     let photoHTML='';
     if(Array.isArray(s.img)){
         photoHTML=`<div class="photo-container multi">${s.img.map((img,idx)=>`
@@ -199,9 +507,11 @@ function showStep(i){
     }else{
         photoHTML=`<div class="photo-container"><img src="${s.img}" class="step-img"><div class="tap-label">タップで拡大</div></div>`;
     }
+    
     let cardClass='card';
     if(s.danger) cardClass+=' danger';
     if(s.final) cardClass+=' final';
+    
     content.innerHTML=`
     <div class="${cardClass}">
     <div class="step-title">${s.title}</div>
@@ -209,6 +519,7 @@ function showStep(i){
     <div class="ok-box">${s.ok}</div>
     <div class="note-box">${s.note}</div>
     </div>`;
+    
     document.querySelectorAll('.step-img').forEach(img=>{
         img.onclick=()=>openOverlay(img.src);
         const btn=document.createElement('button');
@@ -233,7 +544,8 @@ function getPhotoTitle(img){
     const stepNames=['電池BOX','電線接続','スイッチ','モーター','見た目完成','完成'];
     const stepName=stepNames[currentStep]||`工程${currentStep+1}`;
     if(img.src.includes('3ami.gif')) return '三つ編み接続（動画）';
-    return stepName;
+    if(img.src.endsWith('.gif')) return `${stepName}・動画`;
+    return `${stepName}・写真`;
 }
 
 function toggleFavorite(img,title){
@@ -293,63 +605,285 @@ document.getElementById('showFavorites').onclick=()=>{
     document.body.appendChild(overlay);
 };
 
+// ===== 拡大写真機能 - 完全修正版 =====
+let zoomState = {
+    scale: 1,
+    posX: 0,
+    posY: 0,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    initialDistance: null,
+    lastScale: 1,
+    minScale: 1,
+    maxScale: 5
+};
+
 function openOverlay(src){
     const overlay=document.createElement('div');
     overlay.className='overlay active';
+    
+    const overlayContent=document.createElement('div');
+    overlayContent.className='overlay-content';
+    
     const img=document.createElement('img');
     img.className='overlay-img';
     img.src=src;
+    img.alt='拡大表示';
+    
     const close=document.createElement('button');
     close.className='close-btn';
     close.textContent='×';
-    close.onclick=()=>overlay.remove();
-    overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
-    overlay.appendChild(img);
+    close.onclick=()=>{
+        overlay.remove();
+        document.body.style.overflow='auto';
+        zoomState = {
+            scale: 1,
+            posX: 0,
+            posY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            initialDistance: null,
+            lastScale: 1,
+            minScale: 1,
+            maxScale: 5
+        };
+    };
+    
+    // ズームインジケーター
+    const zoomIndicator = document.createElement('div');
+    zoomIndicator.className = 'zoom-indicator';
+    
+    overlay.onclick=e=>{
+        if(e.target===overlay){
+            overlay.remove();
+            document.body.style.overflow='auto';
+            zoomState = {
+                scale: 1,
+                posX: 0,
+                posY: 0,
+                isDragging: false,
+                startX: 0,
+                startY: 0,
+                initialDistance: null,
+                lastScale: 1,
+                minScale: 1,
+                maxScale: 5
+            };
+        }
+    };
+    
+    overlayContent.appendChild(img);
+    overlay.appendChild(overlayContent);
     overlay.appendChild(close);
+    overlay.appendChild(zoomIndicator);
     document.body.appendChild(overlay);
     document.body.style.overflow='hidden';
     
-    // 以下、ズーム・移動ロジック
-    const update=()=>{img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;}
-    let startX,startY,initialDistance;
-    img.onpointerdown=e=>{
-        e.stopPropagation();
-        pointers[e.pointerId]={x:e.clientX,y:e.clientY};
-        const ids=Object.keys(pointers);
-        if(ids.length===1){
-            startX=e.clientX-posX;
-            startY=e.clientY-posY;
-        }else if(ids.length===2){
-            const p1=pointers[ids[0]],p2=pointers[ids[1]];
-            initialDistance=Math.hypot(p2.x-p1.x,p2.y-p1.y);
+    // ズーム状態更新関数
+    function updateTransform() {
+        img.style.transform = `translate(${zoomState.posX}px, ${zoomState.posY}px) scale(${zoomState.scale})`;
+        
+        // ズームインジケーター更新
+        if (zoomState.scale > 1.1) {
+            zoomIndicator.textContent = `ズーム: ${Math.round(zoomState.scale * 100)}%`;
+            zoomIndicator.style.display = 'block';
+        } else {
+            zoomIndicator.style.display = 'none';
         }
-    };
-    img.onpointermove=e=>{
-        e.stopPropagation();
-        if(!pointers[e.pointerId])return;
-        pointers[e.pointerId]={x:e.clientX,y:e.clientY};
-        const ids=Object.keys(pointers);
-        if(ids.length===2){
-            const p1=pointers[ids[0]],p2=pointers[ids[1]];
-            const dist=Math.hypot(p2.x-p1.x,p2.y-p1.y);
-            if(initialDistance&&dist>0){
-                scale=Math.min(5,Math.max(1,scale*dist/initialDistance));
-                update();
+    }
+    
+    // 画像を中央に配置
+    function centerImage() {
+        if (img.complete) {
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
+            const containerWidth = overlayContent.clientWidth;
+            const containerHeight = overlayContent.clientHeight;
+            
+            const scaleX = containerWidth / imgWidth;
+            const scaleY = containerHeight / imgHeight;
+            const scale = Math.min(scaleX, scaleY, 1);
+            
+            zoomState.scale = scale;
+            zoomState.posX = 0;
+            zoomState.posY = 0;
+            updateTransform();
+        }
+    }
+    
+    // 画像読み込み完了時に中央配置
+    if (img.complete) {
+        centerImage();
+    } else {
+        img.onload = centerImage;
+    }
+    
+    // ===== タッチイベント（スマホ対応） =====
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    
+    overlayContent.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        
+        if (e.touches.length === 2) {
+            // ピンチ操作開始
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            zoomState.initialDistance = Math.hypot(
+                touch2.clientX - touch1.clientX,
+                touch2.clientY - touch1.clientY
+            );
+            zoomState.lastScale = zoomState.scale;
+        } else if (e.touches.length === 1) {
+            // シングルタッチ（ドラッグまたはダブルタップ）
+            const touch = e.touches[0];
+            const currentTime = Date.now();
+            
+            // ダブルタップ判定
+            if (currentTime - touchStartTime < 300 && 
+                Math.abs(touch.clientX - touchStartX) < 10 && 
+                Math.abs(touch.clientY - touchStartY) < 10) {
+                // ダブルタップ - ズーム切り替え
+                if (zoomState.scale > 1.1) {
+                    zoomState.scale = 1;
+                    zoomState.posX = 0;
+                    zoomState.posY = 0;
+                } else {
+                    zoomState.scale = 2;
+                }
+                updateTransform();
+                e.preventDefault();
+            } else {
+                // ドラッグ開始
+                zoomState.isDragging = true;
+                zoomState.startX = touch.clientX - zoomState.posX;
+                zoomState.startY = touch.clientY - zoomState.posY;
             }
-            initialDistance=dist;
-        }else if(ids.length===1){
-            if(scale<=1.01)return;
-            posX=e.clientX-startX;
-            posY=e.clientY-startY;
-            update();
+            
+            touchStartTime = currentTime;
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
         }
-    };
-    const up=e=>{
-        delete pointers[e.pointerId];
-        if(Object.keys(pointers).length<2)initialDistance=0;
-    };
-    img.onpointerup=up;
-    img.onpointercancel=up;
+    }, { passive: false });
+    
+    overlayContent.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        
+        if (e.touches.length === 2 && zoomState.initialDistance !== null) {
+            // ピンチズーム
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            const currentDistance = Math.hypot(
+                touch2.clientX - touch1.clientX,
+                touch2.clientY - touch1.clientY
+            );
+            
+            if (zoomState.initialDistance > 0) {
+                const newScale = zoomState.lastScale * (currentDistance / zoomState.initialDistance);
+                zoomState.scale = Math.max(zoomState.minScale, Math.min(zoomState.maxScale, newScale));
+                updateTransform();
+            }
+        } else if (e.touches.length === 1 && zoomState.isDragging) {
+            // ドラッグ移動（ズーム時のみ）
+            if (zoomState.scale > 1) {
+                const touch = e.touches[0];
+                zoomState.posX = touch.clientX - zoomState.startX;
+                zoomState.posY = touch.clientY - zoomState.startY;
+                updateTransform();
+            }
+        }
+    }, { passive: false });
+    
+    overlayContent.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        zoomState.isDragging = false;
+        if (e.touches.length < 2) {
+            zoomState.initialDistance = null;
+        }
+    });
+    
+    overlayContent.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        zoomState.isDragging = false;
+        zoomState.initialDistance = null;
+    });
+    
+    // ===== マウスイベント（PC対応） =====
+    overlayContent.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        
+        // ダブルクリック判定
+        const currentTime = Date.now();
+        if (currentTime - touchStartTime < 300) {
+            // ダブルクリック - ズーム切り替え
+            if (zoomState.scale > 1.1) {
+                zoomState.scale = 1;
+                zoomState.posX = 0;
+                zoomState.posY = 0;
+            } else {
+                zoomState.scale = 2;
+            }
+            updateTransform();
+        } else {
+            // ドラッグ開始
+            zoomState.isDragging = true;
+            zoomState.startX = e.clientX - zoomState.posX;
+            zoomState.startY = e.clientY - zoomState.posY;
+            overlayContent.style.cursor = 'grabbing';
+        }
+        
+        touchStartTime = currentTime;
+    });
+    
+    overlayContent.addEventListener('mousemove', (e) => {
+        e.preventDefault();
+        if (zoomState.isDragging && zoomState.scale > 1) {
+            zoomState.posX = e.clientX - zoomState.startX;
+            zoomState.posY = e.clientY - zoomState.startY;
+            updateTransform();
+        }
+    });
+    
+    overlayContent.addEventListener('mouseup', () => {
+        zoomState.isDragging = false;
+        overlayContent.style.cursor = 'grab';
+    });
+    
+    overlayContent.addEventListener('mouseleave', () => {
+        zoomState.isDragging = false;
+        overlayContent.style.cursor = 'grab';
+    });
+    
+    // ホイールズーム
+    overlayContent.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        
+        const rect = overlayContent.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const zoomIntensity = 0.1;
+        const wheel = e.deltaY < 0 ? 1 : -1;
+        const zoomFactor = 1 + wheel * zoomIntensity;
+        const newScale = Math.max(zoomState.minScale, 
+                                 Math.min(zoomState.maxScale, 
+                                         zoomState.scale * zoomFactor));
+        
+        // マウス位置を中心にズーム
+        const scaleChange = newScale / zoomState.scale;
+        zoomState.posX = mouseX - (mouseX - zoomState.posX) * scaleChange;
+        zoomState.posY = mouseY - (mouseY - zoomState.posY) * scaleChange;
+        zoomState.scale = newScale;
+        
+        updateTransform();
+    }, { passive: false });
+    
+    // 初期カーソル設定
+    overlayContent.style.cursor = 'grab';
+    updateTransform();
 }
 
 document.getElementById('referenceBtn').onclick=()=>{
@@ -372,6 +906,36 @@ document.getElementById('closeReference').onclick=()=>{
 };
 
 showStep(0);
+
+// スマホでの向き変更時にリサイズ対応
+window.addEventListener('resize', () => {
+    const overlay = document.querySelector('.overlay.active');
+    if (overlay) {
+        const img = overlay.querySelector('.overlay-img');
+        if (img && img.complete) {
+            const overlayContent = overlay.querySelector('.overlay-content');
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
+            const containerWidth = overlayContent.clientWidth;
+            const containerHeight = overlayContent.clientHeight;
+            
+            const scaleX = containerWidth / imgWidth;
+            const scaleY = containerHeight / imgHeight;
+            const scale = Math.min(scaleX, scaleY, 1);
+            
+            if (zoomState.scale < 1.1) {
+                zoomState.scale = scale;
+                zoomState.posX = 0;
+                zoomState.posY = 0;
+                
+                const imgElement = overlay.querySelector('.overlay-img');
+                if (imgElement) {
+                    imgElement.style.transform = `translate(0px, 0px) scale(${scale})`;
+                }
+            }
+        }
+    }
+});
 </script>
 </body>
 </html>
