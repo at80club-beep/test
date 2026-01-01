@@ -33,8 +33,8 @@ body {
   background: linear-gradient(135deg, #4CAF50, #2E7D32);
   color: white;
   text-align: center;
-  padding: 1.8rem 1rem;
-  margin-bottom: 1rem;
+  padding: 1.8rem 1rem 1rem;
+  margin-bottom: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -49,6 +49,53 @@ body {
   opacity: 0.95;
 }
 
+/* お気に入りバー */
+.favorites-bar {
+  background: linear-gradient(135deg, #FFD700, #FFA000);
+  padding: 0.8rem 1rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.favorites-bar .show-favorites {
+  background: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.favorites-bar .show-favorites:active {
+  transform: scale(0.95);
+  background: #FFECB3;
+}
+
+.favorites-bar .icon {
+  font-size: 1.4rem;
+}
+
+.favorites-bar .count {
+  background: #FFD700;
+  color: #333;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  min-width: 24px;
+}
+
 /* ナビゲーション設定 */
 .nav-container {
   width: 100%;
@@ -57,7 +104,7 @@ body {
   background: white;
   padding: 0.8rem 0.5rem;
   position: sticky;
-  top: 0;
+  top: 120px;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -133,6 +180,7 @@ body {
   margin: 1.2rem 0;
   overflow-x: auto;
   padding-bottom: 10px;
+  align-items: center;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
 }
@@ -160,7 +208,18 @@ body {
   justify-content: center;
 }
 
-/* GIF画像の特別なスタイル */
+/* JPG画像（最初の画像） */
+.photo-wrapper:nth-child(1) {
+  border: 2px solid #4CAF50;
+}
+
+/* GIF画像（2番目の画像） */
+.photo-wrapper:nth-child(2) {
+  border: 2px dashed #FF9800;
+  background: #fff8e1;
+}
+
+/* GIFバッジ */
 .gif-badge {
   position: absolute;
   top: 10px;
@@ -175,9 +234,37 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.photo-wrapper img[src$=".gif"] {
-  border: 3px solid #FF9800;
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
+/* GIFを小さく表示 */
+.gif-small {
+  width: 85% !important;
+  height: 85% !important;
+  object-fit: contain;
+}
+
+/* 画像に再生アイコンのような表示 */
+.photo-wrapper:has(img[src$=".gif"])::before {
+  content: "▶";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 152, 0, 0.8);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.photo-wrapper:has(img[src$=".gif"]):hover::before {
+  opacity: 1;
 }
 
 .step-image {
@@ -199,6 +286,34 @@ body {
   font-size: 0.95rem;
   font-weight: bold;
   backdrop-filter: blur(5px);
+}
+
+/* お気に入りボタン */
+.favorite-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.favorite-btn.active {
+  background: #FFD700;
+  color: #333;
+  animation: pulse 0.3s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .status-box {
@@ -233,60 +348,7 @@ body {
   font-size: 1.3rem;
 }
 
-/* お気に入り機能 */
-.favorite-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 45px;
-  height: 45px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 50%;
-  font-size: 1.8rem;
-  cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-}
-
-.favorite-btn.active {
-  background: #FFD700;
-  color: #333;
-  animation: pulse 0.3s;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.show-favorites {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  padding: 12px 18px;
-  background: linear-gradient(135deg, #FFD700, #FFA000);
-  color: #333;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 99;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.show-favorites .count {
-  background: white;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-}
-
+/* お気に入りパネル */
 .favorites-panel {
   position: fixed;
   bottom: 0;
@@ -413,6 +475,27 @@ body {
   transition: transform 0.1s ease-out;
 }
 
+/* GIF拡大時は少し小さく */
+.gif-overlay {
+  max-width: 90% !important;
+  max-height: 90% !important;
+}
+
+/* GIF拡大時にバッジ表示 */
+.gif-overlay::before {
+  content: "GIF動画";
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  z-index: 10002;
+}
+
 .close-btn {
   position: fixed;
   top: 1.5rem;
@@ -441,8 +524,13 @@ body {
     margin-bottom: 0;
   }
   
+  .favorites-bar {
+    border-radius: 0;
+  }
+  
   .nav-container {
     border-radius: 0 0 15px 15px;
+    top: 110px;
   }
   
   .nav-scroll {
@@ -513,11 +601,9 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .show-favorites {
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    top: 10px;
-    right: 10px;
+  .favorites-bar .show-favorites {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
   }
 }
 
@@ -530,6 +616,56 @@ body {
   .photo-label {
     padding: 1rem 1.5rem;
     font-size: 1rem;
+  }
+  
+  .photo-wrapper:has(img[src$=".gif"])::before {
+    opacity: 0.7; /* タッチデバイスでも表示 */
+  }
+}
+
+/* スマホ向けの縦並び調整 */
+@media (max-width: 768px) {
+  .multi-photo-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .photo-wrapper {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* スマホで画像にキャプションを追加 */
+  .photo-wrapper:nth-child(1)::after {
+    content: "（完成写真）";
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #4CAF50;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 5px;
+    border-radius: 5px;
+    margin: 0 10px;
+  }
+  
+  .photo-wrapper:nth-child(2)::after {
+    content: "（動作確認）";
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #FF9800;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 5px;
+    border-radius: 5px;
+    margin: 0 10px;
   }
 }
 </style>
@@ -545,6 +681,17 @@ body {
 </header>
 
 <!-- ============================================================================
+     お気に入りバー
+     ============================================================================ -->
+<div class="favorites-bar">
+  <button class="show-favorites" id="showFavorites">
+    <span class="icon">⭐</span>
+    <span class="text">保存した写真</span>
+    <span class="count" id="favoriteCount">0</span>
+  </button>
+</div>
+
+<!-- ============================================================================
      ナビゲーション部 - 工程選択
      ============================================================================ -->
 <div class="nav-container">
@@ -555,15 +702,6 @@ body {
      メインコンテンツ部 - 工程詳細表示
      ============================================================================ -->
 <main class="main-content" id="content"></main>
-
-<!-- ============================================================================
-     お気に入り表示ボタン
-     ============================================================================ -->
-<button class="show-favorites" id="showFavorites">
-  <span>⭐</span>
-  <span>保存した写真</span>
-  <span class="count" id="favoriteCount">0</span>
-</button>
 
 <!-- ============================================================================
      お気に入り写真パネル
@@ -582,7 +720,7 @@ body {
 // ============================================================================
 //     工程データ定義
 //     ----------------------------------------------------------------------------
-//     ⑤みため: GIFとJPGの2枚を配列で指定
+//     ⑤みため: JPGとGIFの2枚を配列で指定（JPG→GIFの順）
 //     他: 単一画像を文字列で指定
 // ============================================================================
 const steps = [
@@ -618,8 +756,8 @@ const steps = [
     nav: "⑤ みため", 
     title: "⑤ 見た目完成（実験中）", 
     img: [
-      "images/car_complete.gif",
-      "images/car_complete.jpg"
+      "images/car_complete.jpg",  // JPGを先
+      "images/car_complete.gif"   // GIFを後
     ],
     ok: "つなぎ方をためそう！", 
     note: "前後が逆なら入れ替えてみよう。", 
@@ -678,6 +816,14 @@ const favoriteManager = {
   updateCount() {
     const count = this.getFavorites().length;
     document.getElementById('favoriteCount').textContent = count;
+    
+    // お気に入りがあるときは特別なスタイルを追加
+    const btn = document.getElementById('showFavorites');
+    if (count > 0) {
+      btn.classList.add('has-favorites');
+    } else {
+      btn.classList.remove('has-favorites');
+    }
   },
   
   clearFavorites() {
@@ -737,10 +883,14 @@ function renderContent() {
       <div class="multi-photo-container">
         ${step.img.map((imgSrc, index) => {
           const isGif = imgSrc.endsWith('.gif');
+          const gifClass = isGif ? 'gif-small' : '';
+          const badgeText = isGif ? '動画' : '';
+          
           return `
             <div class="photo-wrapper" data-index="${index}">
-              ${isGif ? '<div class="gif-badge">GIF</div>' : ''}
-              <img src="${imgSrc}" alt="${step.title}" class="step-image">
+              ${isGif ? `<div class="gif-badge">${badgeText}</div>` : ''}
+              <img src="${imgSrc}" alt="${step.title}" 
+                   class="step-image ${gifClass}">
               <div class="photo-label">タップで拡大</div>
             </div>
           `;
@@ -795,6 +945,29 @@ function initFavorites() {
       hideFavorites();
     }
   });
+  
+  // お気に入りがあるときの特別なスタイル
+  const style = document.createElement('style');
+  style.textContent = `
+    .has-favorites {
+      animation: gentlePulse 2s infinite;
+    }
+    
+    @keyframes gentlePulse {
+      0%, 100% { box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3); }
+      50% { box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5); }
+    }
+    
+    .favorites-bar .show-favorites .count:not(:empty) {
+      animation: countBounce 0.3s ease;
+    }
+    
+    @keyframes countBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 function addFavoriteButtonToPhoto(imgElement) {
@@ -876,6 +1049,9 @@ function hideFavorites() {
 //     オーバーレイ拡大機能
 // ============================================================================
 function openOverlay(e) {
+  const imgSrc = e.target.src;
+  const isGif = imgSrc.endsWith('.gif');
+  
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   
@@ -883,8 +1059,8 @@ function openOverlay(e) {
   contentDiv.className = 'overlay-content';
   
   const img = document.createElement('img');
-  img.className = 'overlay-image';
-  img.src = e.target.src;
+  img.className = `overlay-image ${isGif ? 'gif-overlay' : ''}`;
+  img.src = imgSrc;
   
   const closeBtn = document.createElement('button');
   closeBtn.className = 'close-btn';
