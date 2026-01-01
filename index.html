@@ -5,599 +5,167 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>👀みてつくるシート🚗</title>
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    font-family: 'Arial', 'Hiragino Sans', sans-serif;
-    background: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 15px;
-    min-height: 100vh;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 4px solid #4CAF50;
-}
-
-h1 {
-    font-size: 2rem;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-
-.subtitle {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-}
-
-.nav-container {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 25px;
-    padding-bottom: 10px;
-}
-
-.nav-scroll {
-    display: inline-flex;
-    gap: 10px;
-    padding: 5px 10px;
-    min-width: min-content;
-}
-
-.nav-btn {
-    flex: 0 0 auto;
-    padding: 18px 24px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-radius: 20px;
-    border: 3px solid transparent;
-    background: #3498db;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 130px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
-}
-
-.nav-btn:active {
-    transform: scale(0.97);
-}
-
-.nav-btn.active {
-    background: #e74c3c;
-    border-color: #c0392b;
-    box-shadow: 0 6px 10px rgba(231, 76, 60, 0.3);
-}
-
-.card {
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    border: 2px solid #e0e0e0;
-}
-
-.card.ok {
-    border-left: 6px solid #27ae60;
-}
-
-.card.danger {
-    border-left: 6px solid #e74c3c;
-}
-
-.card.final {
-    border-left: 6px solid #9b59b6;
-}
-
-.step-title {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #ecf0f1;
-}
-
-.photo-wrap {
-    position: relative;
-    margin: 20px 0;
-    border-radius: 15px;
-    overflow: hidden;
-    background: #f5f5f5;
-    min-height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.step-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-.tap-label {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
-    padding: 10px 18px;
-    border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-}
-
-.ok-text {
-    background: #d5efdb;
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 0;
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #155724;
-    border-left: 5px solid #27ae60;
-}
-
-.note-text {
-    background: #fff3cd;
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 0;
-    font-size: 1.2rem;
-    color: #856404;
-    border-left: 5px solid #f39c12;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.98);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-}
-
-.overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.overlay-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.overlay-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    touch-action: none;
-    transform-origin: center center;
-    transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform;
-}
-
-.close-btn {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    z-index: 10001;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    pointer-events: auto;
-}
-
-@media (min-width: 768px) {
-    body {
-        padding: 25px;
-    }
-    
-    h1 {
-        font-size: 2.5rem;
-    }
-    
-    .nav-container {
-        overflow-x: visible;
-    }
-    
-    .nav-scroll {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 15px;
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .nav-btn {
-        min-width: auto;
-        width: 100%;
-        padding: 20px 10px;
-        font-size: 1.4rem;
-    }
-    
-    .step-title {
-        font-size: 2rem;
-    }
-    
-    .ok-text, .note-text {
-        font-size: 1.4rem;
-        padding: 25px;
-    }
-    
-    .close-btn {
-        width: 70px;
-        height: 70px;
-        font-size: 2.2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .nav-btn {
-        padding: 16px 20px;
-        font-size: 1.2rem;
-        min-width: 110px;
-    }
-    
-    .step-title {
-        font-size: 1.6rem;
-    }
-    
-    .ok-text, .note-text {
-        font-size: 1.2rem;
-        padding: 18px;
-    }
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+body{font-family:sans-serif;background:#f5f5f5;max-width:960px;margin:0 auto;padding:15px}
+header{text-align:center;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #4CAF50}
+h1{font-size:2rem;color:#333;margin-bottom:5px}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:20px}
+.nav-btn{flex-shrink:0;padding:18px 22px;font-size:1.2rem;font-weight:bold;border:none;border-radius:20px;background:#2196F3;color:white;min-width:110px}
+.nav-btn.active{background:#FF9800}
+.card{background:white;border-radius:15px;padding:20px;margin-bottom:20px}
+.step-title{font-size:1.6rem;margin-bottom:15px;color:#1976D2}
+.photo-wrap{position:relative;margin:15px 0}
+.step-img{width:100%;border-radius:10px;display:block}
+.tap-label{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:15px;font-size:0.9rem}
+.ok-box{background:#E8F5E9;padding:15px;margin:15px 0;border-radius:10px;font-size:1.2rem;font-weight:bold;color:#2E7D32}
+.note-box{background:#FFF3E0;padding:15px;margin:15px 0;border-radius:10px;font-size:1.1rem;color:#F57C00}
+.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:black;display:none;align-items:center;justify-content:center;z-index:1000;touch-action:none}
+.overlay.active{display:flex}
+.overlay-img{max-width:100%;max-height:100%;object-fit:contain;touch-action:none;transform-origin:center center}
+.close-btn{position:fixed;top:20px;right:20px;width:50px;height:50px;background:white;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
+@media(min-width:768px){
+.nav-scroll{overflow-x:visible;flex-wrap:wrap;justify-content:center}
+.nav-btn{flex:1;min-width:auto}
+h1{font-size:2.5rem}
+.step-title{font-size:1.8rem}
 }
 </style>
 </head>
 <body>
-<header>
-    <h1>👀みてつくるシート🚗</h1>
-    <p class="subtitle">リモコンカーの作り方を写真で確認</p>
-</header>
-
-<div class="nav-container">
-    <div class="nav-scroll" id="navButtons"></div>
-</div>
-
+<header><h1>👀みてつくるシート🚗</h1><p>リモコンカーの作り方を写真で確認</p></header>
+<nav class="nav-scroll" id="nav"></nav>
 <main id="content"></main>
-
 <script>
-const steps = [
-    { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
-      ok:"電池の向きOK！", note:"＋と－を確認します。" },
-    { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
-      ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
-    { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
-      ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
-    { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
-      ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
-    { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
-      ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
-    { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
-      ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+const steps=[
+{nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
+{nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
+{nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
+{nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
+{nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:"images/car_complete.jpg",ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
+{nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
 ];
 
-let currentStep = 0;
-const navButtons = document.getElementById('navButtons');
-const content = document.getElementById('content');
+let current=0;
+const nav=document.getElementById('nav');
+const content=document.getElementById('content');
 
-function renderNavButtons() {
-    navButtons.innerHTML = '';
-    steps.forEach((step, index) => {
-        const button = document.createElement('button');
-        button.className = `nav-btn ${index === currentStep ? 'active' : ''}`;
-        button.textContent = step.nav;
-        button.addEventListener('click', () => {
-            currentStep = index;
-            updateContent();
-            renderNavButtons();
-        });
-        navButtons.appendChild(button);
-    });
-}
-
-function updateContent() {
-    const step = steps[currentStep];
-    
-    let cardClass = 'card ok';
-    if (step.danger) cardClass = 'card danger';
-    if (step.final) cardClass = 'card final';
-    
-    content.innerHTML = `
-        <div class="${cardClass}">
-            <div class="step-title">${step.title}</div>
-            <div class="photo-wrap">
-                <img src="${step.img}" alt="${step.title}" class="step-img">
-                <div class="tap-label">タップで拡大</div>
-            </div>
-            <div class="ok-text">${step.ok}</div>
-            <div class="note-text">${step.note}</div>
-        </div>
-    `;
-    
-    const stepImg = content.querySelector('.step-img');
-    stepImg.addEventListener('click', openOverlay);
-}
-
-let scale = 1;
-let posX = 0;
-let posY = 0;
-let startX = 0;
-let startY = 0;
-let initialDistance = 0;
-let pointers = {};
-let currentImg = null;
-let currentOverlay = null;
-let isMobile = false;
-let lastScale = 1;
-
-// モバイル判定を改善
-function checkIsMobile() {
-    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-function updateTransform() {
-    if (!currentImg) return;
-    
-    // 要件通り: translate → scale → rotate (スマホの場合)
-    if (isMobile) {
-        currentImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
-    } else {
-        currentImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-    }
-}
-
-function getDistance(pointers) {
-    const keys = Object.keys(pointers);
-    if (keys.length < 2) return 0;
-    
-    const p1 = pointers[keys[0]];
-    const p2 = pointers[keys[1]];
-    return Math.sqrt(
-        Math.pow(p2.x - p1.x, 2) + 
-        Math.pow(p2.y - p1.y, 2)
-    );
-}
-
-function getCenter(pointers) {
-    const keys = Object.keys(pointers);
-    if (keys.length === 0) return { x: 0, y: 0 };
-    
-    let sumX = 0;
-    let sumY = 0;
-    
-    keys.forEach(key => {
-        sumX += pointers[key].x;
-        sumY += pointers[key].y;
-    });
-    
-    return {
-        x: sumX / keys.length,
-        y: sumY / keys.length
-    };
-}
-
-function openOverlay(e) {
-    if (e) e.stopPropagation();
-    
-    const step = steps[currentStep];
-    
-    // オーバーレイ要素の作成
-    currentOverlay = document.createElement('div');
-    currentOverlay.className = 'overlay';
-    
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'overlay-content';
-    
-    currentImg = document.createElement('img');
-    currentImg.className = 'overlay-img';
-    currentImg.src = step.img;
-    currentImg.alt = step.title;
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'close-btn';
-    closeBtn.textContent = '×';
-    
-    // 要件通りの順序で追加
-    contentDiv.appendChild(currentImg);
-    currentOverlay.appendChild(contentDiv);
-    currentOverlay.appendChild(closeBtn);
-    document.body.appendChild(currentOverlay);
-    
-    // 変数の初期化
-    scale = 1;
-    posX = 0;
-    posY = 0;
-    initialDistance = 0;
-    pointers = {};
-    
-    // モバイル判定（スマホ縦向きの場合は回転）
-    isMobile = checkIsMobile();
-    
-    // 初期状態のtransformを設定
-    updateTransform();
-    
-    // オーバーレイを表示
-    setTimeout(() => currentOverlay.classList.add('active'), 10);
-    
-    // スクロールを無効化
-    document.body.style.overflow = 'hidden';
-    
-    // 画像のポインターイベント
-    currentImg.addEventListener('pointerdown', (e) => {
-        e.stopPropagation();
-        
-        if (!pointers[e.pointerId]) {
-            pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-            
-            if (Object.keys(pointers).length === 1) {
-                startX = e.clientX - posX;
-                startY = e.clientY - posY;
-            }
-            
-            if (Object.keys(pointers).length === 2) {
-                initialDistance = getDistance(pointers);
-                lastScale = scale;
-            }
-        }
-    });
-    
-    currentImg.addEventListener('pointermove', (e) => {
-        e.stopPropagation();
-        
-        if (!pointers[e.pointerId]) return;
-        
-        // ポインター位置を更新
-        pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-        const activePointers = Object.keys(pointers);
-        
-        if (activePointers.length === 1) {
-            // 1本指ドラッグの場合
-            if (scale <= 1.01) return; // 要件通り
-            
-            posX = e.clientX - startX;
-            posY = e.clientY - startY;
-            updateTransform();
-        }
-        else if (activePointers.length === 2) {
-            // 2本指ピンチズームの場合
-            const currentDistance = getDistance(pointers);
-            
-            if (initialDistance > 0 && currentDistance > 0) {
-                // スケール計算
-                const newScale = Math.max(1, Math.min(5, 
-                    (currentDistance / initialDistance) * lastScale
-                ));
-                
-                if (Math.abs(newScale - scale) > 0.01) {
-                    scale = newScale;
-                    
-                    // ズーム中心を計算
-                    const center = getCenter(pointers);
-                    const oldCenterX = posX + (window.innerWidth / 2);
-                    const oldCenterY = posY + (window.innerHeight / 2);
-                    
-                    // 中心を維持しながらズーム
-                    const zoomFactor = newScale / lastScale;
-                    posX = center.x - (center.x - posX) * zoomFactor;
-                    posY = center.y - (center.y - posY) * zoomFactor;
-                    
-                    updateTransform();
-                }
-            }
-        }
-    });
-    
-    const handlePointerUp = (e) => {
-        e.stopPropagation();
-        
-        if (pointers[e.pointerId]) {
-            delete pointers[e.pointerId];
-            
-            if (Object.keys(pointers).length === 1) {
-                // 2本指から1本指になった場合、残りの指を基準にstartX/Yを更新
-                const remainingKey = Object.keys(pointers)[0];
-                const remaining = pointers[remainingKey];
-                startX = remaining.x - posX;
-                startY = remaining.y - posY;
-                initialDistance = 0;
-            }
-            else if (Object.keys(pointers).length === 0) {
-                initialDistance = 0;
-                lastScale = scale;
-            }
-        }
-    };
-    
-    currentImg.addEventListener('pointerup', handlePointerUp);
-    currentImg.addEventListener('pointercancel', handlePointerUp);
-    
-    // オーバーレイ背景をタップで閉じる（要件通り）
-    currentOverlay.addEventListener('pointerdown', (e) => {
-        if (e.target === currentOverlay) {
-            closeOverlay();
-        }
-    });
-    
-    // 閉じるボタンのイベント
-    closeBtn.addEventListener('click', closeOverlay);
-    
-    // 要件通りのイベント伝播遮断
-    currentImg.addEventListener('pointerdown', e => e.stopPropagation());
-    currentImg.addEventListener('pointermove', e => e.stopPropagation());
-    currentImg.addEventListener('pointerup', e => e.stopPropagation());
-    currentImg.addEventListener('pointercancel', e => e.stopPropagation());
-}
-
-function closeOverlay() {
-    if (!currentOverlay) return;
-    
-    currentOverlay.classList.remove('active');
-    setTimeout(() => {
-        if (currentOverlay && currentOverlay.parentNode) {
-            currentOverlay.parentNode.removeChild(currentOverlay);
-        }
-        document.body.style.overflow = '';
-        
-        // 変数のクリア
-        scale = 1;
-        posX = 0;
-        posY = 0;
-        currentImg = null;
-        currentOverlay = null;
-        pointers = {};
-    }, 300);
-}
-
-// 初期表示
-renderNavButtons();
-updateContent();
-
-// 画面サイズ変更時のイベント
-window.addEventListener('resize', () => {
-    if (currentImg) {
-        isMobile = checkIsMobile();
-        updateTransform();
-    }
+// ナビゲーション作成
+steps.forEach((s,i)=>{
+const btn=document.createElement('button');
+btn.className='nav-btn';
+btn.textContent=s.nav;
+btn.onclick=()=>show(i);
+nav.appendChild(btn);
 });
+
+// コンテンツ表示
+function show(i){
+current=i;
+Array.from(nav.children).forEach((b,idx)=>b.classList.toggle('active',idx===i));
+const s=steps[i];
+content.innerHTML=`
+<div class="card">
+  <div class="step-title">${s.title}</div>
+  <div class="photo-wrap"><img src="${s.img}" class="step-img"><div class="tap-label">タップで拡大</div></div>
+  <div class="ok-box">${s.ok}</div>
+  <div class="note-box">${s.note}</div>
+</div>`;
+content.querySelector('.step-img').onclick=openOverlay;
+}
+
+// 拡大オーバーレイ
+function openOverlay(e){
+const overlay=document.createElement('div');
+overlay.className='overlay active';
+
+const img=document.createElement('img');
+img.className='overlay-img';
+img.src=e.target.src;
+
+const close=document.createElement('button');
+close.className='close-btn';
+close.textContent='×';
+close.onclick=()=>overlay.remove();
+
+overlay.appendChild(img);
+overlay.appendChild(close);
+document.body.appendChild(overlay);
+document.body.style.overflow='hidden';
+
+// 拡大機能
+let scale=1,posX=0,posY=0,startX=0,startY=0;
+const pointers={};
+const isMobile=window.innerHeight>window.innerWidth;
+
+function update(){
+if(isMobile){
+img.style.transform=`translate(${posX}px,${posY}px) scale(${scale}) rotate(90deg)`;
+}else{
+img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
+}
+}
+
+img.onpointerdown=e=>{
+e.stopPropagation();
+pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+if(Object.keys(pointers).length===1){
+startX=e.clientX-posX;
+startY=e.clientY-posY;
+}else if(Object.keys(pointers).length===2){
+const ids=Object.keys(pointers);
+const a=pointers[ids[0]],b=pointers[ids[1]];
+initialDistance=Math.hypot(b.x-a.x,b.y-a.y);
+}
+};
+
+img.onpointermove=e=>{
+e.stopPropagation();
+if(!pointers[e.pointerId])return;
+pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+const ids=Object.keys(pointers);
+
+if(ids.length===2){
+const a=pointers[ids[0]],b=pointers[ids[1]];
+const distance=Math.hypot(b.x-a.x,b.y-a.y);
+if(initialDistance>0){
+scale=Math.min(5,Math.max(1,scale*distance/initialDistance));
+}
+initialDistance=distance;
+}else if(ids.length===1&&scale>1.01){
+posX=e.clientX-startX;
+posY=e.clientY-startY;
+}
+update();
+};
+
+const up=e=>{
+e.stopPropagation();
+delete pointers[e.pointerId];
+if(Object.keys(pointers).length===1){
+const id=Object.keys(pointers)[0];
+startX=pointers[id].x-posX;
+startY=pointers[id].y-posY;
+initialDistance=0;
+}
+};
+
+img.onpointerup=up;
+img.onpointercancel=up;
+
+overlay.onpointerdown=e=>{
+if(e.target===overlay||e.target===close)overlay.remove();
+};
+
+// 要件通りのイベント遮断
+img.onpointerdown=e=>e.stopPropagation();
+img.onpointermove=e=>e.stopPropagation();
+img.onpointerup=e=>e.stopPropagation();
+img.onpointercancel=e=>e.stopPropagation();
+
+update();
+}
+
+show(0);
 </script>
 </body>
 </html>
