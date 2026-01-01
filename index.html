@@ -194,6 +194,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .overlay-img {
@@ -202,7 +203,8 @@ h1 {
     object-fit: contain;
     touch-action: none;
     transform-origin: center center;
-    pointer-events: none;
+    transition: transform 0.1s;
+    will-change: transform;
 }
 
 .close-btn {
@@ -363,12 +365,16 @@ let startY = 0;
 let initialDistance = 0;
 const pointers = {};
 let isDragging = false;
+let currentImg = null;
+let isMobile = false;
 
-function updateTransform(imgElement, isMobileDevice) {
-    if (isMobileDevice) {
-        imgElement.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
+function updateTransform() {
+    if (!currentImg) return;
+    
+    if (isMobile) {
+        currentImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
     } else {
-        imgElement.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        currentImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     }
 }
 
@@ -376,6 +382,8 @@ function openOverlay(e) {
     if (e) e.stopPropagation();
     
     const step = steps[currentStep];
+    
+    // オーバーレイ要素の作成
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     
@@ -391,22 +399,32 @@ function openOverlay(e) {
     closeBtn.className = 'close-btn';
     closeBtn.textContent = '×';
     
+    // 要素の追加（要件通りの順序）
     contentDiv.appendChild(img);
     overlay.appendChild(contentDiv);
     overlay.appendChild(closeBtn);
     document.body.appendChild(overlay);
     
+    // 変数の初期化
     scale = 1;
     posX = 0;
     posY = 0;
-    const isMobile = window.innerHeight > window.innerWidth;
+    currentImg = img;
+    isMobile = window.innerHeight > window.innerWidth;
     
-    updateTransform(img, isMobile);
+    // 初期状態のtransformを設定
+    updateTransform();
     
+    // オーバーレイを表示
     setTimeout(() => overlay.classList.add('active'), 10);
     
+    // スクロールを無効化
     document.body.style.overflow = 'hidden';
     
+    // ポインター管理オブジェクト
+    const pointers = {};
+    
+    // 画像のポインターイベント
     img.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
         pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
@@ -414,7 +432,6 @@ function openOverlay(e) {
         if (Object.keys(pointers).length === 1) {
             startX = e.clientX - posX;
             startY = e.clientY - posY;
-            isDragging = false;
         } else if (Object.keys(pointers).length === 2) {
             const ids = Object.keys(pointers);
             const p1 = pointers[ids[0]];
@@ -431,19 +448,21 @@ function openOverlay(e) {
         const currentPointers = Object.values(pointers);
         
         if (currentPointers.length === 1) {
-            if (scale <= 1.01) return;
+            // 1本指ドラッグの場合
+            if (scale <= 1.01) return; // 要件通り
             posX = e.clientX - startX;
             posY = e.clientY - startY;
-            isDragging = true;
-            updateTransform(img, isMobile);
+            updateTransform();
         } else if (currentPointers.length === 2) {
+            // 2本指ピンチズームの場合
             const p1 = currentPointers[0];
             const p2 = currentPointers[1];
             const currentDistance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            
             if (initialDistance > 0) {
                 const newScale = Math.min(Math.max(1, (currentDistance / initialDistance) * scale), 5);
                 scale = newScale;
-                updateTransform(img, isMobile);
+                updateTransform();
             }
         }
     });
@@ -453,21 +472,23 @@ function openOverlay(e) {
         delete pointers[e.pointerId];
         if (Object.keys(pointers).length === 0) {
             initialDistance = 0;
-            isDragging = false;
         }
     };
     
     img.addEventListener('pointerup', handlePointerUp);
     img.addEventListener('pointercancel', handlePointerUp);
     
+    // オーバーレイ背景をタップで閉じる
     overlay.addEventListener('pointerdown', (e) => {
         if (e.target === overlay || e.target === closeBtn) {
             closeOverlay(overlay);
         }
     });
     
+    // 閉じるボタンのイベント
     closeBtn.addEventListener('click', () => closeOverlay(overlay));
     
+    // 画像のイベント伝播を完全に遮断（要件通り）
     img.addEventListener('pointerdown', e => e.stopPropagation());
     img.addEventListener('pointermove', e => e.stopPropagation());
     img.addEventListener('pointerup', e => e.stopPropagation());
@@ -481,9 +502,14 @@ function closeOverlay(overlay) {
             overlay.parentNode.removeChild(overlay);
         }
         document.body.style.overflow = '';
+        scale = 1;
+        posX = 0;
+        posY = 0;
+        currentImg = null;
     }, 300);
 }
 
+// 初期表示
 renderNavButtons();
 updateContent();
 </script>
