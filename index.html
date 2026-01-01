@@ -5,36 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>👀みてつくるシート🚗</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
-body{font-family:sans-serif;background:#f5f5f5;max-width:960px;margin:0 auto;padding:15px}
-header{text-align:center;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #4CAF50}
-h1{font-size:2rem;color:#333;margin-bottom:5px}
-.nav-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:20px}
-.nav-btn{flex-shrink:0;padding:18px 22px;font-size:1.2rem;font-weight:bold;border:none;border-radius:20px;background:#2196F3;color:white;min-width:110px}
-.nav-btn.active{background:#FF9800}
-.card{background:white;border-radius:15px;padding:20px;margin-bottom:20px}
-.step-title{font-size:1.6rem;margin-bottom:15px;color:#1976D2}
-.photo-wrap{position:relative;margin:15px 0}
-.step-img{width:100%;border-radius:10px;display:block}
-.tap-label{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:15px;font-size:0.9rem}
-.ok-box{background:#E8F5E9;padding:15px;margin:15px 0;border-radius:10px;font-size:1.2rem;font-weight:bold;color:#2E7D32}
-.note-box{background:#FFF3E0;padding:15px;margin:15px 0;border-radius:10px;font-size:1.1rem;color:#F57C00}
-.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:black;display:none;align-items:center;justify-content:center;z-index:1000;touch-action:none}
-.overlay.active{display:flex}
-.overlay-img{max-width:100%;max-height:100%;object-fit:contain;touch-action:none;transform-origin:center center;transition:transform 0.1s}
-.close-btn{position:fixed;top:20px;right:20px;width:50px;height:50px;background:white;border:none;border-radius:50%;font-size:1.5rem;font-weight:bold;z-index:1001}
+body{margin:0;font-family:sans-serif;background:#f2f2f2}
+.container{max-width:960px;margin:0 auto;padding:12px}
+h1{text-align:center;font-size:28px;margin:12px 0}
+.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.nav button{flex:0 0 auto;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:999px;border:none;background:#ddd}
+.nav button.active{background:#4caf50;color:#fff}
+.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px}
+.card.ok{background:#e8f5e9}
+.card.danger{background:#fff3e0}
+.card.final{background:#e3f2fd}
+.photo-wrap{position:relative}
+.photo-wrap img{width:100%;border-radius:12px;touch-action:manipulation}
+.photo-wrap span{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:12px;font-size:14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;touch-action:none}
+.overlay img{max-width:100%;max-height:100%;touch-action:none}
+.close{position:absolute;top:16px;right:16px;font-size:28px;color:#fff;background:#000;border:none;border-radius:50%;width:44px;height:44px}
 @media(min-width:768px){
-.nav-scroll{overflow-x:visible;flex-wrap:wrap;justify-content:center}
-.nav-btn{flex:1;min-width:auto}
-h1{font-size:2.5rem}
-.step-title{font-size:1.8rem}
+.nav{overflow-x:visible}
 }
 </style>
 </head>
 <body>
-<header><h1>👀みてつくるシート🚗</h1><p>リモコンカーの作り方を写真で確認</p></header>
-<nav class="nav-scroll" id="nav"></nav>
-<main id="content"></main>
+<div class="container">
+<h1>👀みてつくるシート🚗</h1>
+<div class="nav" id="nav"></div>
+<div id="content"></div>
+</div>
 <script>
 const steps=[
 {nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
@@ -45,64 +42,50 @@ const steps=[
 {nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
 ];
 
-let current=0;
-const nav=document.getElementById('nav');
-const content=document.getElementById('content');
-
 // ナビゲーション作成
+const nav=document.getElementById("nav");
+const content=document.getElementById("content");
+let current=0;
+
 steps.forEach((s,i)=>{
-const btn=document.createElement('button');
-btn.className='nav-btn';
-btn.textContent=s.nav;
-btn.onclick=()=>show(i);
-nav.appendChild(btn);
+const b=document.createElement("button");
+b.textContent=s.nav;
+b.addEventListener("pointerdown",()=>showStep(i));
+nav.appendChild(b);
 });
 
-// コンテンツ表示
-function show(i){
+// ステップ表示関数
+function showStep(i){
 current=i;
-Array.from(nav.children).forEach((b,idx)=>b.classList.toggle('active',idx===i));
+[...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
 const s=steps[i];
 content.innerHTML=`
-<div class="card">
-  <div class="step-title">${s.title}</div>
-  <div class="photo-wrap"><img src="${s.img}" class="step-img"><div class="tap-label">タップで拡大</div></div>
-  <div class="ok-box">${s.ok}</div>
-  <div class="note-box">${s.note}</div>
+<div class="card${s.danger?" danger":s.final?" final":" ok"}">
+<h2>${s.title}</h2>
+<div class="photo-wrap">
+<img src="${s.img}" alt="${s.title}">
+<span>タップで拡大</span>
+</div>
+<p><strong>${s.ok}</strong></p>
+<p>${s.note}</p>
 </div>`;
-content.querySelector('.step-img').onclick=openOverlay;
+content.querySelector('img').addEventListener("pointerdown",(e)=>openOverlay(s.img));
 }
 
-// 拡大オーバーレイ
-function openOverlay(e){
-const overlay=document.createElement('div');
-overlay.className='overlay active';
+// オーバーレイ表示関数
+function openOverlay(src){
+document.body.style.overflow="hidden";
+const overlay=document.createElement("div");
+overlay.className="overlay";
+const img=document.createElement("img");
+img.src=src;
 
-const img=document.createElement('img');
-img.className='overlay-img';
-img.src=e.target.src;
-
-const close=document.createElement('button');
-close.className='close-btn';
-close.textContent='×';
-close.onclick=()=>{
-  overlay.remove();
-  document.body.style.overflow='';
-};
-
-overlay.appendChild(img);
-overlay.appendChild(close);
-document.body.appendChild(overlay);
-document.body.style.overflow='hidden';
-
-// 拡大機能
 let scale=1,posX=0,posY=0;
 const pointers={};
+let lastDist=0,lastCenter=null;
 const isMobile=window.innerHeight>window.innerWidth;
-let initialDistance=0;
-let lastScale=1;
 
-function update(){
+function updateTransform(){
 if(isMobile){
 img.style.transform=`translate(${posX}px,${posY}px) scale(${scale}) rotate(90deg)`;
 }else{
@@ -110,91 +93,74 @@ img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
 }
 }
 
-// 距離計算
-function getDistance(p1,p2){
-return Math.sqrt(Math.pow(p2.x-p1.x,2)+Math.pow(p2.y-p1.y,2));
-}
-
-img.onpointerdown=e=>{
+// ポインターイベント処理
+img.addEventListener("pointerdown",e=>{
 e.stopPropagation();
-pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+pointers[e.pointerId]=e;
+});
 
-if(Object.keys(pointers).length===1){
-  startX=e.clientX-posX;
-  startY=e.clientY-posY;
-}else if(Object.keys(pointers).length===2){
-  const ids=Object.keys(pointers);
-  initialDistance=getDistance(pointers[ids[0]],pointers[ids[1]]);
-  lastScale=scale;
-}
-};
-
-img.onpointermove=e=>{
+img.addEventListener("pointermove",e=>{
 e.stopPropagation();
-if(!pointers[e.pointerId])return;
-pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+if(!(e.pointerId in pointers))return;
+pointers[e.pointerId]=e;
 const ids=Object.keys(pointers);
 
 // 2本指ピンチズーム
 if(ids.length===2){
-  const p1=pointers[ids[0]];
-  const p2=pointers[ids[1]];
-  const currentDistance=getDistance(p1,p2);
-  
-  if(initialDistance>0){
-    // ゆっくり拡大縮小
-    const newScale=Math.min(5,Math.max(1,lastScale*(currentDistance/initialDistance)));
-    scale=newScale;
-    
-    // 中心点を計算
-    const centerX=(p1.x+p2.x)/2;
-    const centerY=(p1.y+p2.y)/2;
-    
-    // ズーム中心を維持
-    const zoomFactor=newScale/lastScale;
-    posX=centerX-(centerX-posX)*zoomFactor;
-    posY=centerY-(centerY-posY)*zoomFactor;
-  }
-}else if(ids.length===1&&scale>1.01){
-  // 1本指ドラッグ
-  posX=e.clientX-startX;
-  posY=e.clientY-startY;
+const a=pointers[ids[0]],b=pointers[ids[1]];
+const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;
+const dist=Math.hypot(dx,dy);
+const cx=(a.clientX+b.clientX)/2,cy=(a.clientY+b.clientY)/2;
+if(lastDist){
+scale=Math.min(5,Math.max(1,scale*dist/lastDist));
+posX+=cx-lastCenter.x;
+posY+=cy-lastCenter.y;
+updateTransform();
 }
-update();
-};
+lastDist=dist;
+lastCenter={x:cx,y:cy};
+}
 
-const up=e=>{
-e.stopPropagation();
+// 1本指ドラッグ
+if(ids.length===1){
+if(scale<=1.01)return;
+posX+=e.movementX;
+posY+=e.movementY;
+updateTransform();
+}
+});
+
+function onPointerUp(e){
 delete pointers[e.pointerId];
-
-if(Object.keys(pointers).length===1){
-  const remainingId=Object.keys(pointers)[0];
-  startX=pointers[remainingId].x-posX;
-  startY=pointers[remainingId].y-posY;
-  initialDistance=0;
-}else if(Object.keys(pointers).length===0){
-  initialDistance=0;
-  lastScale=scale;
-}
-};
-
-img.onpointerup=up;
-img.onpointercancel=up;
-
-overlay.onpointerdown=e=>{
-if(e.target===overlay||e.target===close)overlay.remove();
-};
-
-// 要件通りのイベント遮断
-img.onpointerdown=e=>e.stopPropagation();
-img.onpointermove=e=>e.stopPropagation();
-img.onpointerup=e=>e.stopPropagation();
-img.onpointercancel=e=>e.stopPropagation();
-
-update();
+lastDist=0;
+lastCenter=null;
 }
 
-show(0);
+img.addEventListener("pointerup",onPointerUp);
+img.addEventListener("pointercancel",onPointerUp);
+
+// 閉じるボタン
+const close=document.createElement("button");
+close.className="close";
+close.textContent="×";
+close.addEventListener("pointerdown",closeOverlay);
+
+overlay.addEventListener("pointerdown",e=>{
+if(e.target===overlay)closeOverlay();
+});
+
+function closeOverlay(){
+document.body.style.overflow="";
+overlay.remove();
+}
+
+overlay.appendChild(img);
+overlay.appendChild(close);
+document.body.appendChild(overlay);
+updateTransform();
+}
+
+showStep(0);
 </script>
 </body>
 </html>
