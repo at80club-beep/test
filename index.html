@@ -31,24 +31,10 @@ h1{font-size:1.4rem;margin:0}
 .ok-box{background:#E8F5E9;padding:1rem;margin:1rem 0;border-radius:.5rem}
 .note-box{background:#FFF3E0;padding:1rem;margin:1rem 0;border-radius:.5rem}
 
-/* 拡大表示オーバーレイ */
 .overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:2000;display:none}
 .overlay.active{display:flex;align-items:center;justify-content:center}
-.overlay-content{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.overlay-img-container{position:relative;transform-origin:center center;transition:transform 0.1s;touch-action:none}
-.overlay-img{max-width:90vh;max-height:90vw;object-fit:contain;transition:transform 0.3s}
-.overlay-img.landscape-mode{transform:rotate(90deg)}
-
-.close-btn{position:fixed;top:1rem;right:1rem;background:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.5rem;cursor:pointer;z-index:2001}
-
-/* ズームコントロール */
-.zoom-controls{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:2001}
-.zoom-btn{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.zoom-btn:hover{background:rgba(255,255,255,0.3)}
-
-/* 操作ガイド */
-.controls-guide{position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.15);color:white;padding:.5rem 1rem;border-radius:.5rem;text-align:center;font-size:.9rem;max-width:90%;z-index:2001;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2)}
-.controls-guide.hidden{opacity:0;pointer-events:none;transition:opacity 0.5s}
+.overlay-img{max-width:90%;max-height:90%;cursor:move}
+.close-btn{position:fixed;top:1rem;right:1rem;background:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.5rem;cursor:pointer}
 
 .reference-btn{background:#fff;color:#4CAF50;border:none;border-radius:25px;padding:.5rem 1rem;cursor:pointer}
 .reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
@@ -60,8 +46,6 @@ h1{font-size:1.4rem;margin:0}
 @media(max-width:480px){
     .header-content{flex-direction:column;gap:.5rem;text-align:center}
     h1{font-size:1.2rem}
-    .zoom-controls{bottom:2rem}
-    .controls-guide{bottom:5rem;font-size:.8rem}
 }
 </style>
 </head>
@@ -150,7 +134,7 @@ function showStep(index) {
     } else {
         photoHTML = `
             <div class="photo-container">
-                <img src="${img}" class="step-img">
+                <img src="${step.img}" class="step-img">
                 <div class="tap-label">タップで拡大</div>
             </div>
         `;
@@ -178,32 +162,9 @@ function openOverlay(src) {
     const overlay = document.createElement('div');
     overlay.className = 'overlay active';
     
-    const overlayContent = document.createElement('div');
-    overlayContent.className = 'overlay-content';
-    
-    const imgContainer = document.createElement('div');
-    imgContainer.className = 'overlay-img-container';
-    
     const img = document.createElement('img');
-    img.className = 'overlay-img landscape-mode'; // 自動横向き表示
+    img.className = 'overlay-img';
     img.src = src;
-    
-    // ズームコントロール
-    const zoomControls = document.createElement('div');
-    zoomControls.className = 'zoom-controls';
-    zoomControls.innerHTML = `
-        <button class="zoom-btn" id="zoomInBtn">+</button>
-        <button class="zoom-btn" id="zoomOutBtn">−</button>
-        <button class="zoom-btn" id="resetZoomBtn">↻</button>
-    `;
-    
-    // 操作ガイド
-    const controlsGuide = document.createElement('div');
-    controlsGuide.className = 'controls-guide';
-    controlsGuide.innerHTML = `
-        <div>ピンチ操作で拡大・縮小できます</div>
-        <div>ドラッグで画像を動かせます</div>
-    `;
     
     const closeBtn = document.createElement('button');
     closeBtn.className = 'close-btn';
@@ -225,59 +186,23 @@ function openOverlay(src) {
     };
     document.addEventListener('keydown', handleEsc);
     
-    imgContainer.appendChild(img);
-    overlayContent.appendChild(imgContainer);
-    overlay.appendChild(overlayContent);
+    overlay.appendChild(img);
     overlay.appendChild(closeBtn);
-    overlay.appendChild(zoomControls);
-    overlay.appendChild(controlsGuide);
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
     
-    // 5秒後に操作ガイドを非表示
-    setTimeout(() => {
-        controlsGuide.classList.add('hidden');
-    }, 5000);
-    
-    // ズーム管理
-    const state = { 
-        scale: 1, 
-        x: 0, 
-        y: 0,
-        minScale: 1,
-        maxScale: 5
-    };
-    
+    // 超シンプルなズーム管理
+    const state = { scale: 1, x: 0, y: 0 };
     let isDragging = false;
     let startX = 0, startY = 0;
     let initDist = 0;
     
     function updateTransform() {
-        imgContainer.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
     }
     
-    // ズーム関数
-    function zoom(delta) {
-        const newScale = state.scale + delta;
-        state.scale = Math.max(state.minScale, Math.min(state.maxScale, newScale));
-        updateTransform();
-    }
-    
-    // ズームリセット
-    function resetZoom() {
-        state.scale = 1;
-        state.x = 0;
-        state.y = 0;
-        updateTransform();
-    }
-    
-    // ズームボタンイベント
-    document.getElementById('zoomInBtn').onclick = () => zoom(0.2);
-    document.getElementById('zoomOutBtn').onclick = () => zoom(-0.2);
-    document.getElementById('resetZoomBtn').onclick = resetZoom;
-    
-    // タッチイベント（ピンチズーム対応）
-    imgContainer.addEventListener('touchstart', (e) => {
+    // タッチイベント
+    img.addEventListener('touchstart', (e) => {
         e.preventDefault();
         if (e.touches.length === 2) {
             const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -290,14 +215,14 @@ function openOverlay(src) {
         }
     });
     
-    imgContainer.addEventListener('touchmove', (e) => {
+    img.addEventListener('touchmove', (e) => {
         e.preventDefault();
         if (e.touches.length === 2 && initDist > 0) {
             const dx = e.touches[0].clientX - e.touches[1].clientX;
             const dy = e.touches[0].clientY - e.touches[1].clientY;
             const currDist = Math.sqrt(dx*dx + dy*dy);
-            const scaleChange = currDist / initDist;
-            state.scale = Math.max(state.minScale, Math.min(state.maxScale, state.scale * scaleChange));
+            const newScale = state.scale * (currDist / initDist);
+            state.scale = Math.max(1.0, Math.min(2.5, newScale));
             updateTransform();
         } else if (e.touches.length === 1 && isDragging && state.scale > 1) {
             state.x = e.touches[0].clientX - startX;
@@ -306,13 +231,13 @@ function openOverlay(src) {
         }
     });
     
-    imgContainer.addEventListener('touchend', () => {
+    img.addEventListener('touchend', () => {
         isDragging = false;
         initDist = 0;
     });
     
     // マウスイベント
-    imgContainer.addEventListener('mousedown', (e) => {
+    img.addEventListener('mousedown', (e) => {
         if (state.scale > 1) {
             isDragging = true;
             startX = e.clientX - state.x;
@@ -320,7 +245,7 @@ function openOverlay(src) {
         }
     });
     
-    document.addEventListener('mousemove', (e) => {
+    img.addEventListener('mousemove', (e) => {
         if (isDragging && state.scale > 1) {
             state.x = e.clientX - startX;
             state.y = e.clientY - startY;
@@ -328,21 +253,26 @@ function openOverlay(src) {
         }
     });
     
-    document.addEventListener('mouseup', () => {
+    img.addEventListener('mouseup', () => {
         isDragging = false;
     });
     
-    // ホイールズーム（PC対応）
-    imgContainer.addEventListener('wheel', (e) => {
+    // ホイールズーム
+    img.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY < 0 ? 0.1 : -0.1;
-        zoom(delta);
+        const change = e.deltaY < 0 ? 0.2 : -0.2;
+        const newScale = state.scale + change;
+        state.scale = Math.max(1.0, Math.min(2.5, newScale));
+        updateTransform();
     });
     
     // ダブルクリックでリセット
-    imgContainer.addEventListener('dblclick', (e) => {
+    img.addEventListener('dblclick', (e) => {
         e.preventDefault();
-        resetZoom();
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        updateTransform();
     });
 }
 
