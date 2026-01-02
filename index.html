@@ -2,145 +2,276 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>👀みてつくるシート🚗</title>
+<title>リモコンカー作り 写真で確認シート（指導員用）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body{margin:0;font-family:sans-serif;background:#f2f2f2}
-.container{max-width:960px;margin:0 auto;padding:12px}
-h1{text-align:center;font-size:28px;margin:12px 0}
-.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
-.nav button{flex:0 0 auto;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:999px;border:none;background:#ddd}
-.nav button.active{background:#4caf50;color:#fff}
-.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px}
-.card.ok{background:#e8f5e9}
-.card.danger{background:#fff3e0}
-.card.final{background:#e3f2fd}
-.photo-wrap{position:relative}
-.photo-wrap img{width:100%;border-radius:12px;touch-action:manipulation}
-.photo-wrap span{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:12px;font-size:14px}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;touch-action:none}
-.overlay img{max-width:100%;max-height:100%;touch-action:none}
-.close{position:absolute;top:16px;right:16px;font-size:28px;color:#fff;background:#000;border:none;border-radius:50%;width:44px;height:44px}
-@media(min-width:768px){
-.nav{overflow-x:visible}
+/* =====================
+   基本
+===================== */
+body{
+  margin:0;
+  font-family: "Hiragino Sans","メイリオ",sans-serif;
+  background:#faf7f2;
+  color:#333;
+  line-height:1.7;
+}
+
+header{
+  position:sticky;
+  top:0;
+  background:#fff7dd;
+  border-bottom:4px solid #e0cfa0;
+  padding:10px;
+  z-index:100;
+}
+
+.title{
+  font-size:1.3em;
+  font-weight:900;
+  margin:0;
+}
+
+.subtitle{
+  font-size:0.6em;
+  color:#555;
+}
+
+nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+
+nav button{
+  flex:1;
+  min-height:48px;
+  font-size:18px;
+  font-weight:700;
+  border:4px solid #a6842c;
+  background:#fff;
+  border-radius:12px;
+}
+
+nav button.active{
+  background:#f0b344;
+  border-color:#000;
+}
+
+main{
+  padding:12px;
+}
+
+.section-title{
+  font-size:1.3em;
+  font-weight:800;
+  border-bottom:3px solid #f0b344;
+  margin-bottom:12px;
+}
+
+.photo-box{
+  background:#fff;
+  border:4px solid #e0cfa0;
+  border-radius:14px;
+  padding:14px;
+}
+
+.photo-img{
+  width:100%;
+  max-width:640px;
+  display:block;
+  margin:0 auto 10px;
+  border-radius:12px;
+  border:4px solid #e0cfa0;
+  cursor:pointer;
+}
+
+.photo-hint{
+  text-align:center;
+  font-size:0.9em;
+  color:#666;
+  background:#f0f0f0;
+  padding:8px;
+  border-radius:8px;
+}
+
+.ok-box{
+  background:#e8f6e8;
+  border:3px solid #4caf50;
+  border-radius:10px;
+  padding:12px;
+  margin:12px 0;
+  font-weight:800;
+  text-align:center;
+}
+
+.note{
+  background:#f5efe4;
+  padding:12px;
+  border-radius:8px;
+  border-left:4px solid #a6842c;
+}
+
+/* =====================
+   拡大表示（横向き固定）
+===================== */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+}
+
+.overlay img{
+  max-height:90vw;
+  max-width:90vh;
+  transform:rotate(90deg);
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.close-btn{
+  position:absolute;
+  top:20px;
+  right:20px;
+  width:56px;
+  height:56px;
+  background:#000;
+  color:#fff;
+  font-size:36px;
+  text-align:center;
+  line-height:56px;
+  border-radius:50%;
+  border:3px solid #fff;
+  cursor:pointer;
+}
+
+.rotate-hint{
+  position:absolute;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  background:rgba(0,0,0,0.7);
+  padding:10px 20px;
+  border-radius:20px;
+  font-size:16px;
+}
+
+/* PC・横向きでは回転しない */
+@media (orientation:landscape){
+  .overlay img{
+    transform:none;
+    max-width:95%;
+    max-height:95%;
+  }
 }
 </style>
 </head>
+
 <body>
-<div class="container">
-<h1>👀みてつくるシート🚗</h1>
-<div class="nav" id="nav"></div>
-<div id="content"></div>
+
+<header>
+  <h1 class="title">
+    リモコンカー作り 写真で確認シート
+    <span class="subtitle">（指導員用）</span>
+  </h1>
+
+  <nav id="nav">
+    <button data-target="battery" class="active">電池BOX完成</button>
+    <button data-target="wire">電線</button>
+    <button data-target="switch">スイッチ</button>
+    <button data-target="test">モーターテスト</button>
+    <button data-target="complete">完成</button>
+  </nav>
+</header>
+
+<main>
+  <div class="section-title" id="sectionTitle">電池BOX完成</div>
+
+  <div class="photo-box">
+    <img id="photo" src="images/battery_box.jpg" class="photo-img">
+    <div class="photo-hint">📱 写真をタップすると横向きで拡大表示されます</div>
+    <div class="ok-box" id="okMessage">✅ この写真と同じなら OK</div>
+    <div class="note" id="note">電池の＋－向きを確認します。</div>
+  </div>
+</main>
+
+<!-- 拡大表示 -->
+<div id="overlay" class="overlay">
+  <div class="close-btn" onclick="closePhoto()">×</div>
+  <div class="rotate-hint">横向き表示</div>
+  <img id="overlayImg">
 </div>
+
 <script>
-const steps=[
-{nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
-{nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
-{nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
-{nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
-{nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:"images/car_complete.jpg",ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
-{nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
-];
-const nav=document.getElementById("nav");
-const content=document.getElementById("content");
-let current=0;
-steps.forEach((s,i)=>{
-const b=document.createElement("button");
-b.textContent=s.nav;
-b.addEventListener("pointerdown",()=>show(i));
-nav.appendChild(b);
+const sections={
+  battery:{
+    title:"電池BOX完成",
+    img:"images/battery_box.jpg",
+    ok:"この写真と同じなら OK",
+    note:"電池の＋－向きを確認します。"
+  },
+  wire:{
+    title:"電池につける電線",
+    img:"images/wire_magnet.jpg",
+    ok:"この形なら OK",
+    note:"磁石がしっかり付いているか確認。"
+  },
+  switch:{
+    title:"前後切り替えスイッチ",
+    img:"images/switch_complete.jpg",
+    ok:"固定できていれば OK",
+    note:"左右に倒して切り替わるか確認。"
+  },
+  test:{
+    title:"モーターのテスト",
+    img:"images/motor_test.jpg",
+    ok:"回れば OK（又はLEDチェッカー）",
+    note:"回らない場合は配線を確認。"
+  },
+  complete:{
+    title:"完成品",
+    img:"images/car_complete.jpg",
+    ok:"完成です！",
+    note:"安全に走らせましょう。"
+  }
+};
+
+const navButtons=document.querySelectorAll("#nav button");
+const photo=document.getElementById("photo");
+const sectionTitle=document.getElementById("sectionTitle");
+const okMessage=document.getElementById("okMessage");
+const note=document.getElementById("note");
+
+navButtons.forEach(btn=>{
+  btn.onclick=()=>{
+    navButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const d=sections[btn.dataset.target];
+    sectionTitle.textContent=d.title;
+    photo.src=d.img;
+    okMessage.textContent="✅ "+d.ok;
+    note.textContent=d.note;
+  };
 });
-function show(i){
-current=i;
-[...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-const s=steps[i];
-content.innerHTML="";
-const card=document.createElement("div");
-card.className="card"+(s.danger?" danger":s.final?" final":" ok");
-const h=document.createElement("h2");
-h.textContent=s.title;
-const p1=document.createElement("p");
-p1.textContent=s.ok;
-const p2=document.createElement("p");
-p2.textContent=s.note;
-const wrap=document.createElement("div");
-wrap.className="photo-wrap";
-const img=document.createElement("img");
-img.src=s.img;
-const lab=document.createElement("span");
-lab.textContent="タップで拡大";
-wrap.appendChild(img);
-wrap.appendChild(lab);
-img.addEventListener("pointerdown",()=>openOverlay(s.img));
-card.append(h,wrap,p1,p2);
-content.appendChild(card);
+
+const overlay=document.getElementById("overlay");
+const overlayImg=document.getElementById("overlayImg");
+
+photo.onclick=()=>{
+  overlay.style.display="flex";
+  overlayImg.src=photo.src;
+};
+
+function closePhoto(){
+  overlay.style.display="none";
 }
-function openOverlay(src){
-document.body.style.overflow="hidden";
-const overlay=document.createElement("div");
-overlay.className="overlay";
-const img=document.createElement("img");
-img.src=src;
-let scale=1,posX=0,posY=0;
-const pointers={};
-let lastDist=0,lastCenter=null;
-const isMobile=window.innerHeight>window.innerWidth;
-function updateTransform(){
-if(isMobile){
-img.style.transform=`translate(${posX}px,${posY}px) scale(${scale}) rotate(90deg)`;
-}else{
-img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
-}
-}
-img.addEventListener("pointerdown",e=>{e.stopPropagation();pointers[e.pointerId]=e});
-img.addEventListener("pointermove",e=>{
-e.stopPropagation();
-if(!(e.pointerId in pointers))return;
-pointers[e.pointerId]=e;
-const ids=Object.keys(pointers);
-if(ids.length===2){
-const a=pointers[ids[0]],b=pointers[ids[1]];
-const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;
-const dist=Math.hypot(dx,dy);
-const cx=(a.clientX+b.clientX)/2,cy=(a.clientY+b.clientY)/2;
-if(lastDist){
-scale=Math.min(5,Math.max(1,scale*dist/lastDist));
-posX+=cx-lastCenter.x;
-posY+=cy-lastCenter.y;
-}
-lastDist=dist;
-lastCenter={x:cx,y:cy};
-updateTransform();
-}
-if(ids.length===1){
-if(scale<=1.01)return;
-posX+=e.movementX;
-posY+=e.movementY;
-updateTransform();
-}
-});
-function onUp(e){
-delete pointers[e.pointerId];
-lastDist=0;
-lastCenter=null;
-}
-img.addEventListener("pointerup",e=>{e.stopPropagation();onUp(e)});
-img.addEventListener("pointercancel",e=>{e.stopPropagation();onUp(e)});
-const close=document.createElement("button");
-close.className="close";
-close.textContent="×";
-close.addEventListener("pointerdown",()=>closeOverlay());
-overlay.addEventListener("pointerdown",e=>{if(e.target!==overlay)return;closeOverlay()});
-function closeOverlay(){
-document.body.style.overflow="";
-overlay.remove();
-}
-overlay.appendChild(img);
-overlay.appendChild(close);
-document.body.appendChild(overlay);
-updateTransform();
-}
-show(0);
 </script>
+
 </body>
 </html>
