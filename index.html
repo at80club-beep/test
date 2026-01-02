@@ -2,172 +2,373 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>👀みてつくるシート🚗</title>
 <style>
-/* --- 基本レイアウト --- */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-top:80px}
+/* 最低限の必須スタイルのみ */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto}
 
-.header{background:#4CAF50;color:#fff;padding:1rem;position:fixed;top:0;left:0;width:100%;z-index:1000;border-bottom:2px solid #2E7D32}
-.header-content{display:flex;justify-content:space-between;align-items:center;max-width:960px;margin:0 auto}
+.header{background:#4CAF50;color:#fff;padding:1rem;position:sticky;top:0}
+.header-content{display:flex;justify-content:space-between;align-items:center}
 h1{font-size:1.4rem;margin:0}
 
-.nav-container{background:#fff;padding:.5rem;position:fixed;top:65px;left:0;width:100%;z-index:999;border-bottom:2px solid #ddd;max-width:960px;margin:0 auto}
-.nav-scroll{display:flex;gap:.5rem;overflow-x:auto;padding:.5rem}
-.nav-btn{padding:0.8rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;font-weight:bold;cursor:pointer;min-width:100px;flex-shrink:0}
+.nav-container{background:#fff;padding:.5rem;border-bottom:2px solid #ddd}
+.nav-scroll{display:flex;gap:.5rem;overflow-x:auto}
+.nav-btn{padding:1rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:1rem;cursor:pointer;min-width:100px}
 .nav-btn.active{background:#FF9800}
 
-.content{padding:1rem;margin-top:110px}
-.card{background:#fff;border-radius:1rem;padding:1.5rem;margin-bottom:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
-.step-title{font-size:1.4rem;color:#1565C0;margin-bottom:1rem;border-bottom:3px solid #BBDEFB;padding-bottom:.5rem}
+.content{padding:1rem}
+.card{background:#fff;border-radius:1rem;padding:1rem;margin-bottom:1rem}
+.step-title{font-size:1.3rem;color:#1565C0;margin-bottom:1rem}
 
-.photo-container{margin:1rem 0;border-radius:.8rem;background:#eee;overflow:hidden;position:relative}
-.photo-wrapper{width:100%; position:relative; background:#fff}
-.step-img{width:100%; height:auto; display:block; cursor:pointer}
-.tap-label{background:rgba(0,0,0,.7);color:#fff;padding:.6rem 1rem;border-radius:2rem;font-size:.9rem;position:absolute;bottom:1rem;right:1rem}
+.photo-container{margin:1rem 0;border-radius:.5rem;background:#eee;min-height:200px;display:flex;align-items:center;justify-content:center}
+.photo-container.multi{display:flex;flex-direction:column;gap:1rem}
+.photo-wrapper{width:100%;min-height:200px;background:#fff;border-radius:.5rem;overflow:hidden}
+.step-img{width:100%;height:auto;display:block;cursor:pointer}
+.tap-label{background:rgba(0,0,0,.7);color:#fff;padding:.5rem;border-radius:.5rem;font-size:.8rem;position:absolute;bottom:.5rem;right:.5rem}
 
-.ok-box{background:#E8F5E9;padding:1.2rem;margin:1rem 0;border-radius:.8rem;color:#2E7D32;font-weight:bold;font-size:1.1rem;border-left:8px solid #4CAF50}
-.note-box{background:#FFF3E0;padding:1.2rem;margin:1rem 0;border-radius:.8rem;color:#E65100;font-size:1rem;line-height:1.5}
+.ok-box{background:#E8F5E9;padding:1rem;margin:1rem 0;border-radius:.5rem}
+.note-box{background:#FFF3E0;padding:1rem;margin:1rem 0;border-radius:.5rem}
 
-/* --- 拡大オーバーレイ --- */
-.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:2000;display:none;align-items:center;justify-content:center;touch-action:none}
-.overlay.active{display:flex}
-.overlay-img-container{position:relative; transition:transform 0.3s ease-out}
-.overlay-img{max-width:95vw; max-height:95vh; object-fit:contain}
+/* 拡大表示オーバーレイ */
+.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:2000;display:none}
+.overlay.active{display:flex;align-items:center;justify-content:center}
+.overlay-content{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.overlay-img-container{position:relative;transform-origin:center center;transition:transform 0.1s;touch-action:none}
+.overlay-img{max-width:90vh;max-height:90vw;object-fit:contain;transition:transform 0.3s}
+.overlay-img.landscape-mode{transform:rotate(90deg)}
 
-/* 非常に大きな閉じるボタン（スマホを横にした時も右上に配置） */
-.close-btn{position:fixed;top:1rem;right:1rem;background:#FF5252;color:#fff;border:none;border-radius:50%;width:60px;height:60px;font-size:2.5rem;font-weight:bold;cursor:pointer;z-index:2001;box-shadow:0 0 15px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center}
-
-/* 持ち替えガイドイラスト */
-.rotate-guide{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.9);padding:2rem;border-radius:2rem;text-align:center;z-index:2002;font-weight:bold;pointer-events:none;transition:opacity 0.5s}
-.rotate-guide.hidden{opacity:0}
+.close-btn{position:fixed;top:1rem;right:1rem;background:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.5rem;cursor:pointer;z-index:2001}
 
 /* ズームコントロール */
-.zoom-controls{position:fixed;bottom:2rem;right:1.5rem;display:flex;flex-direction:column;gap:1rem;z-index:2001}
-.zoom-btn{background:rgba(255,255,255,0.9);color:#333;border:none;border-radius:50%;width:55px;height:55px;font-size:1.8rem;font-weight:bold;box-shadow:0 4px 10px rgba(0,0,0,0.3)}
+.zoom-controls{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:2001}
+.zoom-btn{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.zoom-btn:hover{background:rgba(255,255,255,0.3)}
 
-.reference-btn{background:#fff;color:#4CAF50;border:none;border-radius:2rem;padding:.5rem 1.2rem;font-weight:bold;cursor:pointer}
+/* 操作ガイド */
+.controls-guide{position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.15);color:white;padding:.5rem 1rem;border-radius:.5rem;text-align:center;font-size:.9rem;max-width:90%;z-index:2001;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2)}
+.controls-guide.hidden{opacity:0;pointer-events:none;transition:opacity 0.5s}
+
+.reference-btn{background:#fff;color:#4CAF50;border:none;border-radius:25px;padding:.5rem 1rem;cursor:pointer}
+.reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
+.reference-overlay.active{display:flex}
+.reference-header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #ddd}
+.reference-content{padding:1rem;flex:1;overflow-y:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+
+@media(max-width:480px){
+    .header-content{flex-direction:column;gap:.5rem;text-align:center}
+    h1{font-size:1.2rem}
+    .zoom-controls{bottom:2rem}
+    .controls-guide{bottom:5rem;font-size:.8rem}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
     <div class="header-content">
-        <h1>👀みてつくるシート🚗</h1>
+        <div>
+            <h1>👀みてつくるシート🚗</h1>
+            <p>リモコンカーの作り方を写真で確認</p>
+        </div>
         <button class="reference-btn" id="referenceBtn">📚写真</button>
     </div>
 </div>
 
-<div class="nav-container"><div class="nav-scroll" id="nav"></div></div>
+<div class="nav-container">
+    <div class="nav-scroll" id="nav"></div>
+</div>
+
 <main class="content" id="content"></main>
 
-<div id="overlay" class="overlay">
-    <button class="close-btn" id="closeOverlay">×</button>
-    <div id="rotateGuide" class="rotate-guide">
-        <div style="font-size:4rem; margin-bottom:1rem">📱➡平</div>
-        <p style="font-size:1.2rem">スマホを横にすると<br>大きく見えます</p>
+<div class="reference-overlay" id="referenceOverlay">
+    <div class="reference-header">
+        <h3>📚 参考アルバム</h3>
+        <button class="close-btn" id="closeReference">×</button>
     </div>
-    <div class="overlay-img-container" id="imgContainer">
-        <img id="overlayImg" class="overlay-img" src="">
-    </div>
-    <div class="zoom-controls">
-        <button class="zoom-btn" onclick="zoom(0.2)">＋</button>
-        <button class="zoom-btn" onclick="zoom(-0.2)">－</button>
-        <button class="zoom-btn" onclick="resetZoom()">↻</button>
-    </div>
+    <div class="reference-content" id="referenceContent"></div>
 </div>
 
 <script>
 const steps = [
-    {nav:"①でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－をよくみて入れましょう。"},
-    {nav:"②せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がピタッとついているか確認。"},
-    {nav:"③スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"スイッチを動かしてみましょう。"},
-    {nav:"④まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば大成功！", note:"ぶるぶる動くか確かめます。"},
-    {nav:"⑤みため", title:"⑤ 見た目完成", img:"images/car_complete.jpg", ok:"つなぎ方をためそう！", note:"かっこいい車になってきたかな？"},
-    {nav:"⑥かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"動いたらおめでとう！", note:"広いところで走らせてみよう。"}
+    {nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
+    {nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
+    {nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
+    {nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
+    {nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:["images/car_complete.jpg","images/3ami.gif"],ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
+    {nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
 ];
 
+const referenceAlbum = {
+    "電池関連":[
+        {img:"reference/battery_types.jpg",title:"電池の種類"},
+        {img:"reference/battery_safety.jpg",title:"安全な扱い方"}
+    ],
+    "モーター関連":[
+        {img:"reference/motor_check.jpg",title:"モーター検査"},
+        {img:"reference/motor_trouble.jpg",title:"よくある不具合"}
+    ],
+    "完成例":[
+        {img:"reference/advanced_car.jpg",title:"応用例"},
+        {img:"reference/3ami.gif",title:"三つ編み接続"}
+    ]
+};
+
+let currentStep = 0;
+const nav = document.getElementById('nav');
 const content = document.getElementById('content');
-const overlay = document.getElementById('overlay');
-const overlayImg = document.getElementById('overlayImg');
-const imgContainer = document.getElementById('imgContainer');
-const rotateGuide = document.getElementById('rotateGuide');
 
-let state = { scale: 1, rotation: 90 };
-
-function init() {
-    const nav = document.getElementById('nav');
-    steps.forEach((step, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'nav-btn';
-        btn.textContent = step.nav;
-        btn.onclick = () => showStep(i);
-        nav.appendChild(btn);
-    });
-    showStep(0);
-}
+// ナビゲーション作成
+steps.forEach((step, index) => {
+    const button = document.createElement('button');
+    button.className = 'nav-btn';
+    button.textContent = step.nav;
+    button.onclick = () => showStep(index);
+    nav.appendChild(button);
+});
 
 function showStep(index) {
+    currentStep = index;
+    document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === index);
+    });
+    
     const step = steps[index];
-    document.querySelectorAll('.nav-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
-    content.innerHTML = `
-        <div class="card">
-            <div class="step-title">${step.title}</div>
-            <div class="photo-container" onclick="openOverlay('${step.img}')">
+    let photoHTML = '';
+    
+    if (Array.isArray(step.img)) {
+        photoHTML = `<div class="photo-container multi">${
+            step.img.map(img => `
                 <div class="photo-wrapper">
-                    <img src="${step.img}" class="step-img">
+                    <img src="${img}" class="step-img">
                     <div class="tap-label">タップで拡大</div>
                 </div>
+            `).join('')
+        }</div>`;
+    } else {
+        photoHTML = `
+            <div class="photo-container">
+                <img src="${img}" class="step-img">
+                <div class="tap-label">タップで拡大</div>
             </div>
+        `;
+    }
+    
+    let cardClass = 'card';
+    if (step.danger) cardClass += ' danger';
+    if (step.final) cardClass += ' final';
+    
+    content.innerHTML = `
+        <div class="${cardClass}">
+            <div class="step-title">${step.title}</div>
+            ${photoHTML}
             <div class="ok-box">${step.ok}</div>
             <div class="note-box">${step.note}</div>
-        </div>`;
+        </div>
+    `;
+    
+    document.querySelectorAll('.step-img').forEach(img => {
+        img.onclick = () => openOverlay(img.src);
+    });
 }
 
 function openOverlay(src) {
-    overlayImg.src = src;
-    overlay.classList.add('active');
-    rotateGuide.classList.remove('hidden');
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay active';
+    
+    const overlayContent = document.createElement('div');
+    overlayContent.className = 'overlay-content';
+    
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'overlay-img-container';
+    
+    const img = document.createElement('img');
+    img.className = 'overlay-img landscape-mode'; // 自動横向き表示
+    img.src = src;
+    
+    // ズームコントロール
+    const zoomControls = document.createElement('div');
+    zoomControls.className = 'zoom-controls';
+    zoomControls.innerHTML = `
+        <button class="zoom-btn" id="zoomInBtn">+</button>
+        <button class="zoom-btn" id="zoomOutBtn">−</button>
+        <button class="zoom-btn" id="resetZoomBtn">↻</button>
+    `;
+    
+    // 操作ガイド
+    const controlsGuide = document.createElement('div');
+    controlsGuide.className = 'controls-guide';
+    controlsGuide.innerHTML = `
+        <div>ピンチ操作で拡大・縮小できます</div>
+        <div>ドラッグで画像を動かせます</div>
+    `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-btn';
+    closeBtn.textContent = '×';
+    
+    const closeOverlay = () => {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', handleEsc);
+    };
+    
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') closeOverlay();
+    };
+    
+    closeBtn.onclick = closeOverlay;
+    overlay.onclick = (e) => {
+        if (e.target === overlay) closeOverlay();
+    };
+    document.addEventListener('keydown', handleEsc);
+    
+    imgContainer.appendChild(img);
+    overlayContent.appendChild(imgContainer);
+    overlay.appendChild(overlayContent);
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(zoomControls);
+    overlay.appendChild(controlsGuide);
+    document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
     
-    resetZoom();
-    updateOrientation();
+    // 5秒後に操作ガイドを非表示
+    setTimeout(() => {
+        controlsGuide.classList.add('hidden');
+    }, 5000);
     
-    // ガイドを3秒後に消す
-    setTimeout(() => rotateGuide.classList.add('hidden'), 3000);
+    // ズーム管理
+    const state = { 
+        scale: 1, 
+        x: 0, 
+        y: 0,
+        minScale: 1,
+        maxScale: 5
+    };
+    
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let initDist = 0;
+    
+    function updateTransform() {
+        imgContainer.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+    }
+    
+    // ズーム関数
+    function zoom(delta) {
+        const newScale = state.scale + delta;
+        state.scale = Math.max(state.minScale, Math.min(state.maxScale, newScale));
+        updateTransform();
+    }
+    
+    // ズームリセット
+    function resetZoom() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        updateTransform();
+    }
+    
+    // ズームボタンイベント
+    document.getElementById('zoomInBtn').onclick = () => zoom(0.2);
+    document.getElementById('zoomOutBtn').onclick = () => zoom(-0.2);
+    document.getElementById('resetZoomBtn').onclick = resetZoom;
+    
+    // タッチイベント（ピンチズーム対応）
+    imgContainer.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initDist = Math.sqrt(dx*dx + dy*dy);
+        } else if (e.touches.length === 1 && state.scale > 1) {
+            isDragging = true;
+            startX = e.touches[0].clientX - state.x;
+            startY = e.touches[0].clientY - state.y;
+        }
+    });
+    
+    imgContainer.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 2 && initDist > 0) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currDist = Math.sqrt(dx*dx + dy*dy);
+            const scaleChange = currDist / initDist;
+            state.scale = Math.max(state.minScale, Math.min(state.maxScale, state.scale * scaleChange));
+            updateTransform();
+        } else if (e.touches.length === 1 && isDragging && state.scale > 1) {
+            state.x = e.touches[0].clientX - startX;
+            state.y = e.touches[0].clientY - startY;
+            updateTransform();
+        }
+    });
+    
+    imgContainer.addEventListener('touchend', () => {
+        isDragging = false;
+        initDist = 0;
+    });
+    
+    // マウスイベント
+    imgContainer.addEventListener('mousedown', (e) => {
+        if (state.scale > 1) {
+            isDragging = true;
+            startX = e.clientX - state.x;
+            startY = e.clientY - state.y;
+        }
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging && state.scale > 1) {
+            state.x = e.clientX - startX;
+            state.y = e.clientY - startY;
+            updateTransform();
+        }
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    
+    // ホイールズーム（PC対応）
+    imgContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.1 : -0.1;
+        zoom(delta);
+    });
+    
+    // ダブルクリックでリセット
+    imgContainer.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        resetZoom();
+    });
 }
 
-function updateOrientation() {
-    // 縦持ちなら90度回転、横持ちなら0度に戻す
-    const isPortrait = window.innerHeight > window.innerWidth;
-    state.rotation = isPortrait ? 90 : 0;
-    applyTransform();
-}
-
-function zoom(delta) {
-    state.scale = Math.max(0.5, Math.min(4, state.scale + delta));
-    applyTransform();
-}
-
-function resetZoom() {
-    state.scale = 1;
-    applyTransform();
-}
-
-function applyTransform() {
-    imgContainer.style.transform = `scale(${state.scale}) rotate(${state.rotation}deg)`;
-}
-
-// 持ち替え検知
-window.addEventListener('resize', updateOrientation);
-
-document.getElementById('closeOverlay').onclick = () => {
-    overlay.classList.remove('active');
-    document.body.style.overflow = 'auto';
+document.getElementById('referenceBtn').onclick = () => {
+    const content = document.getElementById('referenceContent');
+    content.innerHTML = Object.entries(referenceAlbum).map(([category, items]) => `
+        <div>
+            <h4>${category}</h4>
+            <div class="reference-grid">
+                ${items.map(item => `
+                    <div>
+                        <img src="${item.img}" onclick="openOverlay('${item.img}')">
+                        <div>${item.title}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('referenceOverlay').classList.add('active');
 };
 
-init();
+document.getElementById('closeReference').onclick = () => {
+    document.getElementById('referenceOverlay').classList.remove('active');
+};
+
+showStep(0);
 </script>
 </body>
 </html>
