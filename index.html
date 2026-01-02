@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>👀みてつくるシート🚗</title>
 <style>
-/* 全体設定 */
+/* --- 基本設定 --- */
 * {
     margin: 0;
     padding: 0;
@@ -15,15 +15,20 @@ body {
     font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
     background: #f5f5f5;
     color: #333;
+    line-height: 1.6;
+}
+.container {
     max-width: 960px;
     margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
 }
 
-/* ヘッダー：左寄せデザイン */
+/* --- ヘッダー（左寄せ・写真ボタン右） --- */
 .header {
-    background: #4CAF50; /* 画像のような鮮やかな緑 */
+    background: #4CAF50;
     color: #fff;
-    padding: 1rem 1.2rem;
+    padding: 1.2rem;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -32,27 +37,25 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 960px;
+    margin: 0 auto;
 }
 .header-title-area {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* 左寄せに設定 */
+    align-items: flex-start; /* 左寄せ */
 }
 h1 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
-    letter-spacing: 1px;
 }
 .header-subtitle {
-    font-size: 1rem;
-    margin-top: 4px;
+    font-size: 0.9rem;
     opacity: 0.9;
 }
-
-/* 写真ボタン：右上の白い丸ボタン */
 .reference-btn {
     background: #fff;
     color: #4CAF50;
@@ -63,80 +66,68 @@ h1 {
     font-weight: bold;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    white-space: nowrap;
 }
 
-/* ナビゲーション：画像のデザインを再現 */
+/* --- ナビゲーション（横スクロール） --- */
 .nav-container {
     background: #fff;
     padding: 1rem 0.8rem;
     border-bottom: 2px solid #ddd;
+    position: sticky;
+    top: 74px; /* ヘッダーの高さ分 */
+    z-index: 900;
 }
 .nav-scroll {
     display: flex;
     gap: 0.8rem;
     overflow-x: auto;
     padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
 }
-.nav-scroll::-webkit-scrollbar {
-    height: 4px;
-}
-.nav-scroll::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-
 .nav-btn {
     padding: 0.8rem 1.2rem;
-    background: #2196F3; /* 通常時は青 */
+    background: #2196F3;
     color: #fff;
     border: none;
-    border-radius: 1.2rem; /* 画像のような大きな丸み */
-    font-size: 1.2rem;
+    border-radius: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
-    min-width: 130px;
+    min-width: 120px;
     white-space: nowrap;
-    box-shadow: 0 4px 0 #1565C0; /* 立体感 */
-    transition: all 0.1s;
+    box-shadow: 0 4px 0 #1565C0;
+    transition: 0.1s;
 }
 .nav-btn.active {
-    background: #FF9800; /* 選択時はオレンジ */
+    background: #FF9800;
     box-shadow: 0 4px 0 #E65100;
 }
-.nav-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #1565C0;
-}
 
-/* メインコンテンツ */
+/* --- コンテンツエリア --- */
 .content {
-    padding: 1rem;
+    padding: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 .card {
     background: #fff;
     border-radius: 1.5rem;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 1rem;
 }
 .step-title {
     font-size: 1.4rem;
     color: #1565C0;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
     border-left: 6px solid #2196F3;
     padding-left: 12px;
 }
 
-/* 写真表示エリア */
 .photo-container {
     margin: 1rem 0;
     border-radius: 1rem;
-    background: #f0f0f0;
-    min-height: 240px;
+    background: #f9f9f9;
+    min-height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -145,84 +136,69 @@ h1 {
     border: 1px solid #eee;
 }
 .step-img {
-    width: 100%;
+    max-width: 100%;
     height: auto;
     display: block;
-    cursor: pointer;
-}
-.tap-label {
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
 }
 
-/* チェック・注意ボックス */
 .ok-box {
     background: #E8F5E9;
     padding: 1rem;
-    margin-top: 1rem;
     border-radius: 0.8rem;
     border: 2px dashed #4CAF50;
     font-weight: bold;
-    color: #2E7D32;
+    margin-bottom: 10px;
 }
 .note-box {
     background: #FFF3E0;
     padding: 1rem;
-    margin-top: 0.8rem;
     border-radius: 0.8rem;
-    color: #E65100;
     font-size: 0.95rem;
 }
 
-/* モバイル調整 */
-@media (max-width: 480px) {
-    h1 { font-size: 1.3rem; }
-    .header-subtitle { font-size: 0.85rem; }
-    .nav-btn { min-width: 110px; font-size: 1.1rem; padding: 0.7rem; }
+/* --- レスポンシブ調整（スマホ向け） --- */
+@media (max-width: 600px) {
+    h1 { font-size: 1.2rem; }
+    .header-subtitle { font-size: 0.8rem; }
+    .nav-btn { min-width: 100px; font-size: 1rem; padding: 0.7rem; }
+    .step-title { font-size: 1.2rem; }
+    .content { padding: 1rem; }
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="header-content">
-        <div class="header-title-area">
-            <h1>👀 みてつくるシート 🚗</h1>
-            <p class="header-subtitle">リモコンカーの作り方を写真で確認</p>
+<div class="container">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title-area">
+                <h1>👀 みてつくるシート 🚗</h1>
+                <p class="header-subtitle">リモコンカーの作り方を写真で確認</p>
+            </div>
+            <button class="reference-btn" id="referenceBtn">📚 写真</button>
         </div>
-        <button class="reference-btn" id="referenceBtn">
-            <span style="font-size: 1rem;">📚</span> 写真
-        </button>
-    </div>
-</div>
+    </header>
 
-<div class="nav-container">
-    <div class="nav-scroll" id="nav"></div>
-</div>
+    <nav class="nav-container">
+        <div class="nav-scroll" id="nav"></div>
+    </nav>
 
-<main class="content" id="content"></main>
+    <main class="content" id="content"></main>
+</div>
 
 <script>
-// ステップ情報
 const steps = [
     {nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"✅ 電池の向きOK！", note:"＋と－を確認します。"},
-    {nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"✅ 線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
-    {nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"✅ 前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。"},
-    {nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"✅ 回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない場合は配線を確認。"},
-    {nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"✅ つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。"},
-    {nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"🎉 前後に動いたら大成功！", note:"安全に走らせよう。"}
+    {nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"✅ 線がつながった！", note:"磁石がしっかり付いているか確認。"},
+    {nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"✅ 前後が切り替わる！", note:"左右SWを押して切り替わるか確認。"},
+    {nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"✅ 回れば OK！", note:"指を近づけないよう注意。"},
+    {nav:"⑤ みため", title:"⑤ 見た目完成", img:"images/car_complete.jpg", ok:"✅ つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。"},
+    {nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"🎉 大成功！", note:"安全に走らせよう。"}
 ];
 
 const nav = document.getElementById('nav');
 const content = document.getElementById('content');
 
-// ナビゲーションの生成
 steps.forEach((step, index) => {
     const button = document.createElement('button');
     button.className = 'nav-btn';
@@ -231,7 +207,6 @@ steps.forEach((step, index) => {
     nav.appendChild(button);
 });
 
-// ステップの表示切り替え
 function showStep(index) {
     document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
         btn.classList.toggle('active', idx === index);
@@ -242,22 +217,18 @@ function showStep(index) {
         <div class="card">
             <div class="step-title">${step.title}</div>
             <div class="photo-container">
-                <img src="${step.img}" class="step-img" onerror="this.style.display='none'; this.parentNode.insertAdjacentHTML('afterbegin', '<span style=color:#999>写真（${step.img}）</span>')">
-                <div class="tap-label">タップで拡大</div>
+                <img src="${step.img}" class="step-img" alt="手順画像">
             </div>
             <div class="ok-box">${step.ok}</div>
-            <div class="note-box"><strong>注意点:</strong> ${step.note}</div>
+            <div class="note-box"><strong>メモ:</strong> ${step.note}</div>
         </div>
     `;
     
-    // 選択したボタンを中央付近にスクロール
     const activeBtn = document.querySelectorAll('.nav-btn')[index];
     activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }
 
-// 初期表示
 showStep(0);
 </script>
-
 </body>
 </html>
