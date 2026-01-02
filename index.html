@@ -1,391 +1,590 @@
 <!DOCTYPE html>
-
-<html lang="ja"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <title>👀みてつくるシート🚗</title> <style> :root { --primary-color: #2c97de; /* 明るい青 / --accent-color: #ff9f1c; / 元気なオレンジ */ --ok-bg: #e6f7ff; --ok-border: #1890ff; --note-bg: #fff7e6; --note-border: #faad14; --danger-bg: #fff1f0; --danger-border: #ff4d4f; --text-main: #333; --bg-body: #f0f4f8; --white: #ffffff; }
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-    background-color: var(--bg-body);
-    color: var(--text-main);
-    line-height: 1.6;
-    padding-bottom: 50px;
-}
-
-/* ヘッダー */
-header {
-    background-color: var(--primary-color);
-    color: var(--white);
-    text-align: center;
-    padding: 15px 10px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-h1 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    letter-spacing: 0.05em;
-}
-
-/* ナビゲーション */
-.nav-container {
-    background: var(--white);
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px 5px;
-    position: sticky;
-    top: 60px; /* header height approx */
-    z-index: 90;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    -webkit-overflow-scrolling: touch;
-}
-
-.nav-btn {
-    display: inline-block;
-    background: #eee;
-    color: #555;
-    padding: 8px 15px;
-    margin: 0 4px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-
-.nav-btn.active {
-    background: var(--primary-color);
-    color: var(--white);
-}
-
-/* メインコンテンツ */
-main {
-    padding: 15px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-/* ステップカード */
-.step-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    scroll-margin-top: 130px; /* アンカーリンクの位置調整 */
-}
-
-.step-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.step-number {
-    background: var(--primary-color);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-right: 10px;
-    flex-shrink: 0;
-}
-
-.step-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-/* 画像エリア */
-.img-container {
-    position: relative;
-    width: 100%;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.step-img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-
-.step-img:active {
-    transform: scale(0.98);
-}
-
-.tap-hint {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 5px;
-    display: block;
-    text-align: right;
-}
-
-/* 確認ポイントボックス */
-.check-box {
-    background-color: var(--ok-bg);
-    border-left: 5px solid var(--ok-border);
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.check-title {
-    color: var(--ok-border);
-    font-weight: bold;
-    font-size: 0.95rem;
-    display: block;
-    margin-bottom: 5px;
-}
-.check-title::before {
-    content: "✅ ";
-}
-
-.check-text {
-    font-size: 1.1rem;
-    font-weight: bold;
-}
-
-/* ノートボックス */
-.note-box {
-    background-color: var(--note-bg);
-    border: 1px dashed var(--note-border);
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    color: #666;
-}
-
-.note-box.danger {
-    background-color: var(--danger-bg);
-    border-color: var(--danger-border);
-    color: #d32f2f;
-}
-
-.note-icon {
-    font-weight: bold;
-    margin-right: 5px;
-}
-
-/* 完了表示 */
-.final-step {
-    border: 3px solid #FFD700;
-    background: linear-gradient(to bottom, #fff, #fffbf0);
-}
-.final-step .step-title {
-    color: #e67e22;
-}
-
-/* --- モーダル（画像拡大） --- */
-.modal {
-    display: none; /* 初期非表示 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-img {
-    max-width: 95%;
-    max-height: 95%;
-    border-radius: 4px;
-    box-shadow: 0 0 20px rgba(255,255,255,0.1);
-    transition: transform 0.3s ease;
-}
-
-.close-hint {
-    position: absolute;
-    bottom: 20px;
-    color: white;
-    font-size: 1rem;
-    background: rgba(0,0,0,0.5);
-    padding: 8px 20px;
-    border-radius: 30px;
-    pointer-events: none;
-    z-index: 2001;
-}
-
-/* スマホ縦向き（Portrait）の時だけ、
-   画像を90度回転させて「擬似横向き」にする 
-*/
-@media screen and (orientation: portrait) {
-    .modal-img {
-        /* 画面の中心を軸に90度回転 */
-        transform: rotate(90deg);
-        /* 回転した状態で画面いっぱいに表示するためのサイズ調整 */
-        width: 85vh; /* 画面の高さを幅として使う */
-        height: auto; 
-        max-width: none;
-        max-height: 85vw;
-    }
-}
-
-/* 横向き（Landscape）で持っている場合はそのまま表示 */
-@media screen and (orientation: landscape) {
-    .modal-img {
-        transform: none;
-        width: auto;
-        height: 90vh;
-    }
-}
-</style> </head> <body>
-
-<header id="top">
-    <h1>👀みてつくるシート🚗</h1>
-</header>
-
-<nav class="nav-container" id="nav-container">
-    </nav>
-
-<main id="main-content">
-    </main>
-
-<div id="imageModal" class="modal">
-    <img id="modalImg" class="modal-img" src="" alt="拡大画像">
-    <div class="close-hint">タップしてもどる</div>
-</div>
-<script> // --- データ構造 --- const steps = [ { nav:"① 電池", title:"① 電池（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－を確認します。" }, { nav:"② 電池の線", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" }, { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" }, { nav:"④ 回る？", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば OK", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" }, { nav:"⑤ 見た目", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true }, { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true } ];
-
-// --- DOM要素 ---
-const navContainer = document.getElementById(&#39;nav-container&#39;);
-const mainContent = document.getElementById(&#39;main-content&#39;);
-const modal = document.getElementById(&#39;imageModal&#39;);
-const modalImg = document.getElementById(&#39;modalImg&#39;);
-
-// --- 初期化処理 ---
-function init() {
-    steps.forEach((step, index) =&gt; {
-        const stepId = `step-${index}`;
-
-        // 1. ナビボタン作成
-        const btn = document.createElement(&#39;a&#39;);
-        btn.href = `#${stepId}`;
-        btn.className = &#39;nav-btn&#39;;
-        btn.textContent = step.nav;
-        btn.onclick = (e) =&gt; {
-            // スムーズスクロールとアクティブ切り替え
-            e.preventDefault();
-            document.getElementById(stepId).scrollIntoView({ behavior: &#39;smooth&#39; });
-            setActiveNav(index);
-        };
-        navContainer.appendChild(btn);
-
-        // 2. メインコンテンツ作成
-        const section = document.createElement(&#39;section&#39;);
-        section.id = stepId;
-        section.className = &#39;step-card&#39;;
-        if(step.final) section.classList.add(&#39;final-step&#39;);
-
-        // 注意書きのスタイル判定
-        const noteClass = step.danger ? &#39;note-box danger&#39; : &#39;note-box&#39;;
-        const noteIcon = step.danger ? &#39;⚠️ 注意：&#39; : &#39;💡 ヒント：&#39;;
-
-        // HTML組み立て
-        // プレースホルダー画像を使用（実際の運用ではimagesフォルダのパスになりますが、ここでは動作確認用にplacehold.jpを使用）
-        // ※実運用時は src=&quot;${step.img}&quot; に戻してください
-        // 今回はコードだけで動作確認できるよう、色付きのプレースホルダー画像をセットします。
-        const imgSrc = step.img; 
-        // 実際は上記のimgSrcを使いますが、デモ用にダミー画像を生成するロジックを入れることも可能です。
-        // ここでは要件通り「imagesフォルダ参照」のパスを出力します。
-        
-        section.innerHTML = `
-            &lt;div class=&quot;step-header&quot;&gt;
-                &lt;div class=&quot;step-title&quot;&gt;${step.title}&lt;/div&gt;
-            &lt;/div&gt;
-            
-            &lt;div class=&quot;img-container&quot;&gt;
-                &lt;img src=&quot;${imgSrc}&quot; alt=&quot;${step.title}&quot; class=&quot;step-img&quot; onerror=&quot;this.src=&#39;[https://placehold.jp/30/cccccc/ffffff/400x300.png?text=No+Image&#39;;this.alt=&#39;画像なし](https://placehold.jp/30/cccccc/ffffff/400x300.png?text=No+Image&#39;;this.alt=&#39;画像なし)&#39;&quot; onclick=&quot;openModal(this.src)&quot;&gt;
-                &lt;span class=&quot;tap-hint&quot;&gt;👆 写真をタップして拡大&lt;/span&gt;
-            &lt;/div&gt;
-
-            &lt;div class=&quot;check-box&quot;&gt;
-                &lt;span class=&quot;check-title&quot;&gt;できているポイント&lt;/span&gt;
-                &lt;div class=&quot;check-text&quot;&gt;${step.ok}&lt;/div&gt;
-            &lt;/div&gt;
-
-            &lt;div class=&quot;${noteClass}&quot;&gt;
-                &lt;span class=&quot;note-icon&quot;&gt;${noteIcon}&lt;/span&gt;
-                ${step.note}
-            &lt;/div&gt;
-        `;
-        mainContent.appendChild(section);
-    });
-
-    // スクロールイベントでナビのアクティブ状態を更新
-    window.addEventListener(&#39;scroll&#39;, onScroll);
-}
-
-// --- ナビゲーションのアクティブ制御 ---
-function setActiveNav(index) {
-    const btns = document.querySelectorAll(&#39;.nav-btn&#39;);
-    btns.forEach(b =&gt; b.classList.remove(&#39;active&#39;));
-    if(btns[index]) btns[index].classList.add(&#39;active&#39;);
-}
-
-function onScroll() {
-    // 現在のスクロール位置から、どのセクションが画面内にあるか判定
-    let current = 0;
-    const sections = document.querySelectorAll(&#39;.step-card&#39;);
-    sections.forEach((section, index) =&gt; {
-        const sectionTop = section.offsetTop - 150; // オフセット調整
-        if (window.scrollY &gt;= sectionTop) {
-            current = index;
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>リモコンカー作り 確認シート</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    });
-    setActiveNav(current);
-}
 
-// --- モーダル制御 ---
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+        }
 
-// 画像を開く
-window.openModal = function(src) {
-    modalImg.src = src;
-    modal.classList.add(&#39;active&#39;);
-    // スクロール防止
-    document.body.style.overflow = &#39;hidden&#39;;
-}
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
 
-// 画像を閉じる（リセット）
-modal.onclick = function() {
-    modal.classList.remove(&#39;active&#39;);
-    // スクロール解除
-    document.body.style.overflow = &#39;&#39;;
-    
-    // 拡大情報をリセットして戻る（CSS transformはクラス制御で自動リセットされるが念の為srcクリア等はしないでおく）
-    setTimeout(() =&gt; {
-        // アニメーション完了後にリセット等の処理が必要であればここに記述
-    }, 300);
-}
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
 
-// 初期化実行
-init();
-</script>
+        h1 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
 
-</body> </html>
+        .subtitle {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        /* ナビゲーション */
+        .nav-container {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 12px 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-container::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .nav-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 10px;
+        }
+
+        .nav-button {
+            flex: 0 0 auto;
+            padding: 10px 15px;
+            margin-right: 8px;
+            border-radius: 8px;
+            background-color: #ecf0f1;
+            color: #34495e;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: 2px solid transparent;
+        }
+
+        .nav-button:hover, .nav-button:active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .nav-button.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #3498db;
+        }
+
+        /* 工程コンテンツ */
+        .step-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .step-image-container {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .step-image-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .step-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+        }
+
+        .step-info {
+            margin-top: 20px;
+        }
+
+        .ok-section {
+            background-color: #e8f6f3;
+            border-left: 5px solid #27ae60;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .ok-title {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ok-title::before {
+            content: "✓ ";
+            font-size: 1.3rem;
+            margin-right: 5px;
+        }
+
+        .note-section {
+            background-color: #fff9e6;
+            border-left: 5px solid #f39c12;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note-title {
+            color: #d35400;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .note-title::before {
+            content: "💡 ";
+            margin-right: 5px;
+        }
+
+        .danger-section {
+            background-color: #fdedec;
+            border-left: 5px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .danger-title {
+            color: #c0392b;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .danger-title::before {
+            content: "⚠️ ";
+            margin-right: 5px;
+        }
+
+        .final-section {
+            background-color: #eaf2f8;
+            border-left: 5px solid #2980b9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .final-title {
+            color: #1a5276;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .final-title::before {
+            content: "🎉 ";
+            margin-right: 5px;
+        }
+
+        .info-text {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* 画像拡大表示 */
+        .image-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .image-overlay.active {
+            display: flex;
+        }
+
+        .image-overlay img {
+            max-width: 95%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 5px;
+            transform: rotate(0deg);
+            transition: transform 0.5s;
+        }
+
+        .image-overlay.active img {
+            transform: rotate(90deg);
+            max-width: 95vh;
+            max-height: 80vw;
+        }
+
+        .image-caption {
+            color: white;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-button:hover {
+            color: #3498db;
+        }
+
+        /* フッター */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        /* レスポンシブ調整 */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .step-title {
+                font-size: 1.3rem;
+            }
+            
+            .nav-button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .step-content {
+                padding: 15px;
+            }
+            
+            .ok-title, .note-title, .danger-title, .final-title {
+                font-size: 1rem;
+            }
+            
+            .info-text {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👀みてつくるシート🚗</h1>
+            <p class="subtitle">リモコンカー作り 写真で確認シート</p>
+        </header>
+
+        <nav>
+            <div class="nav-container" id="navContainer">
+                <!-- ナビゲーションボタンはJavaScriptで生成 -->
+            </div>
+        </nav>
+
+        <main>
+            <div id="stepContent">
+                <!-- 工程コンテンツはJavaScriptで生成 -->
+            </div>
+        </main>
+
+        <footer>
+            <p>写真をタップすると拡大表示できます</p>
+            <p>作りながら一つずつ確認しよう！</p>
+        </footer>
+    </div>
+
+    <!-- 画像拡大表示用 -->
+    <div class="image-overlay" id="imageOverlay">
+        <button class="close-button" id="closeButton">&times;</button>
+        <img id="expandedImage" src="" alt="拡大写真">
+        <div class="image-caption" id="imageCaption"></div>
+    </div>
+
+    <script>
+        // 工程データ
+        const steps = [
+            { 
+                nav: "① でんち", 
+                title: "① 電池（BOX）", 
+                img: "images/battery_box.jpg",
+                ok: "電池の向きOK！", 
+                note: "＋と－を確認します。電池の向きが間違っていると動きません。"
+            },
+            { 
+                nav: "② せん", 
+                title: "② 電池につける電線", 
+                img: "images/wire_magnet.jpg",
+                ok: "線がつながった！", 
+                note: "磁石がしっかり付いているか確認。外れていないか見ます。線がきちんと電池の端子に触れているかもチェック。"
+            },
+            { 
+                nav: "③ スイッチ", 
+                title: "③ 前後切り替えスイッチ", 
+                img: "images/switch_complete.jpg",
+                ok: "前後が切り替わる！", 
+                note: "左右SWを押して切り替わるか確認。向きを確認します。スイッチがしっかりカチッと音がするか確かめよう。"
+            },
+            { 
+                nav: "④ まわる", 
+                title: "④ モーターは回る？", 
+                img: "images/motor_test.jpg",
+                ok: "回れば OK（又は、LEDチェッカーで調べる）", 
+                note: "指を近づけないよう注意。回らない（つかない）場合は配線を確認。線が外れていないか見てみよう。"
+            },
+            { 
+                nav: "⑤ みため", 
+                title: "⑤ 見た目完成（実験中）", 
+                img: "images/car_complete.jpg",
+                ok: "つなぎ方をためそう！", 
+                note: "前後が逆なら入れ替えてみよう。車体がしっかり組み立てられているか確認。",
+                danger: true
+            },
+            { 
+                nav: "⑥ かんせい", 
+                title: "⑥ ほんとうの完成！", 
+                img: "images/complete.jpg",
+                ok: "前後に動いたら大成功！", 
+                note: "安全に走らせよう。まわりの人や物にぶつからないように気をつけて。",
+                final: true
+            }
+        ];
+
+        // 現在の工程インデックス
+        let currentStepIndex = 0;
+
+        // DOM要素
+        const navContainer = document.getElementById('navContainer');
+        const stepContent = document.getElementById('stepContent');
+        const imageOverlay = document.getElementById('imageOverlay');
+        const expandedImage = document.getElementById('expandedImage');
+        const imageCaption = document.getElementById('imageCaption');
+        const closeButton = document.getElementById('closeButton');
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderNavigation();
+            renderStepContent(currentStepIndex);
+            setupEventListeners();
+        });
+
+        // ナビゲーションのレンダリング
+        function renderNavigation() {
+            navContainer.innerHTML = '';
+            
+            steps.forEach((step, index) => {
+                const button = document.createElement('a');
+                button.href = '#';
+                button.className = 'nav-button';
+                if (index === currentStepIndex) {
+                    button.classList.add('active');
+                }
+                button.textContent = step.nav;
+                button.dataset.index = index;
+                
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentStepIndex = index;
+                    renderNavigation();
+                    renderStepContent(currentStepIndex);
+                    // ページトップにスクロール
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                
+                navContainer.appendChild(button);
+            });
+        }
+
+        // 工程コンテンツのレンダリング
+        function renderStepContent(index) {
+            const step = steps[index];
+            
+            let dangerSection = '';
+            if (step.danger) {
+                dangerSection = `
+                    <div class="danger-section">
+                        <div class="danger-title">ちゅうい！</div>
+                        <div class="info-text">動いている車に指や物を近づけないようにしよう。モーターや電池が熱くなることがあるので注意！</div>
+                    </div>
+                `;
+            }
+            
+            let finalSection = '';
+            if (step.final) {
+                finalSection = `
+                    <div class="final-section">
+                        <div class="final-title">おめでとう！</div>
+                        <div class="info-text">リモコンカーが完成しました！上手にできたら、先生やお友達に見せてあげましょう。</div>
+                    </div>
+                `;
+            }
+            
+            stepContent.innerHTML = `
+                <div class="step-content">
+                    <h2 class="step-title">${step.title}</h2>
+                    
+                    <div class="step-image-container" data-index="${index}">
+                        <img src="${step.img}" alt="${step.title}" class="step-image">
+                    </div>
+                    
+                    <div class="step-info">
+                        <div class="ok-section">
+                            <div class="ok-title">できているポイント</div>
+                            <div class="info-text">${step.ok}</div>
+                        </div>
+                        
+                        <div class="note-section">
+                            <div class="note-title">ちゅうい・ヒント</div>
+                            <div class="info-text">${step.note}</div>
+                        </div>
+                        
+                        ${dangerSection}
+                        ${finalSection}
+                    </div>
+                </div>
+            `;
+            
+            // 画像クリックイベントの設定
+            const imageContainer = document.querySelector('.step-image-container');
+            imageContainer.addEventListener('click', function() {
+                expandImage(step.img, step.title);
+            });
+        }
+
+        // 画像拡大表示
+        function expandImage(src, caption) {
+            expandedImage.src = src;
+            imageCaption.textContent = caption;
+            imageOverlay.classList.add('active');
+            
+            // 画面を横向き固定（疑似）
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 画像拡大解除
+        function collapseImage() {
+            imageOverlay.classList.remove('active');
+            expandedImage.src = '';
+            imageCaption.textContent = '';
+            
+            // 画面スクロールを復元
+            document.body.style.overflow = '';
+        }
+
+        // イベントリスナーの設定
+        function setupEventListeners() {
+            // 閉じるボタン
+            closeButton.addEventListener('click', collapseImage);
+            
+            // オーバーレイクリックで閉じる
+            imageOverlay.addEventListener('click', function(e) {
+                if (e.target === imageOverlay) {
+                    collapseImage();
+                }
+            });
+            
+            // ESCキーで閉じる
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageOverlay.classList.contains('active')) {
+                    collapseImage();
+                }
+            });
+            
+            // 画面回転時の処理
+            window.addEventListener('orientationchange', function() {
+                // 画像拡大中は何もしない（混乱防止）
+            });
+        }
+
+        // タッチイベントの制限（スワイプによる画像切り替えを無効化）
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            if (imageOverlay.classList.contains('active')) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                // スワイプによる画像切り替えを防止
+                e.stopPropagation();
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (imageOverlay.classList.contains('active')) {
+                // 拡大中はスワイプを制限（最小限の動きのみ許可）
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchend', function(e) {
+            if (imageOverlay.classList.contains('active')) {
+                // スワイプによる画像切り替えを防止
+                e.stopPropagation();
+            }
+        }, { passive: true });
+    </script>
+</body>
+</html>
