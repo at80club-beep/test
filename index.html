@@ -17,16 +17,10 @@ body {
     color: #333;
     line-height: 1.6;
 }
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    background: #fff;
-    min-height: 100vh;
-}
 
-/* --- ヘッダー（左寄せ・写真ボタン右） --- */
+/* --- ヘッダー設定 --- */
 .header {
-    background: #4CAF50;
+    background: #4CAF50; /* 画像のような鮮やかな緑 */
     color: #fff;
     padding: 1.2rem;
     position: sticky;
@@ -39,23 +33,35 @@ body {
     align-items: center;
     max-width: 960px;
     margin: 0 auto;
+    position: relative;
 }
+
+/* タイトルエリアのレスポンシブ設定 */
 .header-title-area {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* 左寄せ */
+    flex-grow: 1;
+    /* デフォルト（PC）は中央寄せ */
+    align-items: center; 
+    text-align: center;
 }
+
 h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+    letter-spacing: 1px;
 }
 .header-subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    margin-top: 4px;
     opacity: 0.9;
+    font-weight: bold;
 }
+
+/* 写真ボタン */
 .reference-btn {
     background: #fff;
     color: #4CAF50;
@@ -68,40 +74,44 @@ h1 {
     align-items: center;
     gap: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
 }
 
-/* --- ナビゲーション（横スクロール） --- */
+/* --- ナビゲーション（画像のデザインを再現） --- */
 .nav-container {
     background: #fff;
     padding: 1rem 0.8rem;
     border-bottom: 2px solid #ddd;
-    position: sticky;
-    top: 74px; /* ヘッダーの高さ分 */
-    z-index: 900;
 }
 .nav-scroll {
     display: flex;
     gap: 0.8rem;
     overflow-x: auto;
     padding-bottom: 8px;
+    max-width: 960px;
+    margin: 0 auto;
 }
 .nav-btn {
     padding: 0.8rem 1.2rem;
-    background: #2196F3;
+    background: #2196F3; /* 通常は青 */
     color: #fff;
     border: none;
     border-radius: 1.2rem;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    min-width: 120px;
+    min-width: 130px;
     white-space: nowrap;
-    box-shadow: 0 4px 0 #1565C0;
+    box-shadow: 0 4px 0 #1565C0; /* 立体感のある影 */
     transition: 0.1s;
 }
 .nav-btn.active {
-    background: #FF9800;
+    background: #FF9800; /* 選択時はオレンジ */
     box-shadow: 0 4px 0 #E65100;
+}
+.nav-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1565C0;
 }
 
 /* --- コンテンツエリア --- */
@@ -113,78 +123,65 @@ h1 {
 .card {
     background: #fff;
     border-radius: 1.5rem;
-    padding: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 .step-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: #1565C0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     border-left: 6px solid #2196F3;
     padding-left: 12px;
 }
-
 .photo-container {
     margin: 1rem 0;
     border-radius: 1rem;
-    background: #f9f9f9;
+    background: #eee;
     min-height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #eee;
 }
-.step-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
 .ok-box {
     background: #E8F5E9;
     padding: 1rem;
     border-radius: 0.8rem;
     border: 2px dashed #4CAF50;
     font-weight: bold;
-    margin-bottom: 10px;
-}
-.note-box {
-    background: #FFF3E0;
-    padding: 1rem;
-    border-radius: 0.8rem;
-    font-size: 0.95rem;
+    margin-top: 1rem;
 }
 
-/* --- レスポンシブ調整（スマホ向け） --- */
+/* --- 【重要】スマホ向けの修正設定 --- */
 @media (max-width: 600px) {
-    h1 { font-size: 1.2rem; }
-    .header-subtitle { font-size: 0.8rem; }
-    .nav-btn { min-width: 100px; font-size: 1rem; padding: 0.7rem; }
-    .step-title { font-size: 1.2rem; }
+    /* スマホでは左寄せにする */
+    .header-title-area {
+        align-items: flex-start;
+        text-align: left;
+    }
+    h1 { font-size: 1.4rem; }
+    .header-subtitle { font-size: 0.85rem; }
+    .nav-btn { min-width: 110px; font-size: 1.1rem; }
     .content { padding: 1rem; }
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="header">
-        <div class="header-content">
-            <div class="header-title-area">
-                <h1>👀 みてつくるシート 🚗</h1>
-                <p class="header-subtitle">リモコンカーの作り方を写真で確認</p>
-            </div>
-            <button class="reference-btn" id="referenceBtn">📚 写真</button>
+<header class="header">
+    <div class="header-content">
+        <div class="header-title-area">
+            <h1>👀 みてつくるシート 🚗</h1>
+            <p class="header-subtitle">リモコンカーの作り方を写真で確認</p>
         </div>
-    </header>
+        <button class="reference-btn" id="referenceBtn">📚 写真</button>
+    </div>
+</header>
 
-    <nav class="nav-container">
-        <div class="nav-scroll" id="nav"></div>
-    </nav>
-
-    <main class="content" id="content"></main>
+<div class="nav-container">
+    <div class="nav-scroll" id="nav"></div>
 </div>
+
+<main class="content" id="content"></main>
 
 <script>
 const steps = [
@@ -217,10 +214,12 @@ function showStep(index) {
         <div class="card">
             <div class="step-title">${step.title}</div>
             <div class="photo-container">
-                <img src="${step.img}" class="step-img" alt="手順画像">
+                <img src="${step.img}" class="step-img" alt="手順画像" onerror="this.style.display='none'; this.parentNode.innerHTML='<p style=color:#999>写真（${step.img}）</p>'">
             </div>
             <div class="ok-box">${step.ok}</div>
-            <div class="note-box"><strong>メモ:</strong> ${step.note}</div>
+            <div style="background:#FFF3E0; padding:1rem; border-radius:0.8rem; margin-top:10px; color:#E65100;">
+                <strong>メモ:</strong> ${step.note}
+            </div>
         </div>
     `;
     
