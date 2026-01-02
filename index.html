@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>👀みてつくるシート🚗</title>
+<title>みてつくるシート</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -16,7 +16,7 @@ body {
   margin: 0 auto;
   font-size: 18px;
 }
-header {
+.header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,6 +27,8 @@ header {
 h1 {
   font-size: 28px;
   color: #2c3e50;
+  flex: 1;
+  min-width: 200px;
 }
 .album-link {
   font-size: 32px;
@@ -203,10 +205,10 @@ h1 {
 </style>
 </head>
 <body>
-<header>
-  <h1>👀みてつくるシート🚗</h1>
+<div class="header-container">
+  <h1>みてつくるシート</h1>
   <a href="#" class="album-link" id="albumLink">📚</a>
-</header>
+</div>
 
 <div class="nav-scroll">
   <div class="nav-buttons" id="navButtons"></div>
@@ -294,7 +296,7 @@ function switchStep(index) {
   currentStep = index;
 }
 
-const pointers = {};
+let pointers = {};
 let scale = 1;
 let posX = 0;
 let posY = 0;
