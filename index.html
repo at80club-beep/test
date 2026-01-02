@@ -3,171 +3,401 @@
 <head>
 <meta charset="UTF-8">
 <title>リモコンカー作り 写真で確認シート（指導員用）</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
 
 <style>
 /* =====================
-   基本
+   サイズ制御用変数
+===================== */
+:root{
+  --font-base:20px;
+  --btn-font:20px;
+  --btn-padding:12px 18px;
+  --btn-border:5px;
+  --title-weight:900;
+  --photo-max-width:95vw;
+}
+
+/* =====================
+   共通
 ===================== */
 body{
   margin:0;
-  font-family: "Hiragino Sans","メイリオ",sans-serif;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
   background:#faf7f2;
   color:#333;
+  font-size:var(--font-base);
   line-height:1.7;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
 }
 
+/* 拡大写真表示中のbody用クラス */
+body.photo-expanded{
+  overflow:hidden;
+  position:fixed;
+  width:100%;
+  height:100%;
+}
+
+/* =====================
+   ヘッダー
+===================== */
 header{
   position:sticky;
   top:0;
   background:#fff7dd;
   border-bottom:4px solid #e0cfa0;
-  padding:10px;
+  padding:8px 10px;
   z-index:100;
+}
+
+/* タイトル行 */
+.header-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
 .title{
   font-size:1.3em;
-  font-weight:900;
+  font-weight:var(--title-weight);
   margin:0;
+  white-space:nowrap;
 }
 
 .subtitle{
   font-size:0.6em;
+  font-weight:500;
   color:#555;
+  margin-left:4px;
 }
 
+/* =====================
+   文字サイズ切替
+===================== */
+.font-controls{
+  display:flex;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.font-controls button{
+  min-width:50px;
+  padding:8px 12px;
+  font-size:16px;
+  border:2px solid #999;
+  background:#fff;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.font-controls button.active{
+  background:#333;
+  color:#fff;
+  border-color:#000;
+}
+
+/* =====================
+   工程ナビ
+===================== */
 nav{
   display:flex;
   flex-wrap:wrap;
   gap:8px;
-  margin-top:8px;
+  padding:8px 0 6px;
 }
 
 nav button{
-  flex:1;
-  min-height:48px;
-  font-size:18px;
-  font-weight:700;
-  border:4px solid #a6842c;
+  flex:1 1 auto;
+  min-width:120px;
+  min-height:50px;
+  font-size:var(--btn-font);
+  padding:var(--btn-padding);
+  border:var(--btn-border) solid #a6842c;
   background:#fff;
   border-radius:12px;
+  cursor:pointer;
+  font-weight:700;
+  margin-bottom:5px;
 }
 
 nav button.active{
   background:#f0b344;
+  color:#000;
   border-color:#000;
 }
 
+/* =====================
+   メイン
+===================== */
 main{
   padding:12px;
+  scroll-margin-top:120px;
 }
 
 .section-title{
   font-size:1.3em;
   font-weight:800;
-  border-bottom:3px solid #f0b344;
   margin-bottom:12px;
+  padding-bottom:5px;
+  border-bottom:3px solid #f0b344;
+  scroll-margin-top:120px;
 }
 
 .photo-box{
   background:#fff;
   border:4px solid #e0cfa0;
   border-radius:14px;
-  padding:14px;
+  padding:15px;
+  text-align:center;
+}
+
+/* 写真コンテナ */
+.photo-container{
+  position:relative;
+  max-width:var(--photo-max-width);
+  margin:0 auto 15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:200px;
 }
 
 .photo-img{
-  width:100%;
-  max-width:640px;
+  width:auto;
+  max-width:100%;
+  max-height:400px;
+  object-fit:contain;
   display:block;
-  margin:0 auto 10px;
   border-radius:12px;
   border:4px solid #e0cfa0;
   cursor:pointer;
+  background:#f9f9f9;
+  margin:0 auto;
+  -webkit-user-drag:none;
+  user-drag:none;
+  touch-action:pan-y pinch-zoom;
+  -webkit-touch-callout:none;
 }
 
+.photo-img:active{
+  transform:scale(0.98);
+}
+
+/* スマホ向けヒント */
 .photo-hint{
   text-align:center;
-  font-size:0.9em;
   color:#666;
-  background:#f0f0f0;
+  font-size:0.9em;
+  margin:5px 0 15px;
   padding:8px;
+  background:#f0f0f0;
   border-radius:8px;
+  border-left:4px solid #f0b344;
 }
 
+/* OKメッセージ */
 .ok-box{
   background:#e8f6e8;
   border:3px solid #4caf50;
   border-radius:10px;
   padding:12px;
-  margin:12px 0;
+  margin:15px 0;
+  font-size:1.1em;
   font-weight:800;
   text-align:center;
 }
 
+/* 補足 */
 .note{
   background:#f5efe4;
   padding:12px;
   border-radius:8px;
+  font-size:1em;
   border-left:4px solid #a6842c;
 }
 
 /* =====================
-   拡大表示（横向き固定）
+   写真拡大（スマホ最適化）
 ===================== */
 .overlay{
   display:none;
   position:fixed;
-  inset:0;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   background:rgba(0,0,0,0.95);
   z-index:999;
+  overflow:hidden;
+}
+
+.overlay-content{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.overlay-img-container{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:flex;
   align-items:center;
   justify-content:center;
 }
 
-.overlay img{
-  max-height:90vw;
-  max-width:90vh;
-  transform:rotate(90deg);
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+.overlay-img{
+  position:absolute;
+  max-width:100%;
+  max-height:100%;
+  transform-origin:center center;
+  transition:transform 0.1s ease;
+  cursor:move;
+  user-select:none;
+  -webkit-user-drag:none;
+  -webkit-touch-callout:none;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
 }
 
+.overlay-img:active{
+  cursor:grabbing;
+}
+
+/* 閉じるボタン */
 .close-btn{
   position:absolute;
   top:20px;
   right:20px;
-  width:56px;
-  height:56px;
-  background:#000;
-  color:#fff;
-  font-size:36px;
+  width:60px;
+  height:60px;
+  background:rgba(0,0,0,0.7);
+  color:white;
+  font-size:40px;
+  line-height:60px;
   text-align:center;
-  line-height:56px;
   border-radius:50%;
-  border:3px solid #fff;
+  z-index:1001;
   cursor:pointer;
+  border:3px solid white;
+  user-select:none;
 }
 
-.rotate-hint{
+/* 操作説明 */
+.instruction{
   position:absolute;
-  top:20px;
+  bottom:20px;
+  left:0;
+  right:0;
+  text-align:center;
+  color:white;
+  font-size:16px;
+  z-index:1000;
+  padding:10px;
+  background:rgba(0,0,0,0.5);
+  opacity:0.8;
+  user-select:none;
+}
+
+/* スクロールヒント */
+.scroll-hint{
+  position:absolute;
+  bottom:10px;
   left:50%;
   transform:translateX(-50%);
-  color:#fff;
   background:rgba(0,0,0,0.7);
-  padding:10px 20px;
+  color:white;
+  padding:6px 12px;
   border-radius:20px;
-  font-size:16px;
+  font-size:14px;
+  z-index:10;
+  animation:bounce 2s infinite;
+  display:none;
 }
 
-/* PC・横向きでは回転しない */
-@media (orientation:landscape){
-  .overlay img{
-    transform:none;
-    max-width:95%;
-    max-height:95%;
+@keyframes bounce{
+  0%, 20%, 50%, 80%, 100%{ transform:translateX(-50%) translateY(0); }
+  40%{ transform:translateX(-50%) translateY(-10px); }
+  60%{ transform:translateX(-50%) translateY(-5px); }
+}
+
+/* =====================
+   印刷対応
+===================== */
+@media print{
+  header{
+    display:none;
+  }
+
+  .photo-img, .photo-hint{
+    display:none;
+  }
+
+  body{
+    background:#fff;
+    font-size:14pt;
+  }
+
+  .photo-box{
+    border:none;
+    padding:0;
+  }
+}
+
+/* =====================
+   フッター
+===================== */
+footer{
+  text-align:center;
+  padding:15px;
+  font-size:0.9em;
+  color:#666;
+  border-top:2px solid #e0cfa0;
+  margin-top:20px;
+}
+
+/* 画像エラースタイル */
+.img-error{
+  position:relative;
+}
+
+.img-error::after{
+  content:"画像が見つかりません";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  color:#ff6b6b;
+  font-weight:bold;
+  text-align:center;
+  padding:10px;
+  background:rgba(255,255,255,0.9);
+  border-radius:8px;
+}
+
+/* スマホ向け最適化 */
+@media (max-width: 768px){
+  .scroll-hint{
+    display:block;
+  }
+  
+  .photo-container{
+    max-height:50vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:30px;
+  }
+  
+  .photo-img{
+    touch-action:pan-y;
   }
 }
 </style>
@@ -176,101 +406,552 @@ main{
 <body>
 
 <header>
-  <h1 class="title">
-    リモコンカー作り 写真で確認シート
-    <span class="subtitle">（指導員用）</span>
-  </h1>
+  <div class="header-row">
+    <h1 class="title">
+      リモコンカー作り 写真で確認シート
+      <span class="subtitle">（指導員用）</span>
+    </h1>
+
+    <div class="font-controls">
+      <button data-size="small">小</button>
+      <button data-size="medium">中</button>
+      <button data-size="large" class="active">大</button>
+    </div>
+  </div>
 
   <nav id="nav">
     <button data-target="battery" class="active">電池BOX完成</button>
-    <button data-target="wire">電線</button>
-    <button data-target="switch">スイッチ</button>
-    <button data-target="test">モーターテスト</button>
-    <button data-target="complete">完成</button>
+    <button data-target="wire">電池につける電線</button>
+    <button data-target="switch">前後切り替えスイッチ</button>
+    <button data-target="test">モーターのテスト</button>
+    <button data-target="complete">完成品</button>
   </nav>
 </header>
 
 <main>
-  <div class="section-title" id="sectionTitle">電池BOX完成</div>
+  <div class="section-title" id="sectionTitle">
+    電池BOX完成
+  </div>
 
   <div class="photo-box">
-    <img id="photo" src="images/battery_box.jpg" class="photo-img">
-    <div class="photo-hint">📱 写真をタップすると横向きで拡大表示されます</div>
-    <div class="ok-box" id="okMessage">✅ この写真と同じなら OK</div>
-    <div class="note" id="note">電池の＋－向きを確認します。</div>
+    <div class="photo-container">
+      <img id="photo" src="images/battery_box.jpg" alt="電池BOX完成" class="photo-img">
+      <div class="scroll-hint">↓ 写真の上でスクロールできます ↓</div>
+    </div>
+    
+    <p class="photo-hint">
+      📱写真をタップで拡大表示<br>
+      🤏拡大中: 指2本で拡大縮小・1本指で移動・タップで閉じる
+    </p>
+
+    <div class="ok-box" id="okMessage">
+      ✅ この写真と同じになっていれば OK です
+    </div>
+
+    <div class="note" id="note">
+      電池の＋－向きが合っているかを確認します。
+    </div>
   </div>
 </main>
 
-<!-- 拡大表示 -->
+<footer>
+  <p>このシートはリモコンカー作りの指導員用です。写真を見比べて確認しましょう。</p>
+</footer>
+
+<!-- 写真拡大 -->
 <div id="overlay" class="overlay">
-  <div class="close-btn" onclick="closePhoto()">×</div>
-  <div class="rotate-hint">横向き表示</div>
-  <img id="overlayImg">
+  <div class="overlay-content">
+    <div class="close-btn" id="closeBtn">×</div>
+    <div class="instruction" id="instruction">
+      指2本で拡大縮小・1本指で動かす・タップで閉じる
+    </div>
+    <div class="overlay-img-container">
+      <img id="overlayImg" class="overlay-img">
+    </div>
+  </div>
 </div>
 
 <script>
-const sections={
+/* =====================
+   工程データ
+===================== */
+const sections = {
   battery:{
     title:"電池BOX完成",
     img:"images/battery_box.jpg",
-    ok:"この写真と同じなら OK",
-    note:"電池の＋－向きを確認します。"
+    ok:"この写真と同じになっていれば OK です",
+    note:"電池の＋－向きが合っているかを確認します。"
   },
   wire:{
     title:"電池につける電線",
     img:"images/wire_magnet.jpg",
-    ok:"この形なら OK",
-    note:"磁石がしっかり付いているか確認。"
+    ok:"この形になっていれば OK です",
+    note:"磁石が端子にピタッと付いているか確認します。"
   },
   switch:{
     title:"前後切り替えスイッチ",
     img:"images/switch_complete.jpg",
-    ok:"固定できていれば OK",
-    note:"左右に倒して切り替わるか確認。"
+    ok:"この配置になっていれば OK です",
+    note:"左右のボタンで動きが変わることを確認します。"
   },
   test:{
     title:"モーターのテスト",
     img:"images/motor_test.jpg",
-    ok:"回れば OK（又はLEDチェッカー）",
-    note:"回らない場合は配線を確認。"
+    ok:"写真のように回れば OK です",
+    note:"回らない場合は接触を確認します。"
   },
   complete:{
     title:"完成品",
     img:"images/car_complete.jpg",
-    ok:"完成です！",
-    note:"安全に走らせましょう。"
+    ok:"この状態なら完成です",
+    note:"配線がタイヤに絡んでいないか確認します。"
   }
 };
 
-const navButtons=document.querySelectorAll("#nav button");
-const photo=document.getElementById("photo");
-const sectionTitle=document.getElementById("sectionTitle");
-const okMessage=document.getElementById("okMessage");
-const note=document.getElementById("note");
+/* =====================
+   スマホ判定
+===================== */
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-navButtons.forEach(btn=>{
-  btn.onclick=()=>{
-    navButtons.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const d=sections[btn.dataset.target];
-    sectionTitle.textContent=d.title;
-    photo.src=d.img;
-    okMessage.textContent="✅ "+d.ok;
-    note.textContent=d.note;
+/* =====================
+   工程切替
+===================== */
+const buttons = document.querySelectorAll("nav button");
+const photo = document.getElementById("photo");
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if (isMobile) {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  }
+}
+
+buttons.forEach(btn => {
+  btn.onclick = () => {
+    scrollToTop();
+    
+    setTimeout(() => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const key = btn.dataset.target;
+      const section = sections[key];
+      
+      document.getElementById("sectionTitle").textContent = section.title;
+      document.getElementById("okMessage").innerHTML = "✅ " + section.ok;
+      document.getElementById("note").innerHTML = section.note;
+      
+      const img = new Image();
+      img.onload = function() {
+        photo.src = section.img;
+        photo.alt = section.title;
+        photo.classList.remove("img-error");
+        adjustScrollHint();
+      };
+      img.onerror = function() {
+        photo.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="%23f5f5f5"/><text x="320" y="220" font-family="Arial" font-size="24" fill="%23666" text-anchor="middle">${section.title}</text><text x="320" y="260" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle">画像準備中</text></svg>`;
+        photo.alt = `${section.title}（画像準備中）`;
+        photo.classList.add("img-error");
+      };
+      img.src = section.img;
+      
+      btn.focus();
+    }, 300);
   };
 });
 
-const overlay=document.getElementById("overlay");
-const overlayImg=document.getElementById("overlayImg");
-
-photo.onclick=()=>{
-  overlay.style.display="flex";
-  overlayImg.src=photo.src;
-};
-
-function closePhoto(){
-  overlay.style.display="none";
+/* =====================
+   スクロールヒントの調整
+===================== */
+function adjustScrollHint() {
+  const photoContainer = document.querySelector('.photo-container');
+  const scrollHint = document.querySelector('.scroll-hint');
+  
+  if (!photoContainer || !scrollHint) return;
+  
+  const imgHeight = photo.naturalHeight || photo.clientHeight;
+  const containerHeight = photoContainer.clientHeight;
+  
+  if (imgHeight > containerHeight && isMobile) {
+    scrollHint.style.display = 'block';
+    
+    setTimeout(() => {
+      scrollHint.style.transition = 'opacity 1s';
+      scrollHint.style.opacity = '0';
+      setTimeout(() => {
+        scrollHint.style.display = 'none';
+      }, 1000);
+    }, 5000);
+  } else {
+    scrollHint.style.display = 'none';
+  }
 }
+
+/* =====================
+   写真拡大
+===================== */
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+const instruction = document.getElementById("instruction");
+const closeBtn = document.getElementById("closeBtn");
+
+let scale = 1;
+let posX = 0;
+let posY = 0;
+let isDragging = false;
+let isPinching = false;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let lastPosX = 0;
+let lastPosY = 0;
+
+function clampPosition() {
+  if (!overlayImg || !overlay) return;
+  
+  const imgDisplayWidth = overlayImg.naturalWidth * scale;
+  const imgDisplayHeight = overlayImg.naturalHeight * scale;
+  const containerWidth = overlay.clientWidth;
+  const containerHeight = overlay.clientHeight;
+  
+  const maxX = Math.max(0, (imgDisplayWidth - containerWidth) / 2);
+  const maxY = Math.max(0, (imgDisplayHeight - containerHeight) / 2);
+  
+  posX = Math.max(Math.min(posX, maxX), -maxX);
+  posY = Math.max(Math.min(posY, maxY), -maxY);
+  
+  if (imgDisplayWidth <= containerWidth) posX = 0;
+  if (imgDisplayHeight <= containerHeight) posY = 0;
+}
+
+function updateTransform() {
+  overlayImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+
+function resetZoomAndPosition() {
+  scale = 1;
+  posX = 0;
+  posY = 0;
+  isDragging = false;
+  isPinching = false;
+  updateTransform();
+}
+
+function openPhoto() {
+  overlayImg.src = photo.src;
+  overlay.style.display = "block";
+  
+  if (isMobile) {
+    document.body.classList.add("photo-expanded");
+    document.body.style.overflow = "hidden";
+  }
+  
+  resetZoomAndPosition();
+  
+  instruction.style.opacity = "1";
+  instruction.style.display = "block";
+  setTimeout(() => {
+    instruction.style.transition = "opacity 1s";
+    instruction.style.opacity = "0.3";
+  }, 5000);
+}
+
+function closePhoto() {
+  resetZoomAndPosition();
+  overlay.style.display = "none";
+  
+  if (isMobile) {
+    document.body.classList.remove("photo-expanded");
+    document.body.style.overflow = "";
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 10);
+  }
+  
+  instruction.style.display = "none";
+}
+
+closeBtn.onclick = closePhoto;
+
+overlay.addEventListener('click', function(e) {
+  if (e.target === overlay || e.target.classList.contains('instruction')) {
+    closePhoto();
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && overlay.style.display === 'block') {
+    closePhoto();
+  }
+});
+
+/* =====================
+   写真タップで拡大
+===================== */
+let photoTouchStartTime = 0;
+let photoTouchStartX = 0;
+let photoTouchStartY = 0;
+
+photo.addEventListener('touchstart', function(e) {
+  const touch = e.touches[0];
+  photoTouchStartTime = Date.now();
+  photoTouchStartX = touch.clientX;
+  photoTouchStartY = touch.clientY;
+}, { passive: true });
+
+photo.addEventListener('touchend', function(e) {
+  const touchTime = Date.now() - photoTouchStartTime;
+  const touch = e.changedTouches[0];
+  const touchMoveX = Math.abs(touch.clientX - photoTouchStartX);
+  const touchMoveY = Math.abs(touch.clientY - photoTouchStartY);
+  
+  if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10) {
+    e.preventDefault();
+    openPhoto();
+  }
+}, { passive: false });
+
+photo.addEventListener('click', function(e) {
+  if (!('ontouchstart' in window)) {
+    openPhoto();
+  }
+});
+
+/* =====================
+   拡大写真のタッチ操作（修正版）
+===================== */
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+
+overlayImg.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touches = Array.from(e.touches);
+  
+  if (touches.length === 1) {
+    isDragging = true;
+    isPinching = false;
+    
+    const touch = touches[0];
+    lastPosX = posX;
+    lastPosY = posY;
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
+    
+    overlayImg.style.cursor = 'grabbing';
+    overlayImg.style.transition = 'none';
+    
+    touchStartTime = Date.now();
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  } else if (touches.length === 2) {
+    isPinching = true;
+    isDragging = false;
+  }
+}, { passive: false });
+
+overlayImg.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touches = Array.from(e.touches);
+  
+  if (touches.length === 1 && isDragging) {
+    // 1本指での移動（修正版：シンプルに）
+    const touch = touches[0];
+    
+    const deltaX = touch.clientX - lastTouchX;
+    const deltaY = touch.clientY - lastTouchY;
+    
+    // シンプルに移動
+    posX += deltaX;
+    posY += deltaY;
+    
+    clampPosition();
+    updateTransform();
+    
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
+  } else if (touches.length === 2 && isPinching) {
+    // 2本指でのピンチズーム
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    
+    const currentDistance = Math.sqrt(
+      Math.pow(touch1.clientX - touch2.clientX, 2) + 
+      Math.pow(touch1.clientY - touch2.clientY, 2)
+    );
+    
+    if (!window._initialPinchDistance) {
+      window._initialPinchDistance = currentDistance;
+      window._initialScale = scale;
+    }
+    
+    const newScale = Math.max(0.5, Math.min(5, 
+      window._initialScale * (currentDistance / window._initialPinchDistance)));
+    
+    scale = newScale;
+    clampPosition();
+    updateTransform();
+  }
+}, { passive: false });
+
+overlayImg.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const remainingTouches = Array.from(e.touches);
+  const changedTouches = Array.from(e.changedTouches);
+  
+  if (window._initialPinchDistance && remainingTouches.length < 2) {
+    delete window._initialPinchDistance;
+    delete window._initialScale;
+  }
+  
+  if (remainingTouches.length === 0 && changedTouches.length === 1) {
+    const touch = changedTouches[0];
+    const touchTime = Date.now() - touchStartTime;
+    const touchMoveX = Math.abs(touch.clientX - touchStartX);
+    const touchMoveY = Math.abs(touch.clientY - touchStartY);
+    
+    if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && scale <= 1.1) {
+      setTimeout(() => {
+        closePhoto();
+      }, 50);
+      return;
+    }
+    
+    if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && scale > 1.1) {
+      scale = 1;
+      posX = 0;
+      posY = 0;
+      clampPosition();
+      updateTransform();
+      return;
+    }
+  }
+  
+  if (remainingTouches.length === 0) {
+    isDragging = false;
+    isPinching = false;
+    overlayImg.style.cursor = 'move';
+  } else if (remainingTouches.length === 1) {
+    isDragging = true;
+    isPinching = false;
+    const touch = remainingTouches[0];
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
+  }
+}, { passive: false });
+
+/* =====================
+   マウス操作（PC用）
+===================== */
+let isMouseDown = false;
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+overlayImg.addEventListener('mousedown', function(e) {
+  e.preventDefault();
+  if (e.button === 0) {
+    isMouseDown = true;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
+    overlayImg.style.cursor = 'grabbing';
+  }
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (isMouseDown) {
+    e.preventDefault();
+    const deltaX = e.clientX - lastMouseX;
+    const deltaY = e.clientY - lastMouseY;
+    
+    posX = lastPosX + deltaX;
+    posY = lastPosY + deltaY;
+    
+    clampPosition();
+    updateTransform();
+  }
+});
+
+document.addEventListener('mouseup', function(e) {
+  if (e.button === 0) {
+    isMouseDown = false;
+    overlayImg.style.cursor = 'move';
+  }
+});
+
+overlayImg.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  
+  const zoomIntensity = 0.1;
+  const wheelDelta = e.deltaY > 0 ? -zoomIntensity : zoomIntensity;
+  scale = Math.max(0.5, Math.min(5, scale + wheelDelta));
+  
+  clampPosition();
+  updateTransform();
+}, { passive: false });
+
+/* =====================
+   文字サイズ切替
+===================== */
+const sizeButtons = document.querySelectorAll(".font-controls button");
+
+function applySize(size) {
+  sizeButtons.forEach(b => b.classList.remove("active"));
+  
+  if (size === "small") {
+    document.documentElement.style.setProperty("--font-base", "16px");
+    document.documentElement.style.setProperty("--btn-font", "16px");
+    document.documentElement.style.setProperty("--btn-padding", "8px 14px");
+  } else if (size === "medium") {
+    document.documentElement.style.setProperty("--font-base", "18px");
+    document.documentElement.style.setProperty("--btn-font", "18px");
+    document.documentElement.style.setProperty("--btn-padding", "10px 16px");
+  } else if (size === "large") {
+    document.documentElement.style.setProperty("--font-base", "20px");
+    document.documentElement.style.setProperty("--btn-font", "20px");
+    document.documentElement.style.setProperty("--btn-padding", "12px 18px");
+  }
+  
+  localStorage.setItem("fontSize", size);
+  document.querySelector(`.font-controls button[data-size="${size}"]`).classList.add("active");
+  setTimeout(adjustScrollHint, 100);
+}
+
+sizeButtons.forEach(btn => {
+  btn.onclick = () => {
+    applySize(btn.dataset.size);
+  };
+});
+
+const saved = localStorage.getItem("fontSize") || "large";
+applySize(saved);
+
+/* =====================
+   初期化
+===================== */
+window.addEventListener('load', function() {
+  setTimeout(adjustScrollHint, 500);
+});
+
+photo.addEventListener('load', function() {
+  adjustScrollHint();
+});
 </script>
 
 </body>
