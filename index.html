@@ -2,55 +2,81 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>👀みてつくるシート🚗</title>
 <style>
-/* 基本設定：画面からはみ出さない */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:sans-serif;background:#f5f5f5;color:#333;overflow-x:hidden;max-width:600px;margin:0 auto}
+/* 最低限の必須スタイルのみ */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#f5f5f5;color:#333;max-width:960px;margin:0 auto;padding-top:70px;min-height:100vh}
 
-/* ヘッダー：高さを抑えてコンテンツ領域を確保 */
-.header{background:#4CAF50;color:#fff;padding:0.5rem 1rem;position:fixed;top:0;width:100%;max-width:600px;z-index:1000;display:flex;justify-content:space-between;align-items:center}
-h1{font-size:1.1rem}
-.ref-btn{background:#fff;color:#4CAF50;border:none;border-radius:1rem;padding:0.3rem 0.8rem;font-weight:bold;font-size:0.9rem}
+/* ヘッダーを常に表示するように修正 */
+.header{background:#4CAF50;color:#fff;padding:0.8rem;position:fixed;top:0;left:0;width:100%;z-index:1000;border-bottom:2px solid #2E7D32}
+.header-content{display:flex;justify-content:space-between;align-items:center;max-width:960px;margin:0 auto}
+h1{font-size:1.2rem;margin:0;white-space:nowrap}
+.header p{margin:0;font-size:0.85rem;opacity:0.9}
 
-/* ナビ：高さを抑えてボタンを押しやすく */
-.nav-container{background:#fff;padding:0.3rem;position:fixed;top:45px;width:100%;max-width:600px;z-index:999;border-bottom:1px solid #ddd}
-.nav-scroll{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:0.2rem}
-.nav-btn{padding:0.6rem;background:#2196F3;color:#fff;border:none;border-radius:0.8rem;font-size:0.9rem;font-weight:bold;min-width:85px;flex-shrink:0}
+.nav-container{background:#fff;padding:.4rem;position:fixed;top:60px;left:0;width:100%;z-index:999;border-bottom:2px solid #ddd;max-width:960px;margin:0 auto}
+.nav-scroll{display:flex;gap:.4rem;overflow-x:auto;padding:.4rem;-webkit-overflow-scrolling:touch}
+.nav-btn{padding:0.8rem;background:#2196F3;color:#fff;border:none;border-radius:1rem;font-size:0.9rem;cursor:pointer;min-width:90px;flex-shrink:0}
 .nav-btn.active{background:#FF9800}
 
-/* メイン：1画面に収めるためのサイズ調整 */
-.content{padding:0.5rem;margin-top:105px}
-.card{background:#fff;border-radius:0.8rem;padding:0.8rem;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
-.step-title{font-size:1.1rem;color:#1565C0;margin-bottom:0.5rem;border-bottom:2px solid #BBDEFB}
+.content{padding:0.8rem;margin-top:110px}
+.card{background:#fff;border-radius:1rem;padding:0.8rem;margin-bottom:0.8rem}
+.step-title{font-size:1.2rem;color:#1565C0;margin-bottom:0.8rem}
 
-/* 写真：縦長画面で1画面に収まる高さに制限 */
-.photo-container{margin:0.5rem 0;background:#eee;border-radius:0.5rem;overflow:hidden;position:relative;text-align:center}
-.step-img{width:100%;max-height:45vh;object-fit:contain;display:block;cursor:pointer}
-.tap-guide{position:absolute;bottom:0.5rem;right:0.5rem;background:rgba(0,0,0,0.6);color:#fff;padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem}
+/* 写真欄のサイズを適切に調整 */
+.photo-container{margin:0.8rem 0;border-radius:.5rem;background:#eee;position:relative;min-height:180px;overflow:hidden}
+.photo-container.multi{display:flex;flex-direction:column;gap:0.4rem}
+.photo-wrapper{width:100%;background:#fff;border-radius:.5rem;overflow:hidden;position:relative;min-height:180px}
+.step-img{width:100%;height:auto;display:block;cursor:pointer;object-fit:contain}
+.tap-label{background:rgba(0,0,0,.7);color:#fff;padding:.4rem;border-radius:.5rem;font-size:.7rem;position:absolute;bottom:.4rem;right:.4rem;z-index:10}
 
-/* 文字情報：大きく、でもコンパクトに */
-.ok-box{background:#E8F5E9;padding:0.7rem;margin-top:0.5rem;border-radius:0.5rem;color:#2E7D32;font-weight:bold;font-size:1rem;border-left:5px solid #4CAF50}
-.note-box{background:#FFF3E0;padding:0.7rem;margin-top:0.5rem;border-radius:0.5rem;color:#E65100;font-size:0.95rem;line-height:1.4}
+.ok-box{background:#E8F5E9;padding:0.8rem;margin:0.8rem 0;border-radius:.5rem;font-size:0.9rem}
+.note-box{background:#FFF3E0;padding:0.8rem;margin:0.8rem 0;border-radius:.5rem;font-size:0.9rem}
+.card.danger{border-left:5px solid #f44336}
+.card.final{border-left:5px solid #4CAF50}
 
-/* 拡大画面：どこを触っても閉じられるように */
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:2000;display:none;align-items:center;justify-content:center}
-.overlay.active{display:flex}
-.overlay-img{max-width:98%;max-height:90%;object-fit:contain}
-.close-msg{position:fixed;bottom:2rem;color:#fff;background:rgba(255,255,255,0.2);padding:0.5rem 1rem;border-radius:2rem;font-size:0.9rem}
+/* 拡大表示オーバーレイ - シンプル化 */
+.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:2000;display:none}
+.overlay.active{display:flex;align-items:center;justify-content:center}
+.overlay-content{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.overlay-img-container{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.overlay-img{max-width:100vw;max-height:100vh;object-fit:contain}
 
-/* 参考資料 */
-.reference-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:3000;display:none;flex-direction:column}
+.close-btn{position:fixed;top:1rem;right:1rem;background:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:1.5rem;cursor:pointer;z-index:2001}
+
+.reference-btn{background:#fff;color:#4CAF50;border:none;border-radius:25px;padding:.4rem 0.8rem;cursor:pointer;white-space:nowrap;font-size:0.9rem}
+.reference-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:2000;display:none;flex-direction:column}
 .reference-overlay.active{display:flex}
-.ref-header{background:#4CAF50;color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center}
+.reference-header{display:flex;justify-content:space-between;align-items:center;padding:0.8rem;border-bottom:1px solid #ddd;background:#4CAF50;color:#fff}
+.reference-content{padding:0.8rem;flex:1;overflow-y:auto}
+.reference-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem}
+
+@media(max-width:480px){
+    body{padding-top:60px}
+    .header{padding:0.5rem}
+    h1{font-size:1rem}
+    .header p{font-size:0.75rem}
+    .nav-container{top:50px}
+    .content{margin-top:95px}
+    .nav-btn{padding:0.6rem;min-width:80px;font-size:0.85rem}
+    .photo-container{min-height:160px}
+    .photo-wrapper{min-height:160px}
+    .ok-box, .note-box{padding:0.6rem;font-size:0.85rem}
+    .reference-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>👀みてつくるシート</h1>
-    <button class="ref-btn" onclick="openRef()">📚参考</button>
+    <div class="header-content">
+        <div>
+            <h1>👀みてつくるシート🚗</h1>
+            <p>リモコンカーの作り方を写真で確認</p>
+        </div>
+        <button class="reference-btn" id="referenceBtn">📚写真</button>
+    </div>
 </div>
 
 <div class="nav-container">
@@ -59,79 +85,283 @@ h1{font-size:1.1rem}
 
 <main class="content" id="content"></main>
 
-<div id="overlay" class="overlay" onclick="closeOverlay()">
-    <img id="overlayImg" class="overlay-img">
-    <div class="close-msg">どこかをさわると もどります</div>
-</div>
-
-<div id="refOverlay" class="reference-overlay">
-    <div class="ref-header">
+<div class="reference-overlay" id="referenceOverlay">
+    <div class="reference-header">
         <h3>📚 参考アルバム</h3>
-        <button class="ref-btn" onclick="closeRef()">× とじる</button>
+        <button class="close-btn" id="closeReference">×</button>
     </div>
-    <div style="padding:1rem; overflow-y:auto;" id="refContent"></div>
+    <div class="reference-content" id="referenceContent"></div>
 </div>
 
 <script>
+// ステップデータ
 const steps = [
-    {nav:"①でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－をよくみて入れましょう。"},
-    {nav:"②せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がピタッとついているか確認。"},
-    {nav:"③スイッチ", title:"③ 切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"スイッチを左右に動かしてみよう。"},
-    {nav:"④まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば大成功！", note:"ぶるぶる動けば電気が通っています。"},
-    {nav:"⑤みため", title:"⑤ 見た目完成", img:"images/car_complete.jpg", ok:"かっこいい車！", note:"配線がはずれていないかな？"},
-    {nav:"⑥かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"動いたらおめでとう！", note:"広いところで走らせてみよう。"}
+    {
+        nav: "① でんち",
+        title: "① でんち（BOX）",
+        img: "images/battery_box.jpg",
+        ok: "電池の向きOK！",
+        note: "＋と－を確認します。"
+    },
+    {
+        nav: "② せん",
+        title: "② 電池につける電線",
+        img: "images/wire_magnet.jpg",
+        ok: "線がつながった！",
+        note: "磁石がしっかり付いているか確認。外れていないか見ます。"
+    },
+    {
+        nav: "③ スイッチ",
+        title: "③ 前後切り替えスイッチ",
+        img: "images/switch_complete.jpg",
+        ok: "前後が切り替わる！",
+        note: "左右SWを押して切り替わるか確認。向きを確認します。"
+    },
+    {
+        nav: "④ まわる",
+        title: "④ モーターは回る？",
+        img: "images/motor_test.jpg",
+        ok: "回れば OK（又は、LEDチェッカーで調べる）",
+        note: "指を近づけないよう注意。回らない（つかない）場合は配線を確認。"
+    },
+    {
+        nav: "⑤ みため",
+        title: "⑤ 見た目完成（実験中）",
+        img: ["images/car_complete.jpg", "images/3ami.gif"],
+        ok: "つなぎ方をためそう！",
+        note: "前後が逆なら入れ替えてみよう。",
+        danger: true
+    },
+    {
+        nav: "⑥ かんせい",
+        title: "⑥ ほんとうの完成！",
+        img: "images/complete.jpg",
+        ok: "前後に動いたら大成功！",
+        note: "安全に走らせよう。",
+        final: true
+    }
 ];
 
-function init() {
-    const navDiv = document.getElementById('nav');
-    steps.forEach((step, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'nav-btn';
-        btn.textContent = step.nav;
-        btn.onclick = () => showStep(i);
-        navDiv.appendChild(btn);
+// 参考アルバムデータ
+const referenceAlbum = {
+    "電池関連": [
+        {img: "reference/battery_types.jpg", title: "電池の種類"},
+        {img: "reference/battery_safety.jpg", title: "安全な扱い方"}
+    ],
+    "モーター関連": [
+        {img: "reference/motor_check.jpg", title: "モーター検査"},
+        {img: "reference/motor_trouble.jpg", title: "よくある不具合"}
+    ],
+    "完成例": [
+        {img: "reference/advanced_car.jpg", title: "応用例"},
+        {img: "reference/3ami.gif", title: "三つ編み接続"}
+    ]
+};
+
+// DOM要素
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+
+// グローバル変数
+let currentStep = 0;
+
+// ナビゲーションボタン作成
+function createNavigation() {
+    nav.innerHTML = ''; // 既存のボタンをクリア
+    steps.forEach((step, index) => {
+        const button = document.createElement('button');
+        button.className = 'nav-btn';
+        button.textContent = step.nav;
+        button.addEventListener('click', () => showStep(index));
+        nav.appendChild(button);
     });
-    showStep(0);
 }
 
+// ステップ表示関数
 function showStep(index) {
-    const step = steps[index];
-    document.querySelectorAll('.nav-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+    console.log('showStep called with index:', index);
     
-    document.getElementById('content').innerHTML = `
-        <div class="card">
-            <div class="step-title">${step.title}</div>
-            <div class="photo-container" onclick="openOverlay('${step.img}')">
-                <img src="${step.img}" class="step-img">
-                <div class="tap-guide">👆 タップで拡大</div>
+    // インデックスの範囲チェック
+    if (index < 0 || index >= steps.length) {
+        console.error('Invalid step index:', index);
+        return;
+    }
+    
+    currentStep = index;
+    
+    // ナビゲーションボタンのアクティブ状態を更新
+    document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === index);
+    });
+    
+    const step = steps[index];
+    let photoHTML = '';
+    
+    // 画像が配列かどうかで表示を分岐
+    if (Array.isArray(step.img)) {
+        // 複数画像の場合
+        const imageElements = step.img.map(img => `
+            <div class="photo-wrapper">
+                <img src="${img}" class="step-img" alt="${step.title}" 
+                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\"><rect width=\"100%\" height=\"100%\" fill=\"#e0e0e0\"/><text x=\"50%\" y=\"50%\" font-family=\"sans-serif\" font-size=\"20\" fill=\"#666\" text-anchor=\"middle\" dy=\".3em\">画像を読み込めません</text></svg>'">
+                <div class="tap-label">タップで拡大</div>
             </div>
+        `).join('');
+        
+        photoHTML = `<div class="photo-container multi">${imageElements}</div>`;
+    } else {
+        // 単一画像の場合
+        photoHTML = `
+            <div class="photo-container">
+                <div class="photo-wrapper">
+                    <img src="${step.img}" class="step-img" alt="${step.title}" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\"><rect width=\"100%\" height=\"100%\" fill=\"#e0e0e0\"/><text x=\"50%\" y=\"50%\" font-family=\"sans-serif\" font-size=\"20\" fill=\"#666\" text-anchor=\"middle\" dy=\".3em\">画像を読み込めません</text></svg>'">
+                    <div class="tap-label">タップで拡大</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // カードクラスの設定
+    let cardClass = 'card';
+    if (step.danger) cardClass += ' danger';
+    if (step.final) cardClass += ' final';
+    
+    // コンテンツの更新
+    content.innerHTML = `
+        <div class="${cardClass}">
+            <div class="step-title">${step.title}</div>
+            ${photoHTML}
             <div class="ok-box">${step.ok}</div>
             <div class="note-box">${step.note}</div>
-        </div>`;
+        </div>
+    `;
+    
+    // 画像クリックイベントの設定
+    setTimeout(() => {
+        document.querySelectorAll('.step-img').forEach(img => {
+            img.onclick = (e) => {
+                e.stopPropagation();
+                openOverlay(img.src);
+            };
+        });
+    }, 100);
 }
 
+// 拡大表示オーバーレイを開く関数（シンプル化）
 function openOverlay(src) {
-    const ov = document.getElementById('overlay');
-    document.getElementById('overlayImg').src = src;
-    ov.classList.add('active');
+    console.log('openOverlay called with src:', src);
+    
+    // 画像がプレースホルダーの場合は拡大表示しない
+    if (src.includes('画像を読み込めません')) {
+        return;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    
+    const overlayContent = document.createElement('div');
+    overlayContent.className = 'overlay-content';
+    
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'overlay-img-container';
+    
+    const img = document.createElement('img');
+    img.className = 'overlay-img';
+    img.src = src;
+    img.alt = '拡大表示';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-btn';
+    closeBtn.textContent = '×';
+    
+    // 閉じる関数
+    const closeOverlay = () => {
+        if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+        }
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', handleEsc);
+    };
+    
+    // ESCキー処理
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') closeOverlay();
+    };
+    
+    closeBtn.onclick = closeOverlay;
+    
+    // オーバーレイ背景クリックで閉じる
+    overlay.onclick = (e) => {
+        if (e.target === overlay) closeOverlay();
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    
+    // オーバーレイの構築
+    imgContainer.appendChild(img);
+    overlayContent.appendChild(imgContainer);
+    overlay.appendChild(overlayContent);
+    overlay.appendChild(closeBtn);
+    document.body.appendChild(overlay);
+    
+    // オーバーレイを表示
+    setTimeout(() => {
+        overlay.classList.add('active');
+    }, 10);
+    
     document.body.style.overflow = 'hidden';
 }
 
-function closeOverlay() {
-    document.getElementById('overlay').classList.remove('active');
-    document.body.style.overflow = 'auto';
+// 参考アルバムの表示
+document.getElementById('referenceBtn').onclick = () => {
+    const content = document.getElementById('referenceContent');
+    content.innerHTML = Object.entries(referenceAlbum).map(([category, items]) => `
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: #4CAF50; margin-bottom: 0.8rem; font-size: 1rem;">${category}</h4>
+            <div class="reference-grid">
+                ${items.map(item => `
+                    <div style="text-align: center;">
+                        <img src="${item.img}" 
+                             style="width:100%;height:150px;object-fit:cover;border-radius:.5rem;cursor:pointer;border:2px solid #ddd" 
+                             onclick="openOverlay('${item.img}')"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"200\"><rect width=\"100%\" height=\"100%\" fill=\"#e0e0e0\"/><text x=\"50%\" y=\"50%\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#666\" text-anchor=\"middle\" dy=\".3em\">画像なし</text></svg>'">
+                        <div style="margin-top:.5rem;font-size:.85rem;">${item.title}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('referenceOverlay').classList.add('active');
+};
+
+// 参考アルバムを閉じる
+document.getElementById('closeReference').onclick = () => {
+    document.getElementById('referenceOverlay').classList.remove('active');
+};
+
+// 初期化関数
+function init() {
+    console.log('Initializing application...');
+    
+    // ナビゲーションを作成
+    createNavigation();
+    
+    // 最初のステップを表示
+    showStep(0);
+    
+    console.log('Application initialized');
 }
 
-function openRef() {
-    document.getElementById('refOverlay').classList.add('active');
-    // 参考アルバムの内容はここに追加
+// DOMが完全に読み込まれたら初期化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
 }
 
-function closeRef() {
-    document.getElementById('refOverlay').classList.remove('active');
-}
-
-init();
+// グローバル関数としてopenOverlayを公開
+window.openOverlay = openOverlay;
 </script>
 </body>
 </html>
