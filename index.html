@@ -5,142 +5,879 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>👀みてつくるシート🚗</title>
 <style>
-body{margin:0;font-family:sans-serif;background:#f2f2f2}
+/* 基本スタイル */
+body{margin:0;font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;background:#f2f2f2;transition:background 0.3s,color 0.3s}
 .container{max-width:960px;margin:0 auto;padding:12px}
-h1{text-align:center;font-size:28px;margin:12px 0}
-.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
-.nav button{flex:0 0 auto;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:999px;border:none;background:#ddd}
+
+/* ヘッダーとアクセシビリティコントロール */
+header{position:relative;padding:12px 0}
+h1{text-align:center;font-size:28px;margin:12px 0;transition:font-size 0.3s}
+.accessibility-controls{position:absolute;top:12px;right:0;display:flex;gap:8px}
+.acc-btn{padding:10px 14px;border-radius:999px;border:none;background:#666;color:#fff;font-size:16px;cursor:pointer;min-width:44px;min-height:44px}
+.acc-btn.active{background:#4caf50}
+.volume-control{display:none;position:absolute;top:50px;right:0;background:#fff;padding:12px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000}
+.volume-control.show{display:block}
+.volume-slider{width:120px;margin:8px 0}
+
+/* ナビゲーション */
+.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin:16px 0}
+.nav button{flex:0 0 auto;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:999px;border:none;background:#ddd;min-width:44px;min-height:44px}
 .nav button.active{background:#4caf50;color:#fff}
-.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px}
+
+/* プログレスバー */
+.progress-bar{height:12px;background:#ddd;border-radius:6px;margin:16px 0;overflow:hidden}
+.progress-fill{height:100%;background:#4caf50;width:0%;transition:width 0.5s}
+.progress-text{text-align:center;font-size:14px;margin-bottom:12px}
+
+/* カード */
+.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px;transition:all 0.3s;position:relative}
 .card.ok{background:#e8f5e9}
 .card.danger{background:#fff3e0}
 .card.final{background:#e3f2fd}
-.photo-wrap{position:relative}
-.photo-wrap img{width:100%;border-radius:12px;touch-action:manipulation}
+.card.completed{border:4px solid #4caf50}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.complete-check{width:36px;height:36px;border-radius:50%;border:3px solid #ccc;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px}
+.complete-check.checked{background:#4caf50;border-color:#2e7d32;color:#fff}
+.speech-btn{padding:10px 14px;border-radius:999px;border:none;background:#2196f3;color:#fff;font-size:16px;cursor:pointer;min-width:44px;min-height:44px}
+.speech-btn.speaking{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* 写真 */
+.photo-wrap{position:relative;margin:16px 0}
+.photo-wrap img{width:100%;border-radius:12px;touch-action:manipulation;display:block}
 .photo-wrap span{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:12px;font-size:14px}
+.hotspot-toggle{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:12px;font-size:14px;border:none;cursor:pointer}
+.hotspot-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.hotspot{position:absolute;transform:translate(-50%,-50%)}
+.hotspot-arrow{width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:20px solid rgba(255,0,0,0.7);margin:0 auto}
+.hotspot-label{background:rgba(0,0,0,0.7);color:#fff;padding:4px 8px;border-radius:6px;font-size:12px;margin-top:4px;white-space:nowrap}
+.zoom-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,0,0.8);color:#000;padding:8px 12px;border-radius:12px;font-weight:bold;display:none}
+
+/* 支援機能 */
+.help-btn{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#ff5722;color:#fff;border:none;font-size:24px;cursor:pointer;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.help-menu{position:fixed;bottom:90px;right:20px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:16px;display:none;z-index:1000;width:280px}
+.help-menu.show{display:block}
+.help-item{padding:12px;border-bottom:1px solid #eee;cursor:pointer;font-size:16px}
+.help-item:last-child{border-bottom:none}
+.help-item:hover{background:#f5f5f5}
+
+/* オフライン表示 */
+.offline-badge{position:fixed;top:12px;left:12px;background:#ff9800;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;display:none;z-index:1000}
+
+/* 印刷用 */
+@media print{
+body{background:#fff!important}
+.help-btn,.accessibility-controls,.speech-btn,.complete-check,.hotspot-toggle{display:none!important}
+.card{break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}
+.photo-wrap span{display:none}
+.progress-bar,.progress-text{display:none}
+}
+.print-summary{display:none}
+@media print{
+.print-summary{display:block;page-break-before:always}
+}
+
+/* 多言語 */
+.lang-select{position:absolute;top:12px;left:0;padding:8px 12px;border-radius:999px;border:2px solid #666;background:#fff;font-size:14px}
+
+/* ガイド */
+.guide-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:2000;display:none;align-items:center;justify-content:center}
+.guide-overlay.show{display:flex}
+.guide-slide{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:90%;text-align:center}
+.guide-dots{display:flex;justify-content:center;gap:8px;margin:16px 0}
+.guide-dot{width:12px;height:12px;border-radius:50%;background:#ccc}
+.guide-dot.active{background:#4caf50}
+.guide-close{background:none;border:none;color:#666;position:absolute;top:12px;right:12px;font-size:24px;cursor:pointer}
+
+/* 完了アニメーション */
+.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10000;display:none}
+.confetti.show{display:block}
+.confetti-item{position:absolute;width:10px;height:10px;background:#f00;animation:fall 3s linear forwards}
+@keyframes fall{
+0%{transform:translateY(-100px) rotate(0deg);opacity:1}
+100%{transform:translateY(100vh) rotate(360deg);opacity:0}
+}
+
+/* ヘルプ */
+.help-icon{position:fixed;bottom:20px;left:20px;width:44px;height:44px;border-radius:50%;background:#2196f3;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:1000}
+.help-tooltip{position:fixed;bottom:70px;left:20px;background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:300px;display:none;z-index:1000}
+.help-tooltip.show{display:block}
+
+/* 高コントラストモード */
+body.high-contrast{background:#000!important;color:#fff!important}
+body.high-contrast .card{background:#222!important;color:#fff!important}
+body.high-contrast .nav button{background:#444!important;color:#fff!important}
+body.high-contrast .nav button.active{background:#ffcc00!important;color:#000!important}
+body.high-contrast .acc-btn{background:#555!important}
+
+/* 拡大文字モード */
+body.large-text h1{font-size:34px}
+body.large-text .card{font-size:20px}
+body.large-text .nav button{font-size:22px}
+
+/* オーバーレイ */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;touch-action:none}
 .overlay img{max-width:100%;max-height:100%;touch-action:none}
-.close{position:absolute;top:16px;right:16px;font-size:28px;color:#fff;background:#000;border:none;border-radius:50%;width:44px;height:44px}
+.close{position:absolute;top:16px;right:16px;font-size:28px;color:#fff;background:#000;border:none;border-radius:50%;width:44px;height:44px;cursor:pointer}
+
+/* レスポンシブ */
 @media(min-width:768px){
-.nav{overflow-x:visible}
+.nav{overflow-x:visible;justify-content:center}
+.container{padding:20px}
 }
+
+/* アイドルチェック */
+.idle-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;padding:32px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.3);z-index:2001;display:none}
+.idle-popup.show{display:block}
+.idle-popup h2{color:#ff5722;margin-bottom:16px}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>👀みてつくるシート🚗</h1>
-<div class="nav" id="nav"></div>
-<div id="content"></div>
+    <!-- アクセシビリティコントロール -->
+    <header>
+        <div class="lang-select">
+            <select id="languageSelect">
+                <option value="ja">日本語</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <h1>👀みてつくるシート🚗</h1>
+        <div class="accessibility-controls">
+            <button class="acc-btn" id="textSizeBtn" aria-label="文字拡大">👁️</button>
+            <button class="acc-btn" id="contrastBtn" aria-label="コントラスト強化">🎨</button>
+            <button class="acc-btn" id="speechControlBtn" aria-label="音声設定">🔊</button>
+        </div>
+        <div class="volume-control" id="volumeControl">
+            <div>音量調整</div>
+            <input type="range" min="0" max="100" value="50" class="volume-slider" id="volumeSlider">
+        </div>
+    </header>
+
+    <!-- プログレス表示 -->
+    <div class="progress-text" id="progressText">進捗: 0/6 (0%)</div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="nav" id="nav"></div>
+
+    <!-- メインコンテンツ -->
+    <div id="content"></div>
+
+    <!-- 印刷用要約 -->
+    <div class="print-summary" id="printSummary"></div>
 </div>
+
+<!-- 支援ボタンとメニュー -->
+<button class="help-btn" id="helpBtn" aria-label="困ったときは">🆘</button>
+<div class="help-menu" id="helpMenu">
+    <div class="help-item" data-help="photo">写真が見えない</div>
+    <div class="help-item" data-help="trouble">うまくいかない</div>
+    <div class="help-item" data-help="teacher">先生を呼ぶ</div>
+    <div class="help-item" data-help="reset">最初からやり直す</div>
+</div>
+
+<!-- 常時ヘルプ -->
+<button class="help-icon" id="helpIcon" aria-label="ヘルプ">?</button>
+<div class="help-tooltip" id="helpTooltip">
+    現在の画面の使い方を説明します。
+</div>
+
+<!-- 画像拡大オーバーレイ -->
+<div class="overlay" id="overlay">
+    <button class="close" id="closeOverlay">×</button>
+    <img id="overlayImage" src="" alt="">
+</div>
+
+<!-- ガイドオーバーレイ -->
+<div class="guide-overlay" id="guideOverlay">
+    <div class="guide-slide">
+        <button class="guide-close" id="closeGuide">×</button>
+        <h2>ようこそ！</h2>
+        <p>このシートでは写真を見ながらリモコンカーを作れます</p>
+        <div class="guide-dots">
+            <div class="guide-dot active"></div>
+            <div class="guide-dot"></div>
+            <div class="guide-dot"></div>
+        </div>
+        <button id="nextGuide">次へ</button>
+        <label><input type="checkbox" id="dontShowAgain"> もう表示しない</label>
+    </div>
+</div>
+
+<!-- 紙吹雪アニメーション -->
+<div class="confetti" id="confetti"></div>
+
+<!-- アイドルチェックポップアップ -->
+<div class="idle-popup" id="idlePopup">
+    <h2>大丈夫ですか？</h2>
+    <p>しばらく操作がありませんが、続けられますか？</p>
+    <button id="continueBtn">続ける</button>
+    <button id="callHelpBtn">ヘルプを呼ぶ</button>
+</div>
+
+<!-- オフラインバッジ -->
+<div class="offline-badge" id="offlineBadge">📶 オフライン中</div>
+
 <script>
-const steps=[
-{nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
-{nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
-{nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
-{nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
-{nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:"images/car_complete.jpg",ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
-{nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
+// 工程データ
+const steps = [
+    {
+        nav: { ja: "① でんち", en: "① Battery" },
+        title: { ja: "① でんち（BOX）", en: "① Battery (BOX)" },
+        img: "images/battery_box.jpg",
+        ok: { 
+            ja: "電池の向きOK！", 
+            en: "Battery direction is correct!"
+        },
+        note: { 
+            ja: "＋と－を確認します。", 
+            en: "Check + and - terminals."
+        },
+        hotspots: [
+            { x: 30, y: 50, label: { ja: "＋端子", en: "+ Terminal" } },
+            { x: 70, y: 50, label: { ja: "－端子", en: "- Terminal" } }
+        ]
+    },
+    {
+        nav: { ja: "② せん", en: "② Wire" },
+        title: { ja: "② 電池につける電線", en: "② Wires to Battery" },
+        img: "images/wire_magnet.jpg",
+        ok: { 
+            ja: "線がつながった！", 
+            en: "Wires are connected!"
+        },
+        note: { 
+            ja: "磁石がしっかり付いているか確認。外れていないか見ます。", 
+            en: "Check if magnets are firmly attached and not loose."
+        },
+        hotspots: [
+            { x: 40, y: 60, label: { ja: "磁石", en: "Magnet" } },
+            { x: 60, y: 30, label: { ja: "接続部", en: "Connection" } }
+        ]
+    },
+    {
+        nav: { ja: "③ スイッチ", en: "③ Switch" },
+        title: { ja: "③ 前後切り替えスイッチ", en: "③ Forward/Reverse Switch" },
+        img: "images/switch_complete.jpg",
+        ok: { 
+            ja: "前後が切り替わる！", 
+            en: "Forward/reverse switches correctly!"
+        },
+        note: { 
+            ja: "左右SWを押して切り替わるか確認。向きを確認します。", 
+            en: "Press left/right switches to check if they work. Verify direction."
+        },
+        hotspots: [
+            { x: 30, y: 40, label: { ja: "左スイッチ", en: "Left Switch" } },
+            { x: 70, y: 40, label: { ja: "右スイッチ", en: "Right Switch" } }
+        ]
+    },
+    {
+        nav: { ja: "④ まわる", en: "④ Motor" },
+        title: { ja: "④ モーターは回る？", en: "④ Does Motor Turn?" },
+        img: "images/motor_test.jpg",
+        ok: { 
+            ja: "回れば OK（又は、LEDチェッカーで調べる）", 
+            en: "OK if it turns (or check with LED checker)"
+        },
+        note: { 
+            ja: "指を近づけないよう注意。回らない（つかない）場合は配線を確認。", 
+            en: "Keep fingers away. Check wiring if it doesn't turn on."
+        },
+        hotspots: [
+            { x: 50, y: 50, label: { ja: "モーター", en: "Motor" } },
+            { x: 50, y: 80, label: { ja: "配線", en: "Wiring" } }
+        ]
+    },
+    {
+        nav: { ja: "⑤ みため", en: "⑤ Looks" },
+        title: { ja: "⑤ 見た目完成（実験中）", en: "⑤ Appearance Complete (Testing)" },
+        img: "images/car_complete.jpg",
+        ok: { 
+            ja: "つなぎ方をためそう！", 
+            en: "Try the connections!"
+        },
+        note: { 
+            ja: "前後が逆なら入れ替えてみよう。", 
+            en: "Swap if forward/reverse is wrong."
+        },
+        danger: true,
+        hotspots: [
+            { x: 40, y: 40, label: { ja: "前輪", en: "Front Wheel" } },
+            { x: 60, y: 40, label: { ja: "後輪", en: "Rear Wheel" } }
+        ]
+    },
+    {
+        nav: { ja: "⑥ かんせい", en: "⑥ Complete" },
+        title: { ja: "⑥ ほんとうの完成！", en: "⑥ Truly Complete!" },
+        img: "images/complete.jpg",
+        ok: { 
+            ja: "前後に動いたら大成功！", 
+            en: "Great success if it moves forward/backward!"
+        },
+        note: { 
+            ja: "安全に走らせよう。", 
+            en: "Operate safely."
+        },
+        final: true,
+        hotspots: [
+            { x: 50, y: 50, label: { ja: "完成品", en: "Finished Product" } }
+        ]
+    }
 ];
-const nav=document.getElementById("nav");
-const content=document.getElementById("content");
-let current=0;
-steps.forEach((s,i)=>{
-const b=document.createElement("button");
-b.textContent=s.nav;
-b.addEventListener("pointerdown",()=>show(i));
-nav.appendChild(b);
+
+// 状態管理
+let currentLanguage = 'ja';
+let currentStep = 0;
+let completedSteps = JSON.parse(localStorage.getItem('completedSteps') || '[]');
+let isSpeaking = false;
+let speechSynthesis = window.speechSynthesis;
+let currentUtterance = null;
+let showHotspots = JSON.parse(localStorage.getItem('showHotspots') || 'false');
+let idleTimer = null;
+let startTime = Date.now();
+
+// DOM要素
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+const overlay = document.getElementById('overlay');
+const overlayImage = document.getElementById('overlayImage');
+const closeOverlay = document.getElementById('closeOverlay');
+const textSizeBtn = document.getElementById('textSizeBtn');
+const contrastBtn = document.getElementById('contrastBtn');
+const speechControlBtn = document.getElementById('speechControlBtn');
+const volumeControl = document.getElementById('volumeControl');
+const volumeSlider = document.getElementById('volumeSlider');
+const progressText = document.getElementById('progressText');
+const progressFill = document.getElementById('progressFill');
+const helpBtn = document.getElementById('helpBtn');
+const helpMenu = document.getElementById('helpMenu');
+const helpIcon = document.getElementById('helpIcon');
+const helpTooltip = document.getElementById('helpTooltip');
+const languageSelect = document.getElementById('languageSelect');
+const guideOverlay = document.getElementById('guideOverlay');
+const closeGuide = document.getElementById('closeGuide');
+const nextGuide = document.getElementById('nextGuide');
+const dontShowAgain = document.getElementById('dontShowAgain');
+const confetti = document.getElementById('confetti');
+const idlePopup = document.getElementById('idlePopup');
+const continueBtn = document.getElementById('continueBtn');
+const callHelpBtn = document.getElementById('callHelpBtn');
+const offlineBadge = document.getElementById('offlineBadge');
+const printSummary = document.getElementById('printSummary');
+
+// 初期化
+function init() {
+    // 設定の復元
+    if (localStorage.getItem('largeText') === 'true') {
+        document.body.classList.add('large-text');
+        textSizeBtn.classList.add('active');
+    }
+    
+    if (localStorage.getItem('highContrast') === 'true') {
+        document.body.classList.add('high-contrast');
+        contrastBtn.classList.add('active');
+    }
+    
+    // 初回ガイド表示
+    if (localStorage.getItem('showGuide') !== 'false') {
+        setTimeout(() => {
+            guideOverlay.classList.add('show');
+        }, 1000);
+    }
+    
+    // オフライン検出
+    updateOnlineStatus();
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    // アイドルタイマー
+    resetIdleTimer();
+    document.addEventListener('mousemove', resetIdleTimer);
+    document.addEventListener('touchstart', resetIdleTimer);
+    document.addEventListener('keypress', resetIdleTimer);
+    
+    renderNavigation();
+    show(currentStep);
+    updateProgress();
+    renderPrintSummary();
+    
+    // Service Worker登録
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
+}
+
+// ナビゲーションのレンダリング
+function renderNavigation() {
+    nav.innerHTML = '';
+    steps.forEach((step, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = step.nav[currentLanguage];
+        btn.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            show(i);
+            vibrate();
+        });
+        nav.appendChild(btn);
+    });
+}
+
+// 工程表示
+function show(index) {
+    currentStep = index;
+    
+    // ナビボタンのアクティブ状態更新
+    [...nav.children].forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+    });
+    
+    const step = steps[index];
+    const isCompleted = completedSteps.includes(index);
+    
+    content.innerHTML = '';
+    
+    const card = document.createElement('div');
+    card.className = `card ${step.danger ? 'danger' : step.final ? 'final' : 'ok'} ${isCompleted ? 'completed' : ''}`;
+    
+    // ヘッダー（完了チェック＋音声読み上げ）
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    
+    const completeCheck = document.createElement('button');
+    completeCheck.className = `complete-check ${isCompleted ? 'checked' : ''}`;
+    completeCheck.innerHTML = isCompleted ? '✓' : '';
+    completeCheck.setAttribute('aria-label', currentLanguage === 'ja' ? '完了チェック' : 'Complete check');
+    completeCheck.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        toggleComplete(index);
+        vibrate();
+    });
+    
+    const speechBtn = document.createElement('button');
+    speechBtn.className = `speech-btn ${isSpeaking ? 'speaking' : ''}`;
+    speechBtn.textContent = '🔊';
+    speechBtn.setAttribute('aria-label', currentLanguage === 'ja' ? '読み上げ' : 'Read aloud');
+    speechBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (isSpeaking) {
+            stopSpeaking();
+        } else {
+            speakStep(step);
+        }
+        vibrate();
+    });
+    
+    header.appendChild(completeCheck);
+    header.appendChild(speechBtn);
+    
+    // タイトル
+    const title = document.createElement('h2');
+    title.textContent = step.title[currentLanguage];
+    
+    // 写真
+    const photoWrap = document.createElement('div');
+    photoWrap.className = 'photo-wrap';
+    
+    const img = document.createElement('img');
+    img.src = step.img;
+    img.alt = `${step.title[currentLanguage]}${currentLanguage === 'ja' ? 'の写真' : ' photo'}`;
+    img.loading = 'lazy';
+    img.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        openOverlay(step.img, step.title[currentLanguage]);
+        vibrate();
+    });
+    
+    const hotspotToggle = document.createElement('button');
+    hotspotToggle.className = 'hotspot-toggle';
+    hotspotToggle.textContent = showHotspots ? '📍 非表示' : '📍 表示';
+    hotspotToggle.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        toggleHotspots();
+        vibrate();
+    });
+    
+    const label = document.createElement('span');
+    label.textContent = currentLanguage === 'ja' ? 'タップで拡大' : 'Tap to enlarge';
+    
+    photoWrap.appendChild(img);
+    photoWrap.appendChild(hotspotToggle);
+    photoWrap.appendChild(label);
+    
+    // ホットスポット
+    if (step.hotspots && showHotspots) {
+        const hotspotOverlay = document.createElement('div');
+        hotspotOverlay.className = 'hotspot-overlay';
+        
+        step.hotspots.forEach(hotspot => {
+            const hotspotEl = document.createElement('div');
+            hotspotEl.className = 'hotspot';
+            hotspotEl.style.left = `${hotspot.x}%`;
+            hotspotEl.style.top = `${hotspot.y}%`;
+            
+            const arrow = document.createElement('div');
+            arrow.className = 'hotspot-arrow';
+            
+            const label = document.createElement('div');
+            label.className = 'hotspot-label';
+            label.textContent = hotspot.label[currentLanguage];
+            
+            hotspotEl.appendChild(arrow);
+            hotspotEl.appendChild(label);
+            hotspotOverlay.appendChild(hotspotEl);
+        });
+        
+        photoWrap.appendChild(hotspotOverlay);
+    }
+    
+    // コンテンツ
+    const okText = document.createElement('p');
+    okText.innerHTML = `<strong>${currentLanguage === 'ja' ? 'できているポイント：' : 'Checkpoint: '}</strong>${step.ok[currentLanguage]}`;
+    
+    const noteText = document.createElement('p');
+    noteText.innerHTML = `<strong>${currentLanguage === 'ja' ? '注意・ヒント：' : 'Note: '}</strong>${step.note[currentLanguage]}`;
+    
+    card.append(header, title, photoWrap, okText, noteText);
+    content.appendChild(card);
+    
+    // ツールチップ更新
+    updateHelpTooltip(step);
+}
+
+// 完了状態の切り替え
+function toggleComplete(index) {
+    const cardIndex = completedSteps.indexOf(index);
+    if (cardIndex > -1) {
+        completedSteps.splice(cardIndex, 1);
+    } else {
+        completedSteps.push(index);
+        // 完了アニメーション
+        showConfetti();
+    }
+    
+    localStorage.setItem('completedSteps', JSON.stringify(completedSteps));
+    show(currentStep);
+    updateProgress();
+    renderPrintSummary();
+}
+
+// 進捗の更新
+function updateProgress() {
+    const percent = Math.round((completedSteps.length / steps.length) * 100);
+    progressFill.style.width = `${percent}%`;
+    progressText.textContent = currentLanguage === 'ja' 
+        ? `進捗: ${completedSteps.length}/${steps.length} (${percent}%)`
+        : `Progress: ${completedSteps.length}/${steps.length} (${percent}%)`;
+}
+
+// 音声読み上げ
+function speakStep(step) {
+    if (isSpeaking) {
+        stopSpeaking();
+        return;
+    }
+    
+    const text = `
+        ${step.title[currentLanguage]}。
+        ${currentLanguage === 'ja' ? 'できているポイントは' : 'Checkpoint is'}：${step.ok[currentLanguage]}。
+        ${currentLanguage === 'ja' ? '注意とヒント' : 'Note'}：${step.note[currentLanguage]}。
+    `;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = currentLanguage === 'ja' ? 'ja-JP' : 'en-US';
+    utterance.volume = parseInt(volumeSlider.value) / 100;
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    
+    utterance.onstart = () => {
+        isSpeaking = true;
+        document.querySelector('.speech-btn').classList.add('speaking');
+    };
+    
+    utterance.onend = () => {
+        isSpeaking = false;
+        document.querySelector('.speech-btn').classList.remove('speaking');
+    };
+    
+    currentUtterance = utterance;
+    speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    document.querySelector('.speech-btn')?.classList.remove('speaking');
+}
+
+// 画像拡大
+function openOverlay(src, title) {
+    overlayImage.src = src;
+    overlayImage.alt = title;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeOverlayFunc() {
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// アクセシビリティ機能
+textSizeBtn.addEventListener('pointerdown', () => {
+    document.body.classList.toggle('large-text');
+    textSizeBtn.classList.toggle('active');
+    localStorage.setItem('largeText', document.body.classList.contains('large-text'));
+    vibrate();
 });
-function show(i){
-current=i;
-[...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-const s=steps[i];
-content.innerHTML="";
-const card=document.createElement("div");
-card.className="card"+(s.danger?" danger":s.final?" final":" ok");
-const h=document.createElement("h2");
-h.textContent=s.title;
-const p1=document.createElement("p");
-p1.textContent=s.ok;
-const p2=document.createElement("p");
-p2.textContent=s.note;
-const wrap=document.createElement("div");
-wrap.className="photo-wrap";
-const img=document.createElement("img");
-img.src=s.img;
-const lab=document.createElement("span");
-lab.textContent="タップで拡大";
-wrap.appendChild(img);
-wrap.appendChild(lab);
-img.addEventListener("pointerdown",()=>openOverlay(s.img));
-card.append(h,wrap,p1,p2);
-content.appendChild(card);
-}
-function openOverlay(src){
-document.body.style.overflow="hidden";
-const overlay=document.createElement("div");
-overlay.className="overlay";
-const img=document.createElement("img");
-img.src=src;
-let scale=1,posX=0,posY=0;
-const pointers={};
-let lastDist=0,lastCenter=null;
-const isMobile=window.innerHeight>window.innerWidth;
-function updateTransform(){
-if(isMobile){
-img.style.transform=`translate(${posX}px,${posY}px) scale(${scale}) rotate(90deg)`;
-}else{
-img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
-}
-}
-img.addEventListener("pointerdown",e=>{e.stopPropagation();pointers[e.pointerId]=e});
-img.addEventListener("pointermove",e=>{
-e.stopPropagation();
-if(!(e.pointerId in pointers))return;
-pointers[e.pointerId]=e;
-const ids=Object.keys(pointers);
-if(ids.length===2){
-const a=pointers[ids[0]],b=pointers[ids[1]];
-const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;
-const dist=Math.hypot(dx,dy);
-const cx=(a.clientX+b.clientX)/2,cy=(a.clientY+b.clientY)/2;
-if(lastDist){
-scale=Math.min(5,Math.max(1,scale*dist/lastDist));
-posX+=cx-lastCenter.x;
-posY+=cy-lastCenter.y;
-}
-lastDist=dist;
-lastCenter={x:cx,y:cy};
-updateTransform();
-}
-if(ids.length===1){
-if(scale<=1.01)return;
-posX+=e.movementX;
-posY+=e.movementY;
-updateTransform();
-}
+
+contrastBtn.addEventListener('pointerdown', () => {
+    document.body.classList.toggle('high-contrast');
+    contrastBtn.classList.toggle('active');
+    localStorage.setItem('highContrast', document.body.classList.contains('high-contrast'));
+    vibrate();
 });
-function onUp(e){
-delete pointers[e.pointerId];
-lastDist=0;
-lastCenter=null;
+
+speechControlBtn.addEventListener('pointerdown', () => {
+    volumeControl.classList.toggle('show');
+    vibrate();
+});
+
+volumeSlider.addEventListener('input', (e) => {
+    if (currentUtterance) {
+        currentUtterance.volume = e.target.value / 100;
+    }
+});
+
+// ホットスポット表示切り替え
+function toggleHotspots() {
+    showHotspots = !showHotspots;
+    localStorage.setItem('showHotspots', showHotspots);
+    show(currentStep);
 }
-img.addEventListener("pointerup",e=>{e.stopPropagation();onUp(e)});
-img.addEventListener("pointercancel",e=>{e.stopPropagation();onUp(e)});
-const close=document.createElement("button");
-close.className="close";
-close.textContent="×";
-close.addEventListener("pointerdown",()=>closeOverlay());
-overlay.addEventListener("pointerdown",e=>{if(e.target!==overlay)return;closeOverlay()});
-function closeOverlay(){
-document.body.style.overflow="";
-overlay.remove();
+
+// 支援メニュー
+helpBtn.addEventListener('pointerdown', () => {
+    helpMenu.classList.toggle('show');
+    vibrate();
+});
+
+helpMenu.addEventListener('pointerdown', (e) => {
+    if (e.target.classList.contains('help-item')) {
+        const action = e.target.dataset.help;
+        handleHelpAction(action);
+        helpMenu.classList.remove('show');
+        vibrate();
+    }
+});
+
+function handleHelpAction(action) {
+    switch(action) {
+        case 'photo':
+            const currentStepData = steps[currentStep];
+            alert(`${currentLanguage === 'ja' ? '写真の説明：' : 'Photo description:'}\n${currentStepData.title[currentLanguage]}\n\n${currentStepData.ok[currentLanguage]}\n${currentStepData.note[currentLanguage]}`);
+            break;
+        case 'trouble':
+            const troubleText = currentLanguage === 'ja' 
+                ? 'よくある問題：\n1. 電池の向きを確認\n2. 線がしっかり接続されているか確認\n3. スイッチの向きを確認\n4. モーターの配線を確認'
+                : 'Common issues:\n1. Check battery direction\n2. Check wire connections\n3. Check switch orientation\n4. Check motor wiring';
+            alert(troubleText);
+            break;
+        case 'teacher':
+            document.body.innerHTML = '<h1 style="font-size: 60px; text-align: center; color: #ff0000; margin-top: 100px;">HELP!!!</h1>';
+            new Audio('data:audio/wav;base64,UklGRno...').play().catch(() => {}); // 短いビープ音
+            break;
+        case 'reset':
+            if (confirm(currentLanguage === 'ja' ? '本当にはじめからやり直しますか？' : 'Really start over from beginning?')) {
+                localStorage.clear();
+                completedSteps = [];
+                currentStep = 0;
+                init();
+            }
+            break;
+    }
 }
-overlay.appendChild(img);
-overlay.appendChild(close);
-document.body.appendChild(overlay);
-updateTransform();
+
+// 言語切り替え
+languageSelect.addEventListener('change', (e) => {
+    currentLanguage = e.target.value;
+    renderNavigation();
+    show(currentStep);
+    updateProgress();
+});
+
+// ガイド
+nextGuide.addEventListener('pointerdown', () => {
+    const dots = document.querySelectorAll('.guide-dot');
+    let currentIndex = 0;
+    dots.forEach((dot, i) => {
+        if (dot.classList.contains('active')) {
+            currentIndex = i;
+            dot.classList.remove('active');
+        }
+    });
+    
+    if (currentIndex < 2) {
+        dots[currentIndex + 1].classList.add('active');
+        // スライド内容更新（簡易実装）
+        if (currentIndex === 0) {
+            document.querySelector('.guide-slide h2').textContent = currentLanguage === 'ja' ? '使い方' : 'How to Use';
+            document.querySelector('.guide-slide p').textContent = currentLanguage === 'ja' 
+                ? '写真をタップで拡大、ボタンで工程移動します'
+                : 'Tap photos to enlarge, use buttons to navigate steps';
+        } else {
+            document.querySelector('.guide-slide h2').textContent = currentLanguage === 'ja' ? 'アクセシビリティ' : 'Accessibility';
+            document.querySelector('.guide-slide p').textContent = currentLanguage === 'ja' 
+                ? '右上のボタンで文字拡大や読み上げができます'
+                : 'Use top-right buttons for text enlargement and speech';
+            nextGuide.textContent = currentLanguage === 'ja' ? 'はじめる' : 'Start';
+        }
+    } else {
+        closeGuideFunc();
+    }
+});
+
+closeGuide.addEventListener('pointerdown', closeGuideFunc);
+
+function closeGuideFunc() {
+    guideOverlay.classList.remove('show');
+    if (dontShowAgain.checked) {
+        localStorage.setItem('showGuide', 'false');
+    }
 }
-show(0);
+
+// 紙吹雪アニメーション
+function showConfetti() {
+    confetti.classList.add('show');
+    for (let i = 0; i < 50; i++) {
+        const item = document.createElement('div');
+        item.className = 'confetti-item';
+        item.style.left = `${Math.random() * 100}%`;
+        item.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        item.style.animationDelay = `${Math.random() * 2}s`;
+        confetti.appendChild(item);
+    }
+    
+    setTimeout(() => {
+        confetti.classList.remove('show');
+        confetti.innerHTML = '';
+    }, 3000);
+}
+
+// アイドルチェック
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        idlePopup.classList.add('show');
+    }, 10 * 60 * 1000); // 10分
+}
+
+continueBtn.addEventListener('pointerdown', () => {
+    idlePopup.classList.remove('show');
+    resetIdleTimer();
+});
+
+callHelpBtn.addEventListener('pointerdown', () => {
+    handleHelpAction('teacher');
+    idlePopup.classList.remove('show');
+});
+
+// オフライン検出
+function updateOnlineStatus() {
+    if (navigator.onLine) {
+        offlineBadge.style.display = 'none';
+    } else {
+        offlineBadge.style.display = 'block';
+    }
+}
+
+// ヘルプアイコン
+helpIcon.addEventListener('pointerdown', () => {
+    helpTooltip.classList.toggle('show');
+});
+
+// ツールチップ更新
+function updateHelpTooltip(step) {
+    const text = currentLanguage === 'ja'
+        ? `「${step.title[currentLanguage]}」の工程です。\n写真をタップで拡大、チェックボックスで完了できます。`
+        : `Step "${step.title[currentLanguage]}".\nTap photo to enlarge, check box to complete.`;
+    helpTooltip.textContent = text;
+}
+
+// 印刷用要約
+function renderPrintSummary() {
+    let html = '<h2>' + (currentLanguage === 'ja' ? '進捗まとめ' : 'Progress Summary') + '</h2>';
+    
+    steps.forEach((step, i) => {
+        const completed = completedSteps.includes(i);
+        html += `
+            <div style="margin: 20px 0; padding: 10px; border: 2px solid ${completed ? '#4caf50' : '#ccc'}">
+                <h3>${step.title[currentLanguage]} ${completed ? '✅' : ''}</h3>
+                <p><strong>${currentLanguage === 'ja' ? 'できているポイント：' : 'Checkpoint:'}</strong> ${step.ok[currentLanguage]}</p>
+                <p><strong>${currentLanguage === 'ja' ? '注意：' : 'Note:'}</strong> ${step.note[currentLanguage]}</p>
+            </div>
+        `;
+    });
+    
+    html += `<p><strong>${currentLanguage === 'ja' ? '完了率：' : 'Completion:'}</strong> ${completedSteps.length}/${steps.length}</p>`;
+    
+    const totalTime = Math.floor((Date.now() - startTime) / 1000 / 60);
+    html += `<p><strong>${currentLanguage === 'ja' ? 'かかった時間：' : 'Time spent:'}</strong> ${totalTime}分</p>`;
+    
+    printSummary.innerHTML = html;
+}
+
+// バイブレーション（サポートされている場合）
+function vibrate() {
+    if (navigator.vibrate) {
+        navigator.vibrate(10);
+    }
+}
+
+// イベントリスナー
+closeOverlay.addEventListener('pointerdown', closeOverlayFunc);
+overlay.addEventListener('pointerdown', (e) => {
+    if (e.target === overlay) {
+        closeOverlayFunc();
+    }
+});
+
+// キーボードナビゲーション
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+        // フォーカス可能な要素を強調
+        document.querySelectorAll('button, [tabindex]').forEach(el => {
+            el.style.outline = '2px solid #4caf50';
+        });
+    }
+    
+    if (e.key === 'Escape') {
+        closeOverlayFunc();
+        helpMenu.classList.remove('show');
+        volumeControl.classList.remove('show');
+        helpTooltip.classList.remove('show');
+        idlePopup.classList.remove('show');
+    }
+    
+    if (e.key === 'ArrowRight') {
+        currentStep = (currentStep + 1) % steps.length;
+        show(currentStep);
+    }
+    
+    if (e.key === 'ArrowLeft') {
+        currentStep = (currentStep - 1 + steps.length) % steps.length;
+        show(currentStep);
+    }
+});
+
+// 初期化実行
+init();
 </script>
 </body>
 </html>
