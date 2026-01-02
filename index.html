@@ -1,656 +1,146 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リモコンカー作り・写真で確認シート</title>
-    <style>
-        /* リセットと基本設定 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding-bottom: 40px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* ヘッダー */
-        header {
-            text-align: center;
-            padding: 25px 0 15px;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            margin-bottom: 25px;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 8px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        /* ナビゲーション */
-        .nav-section {
-            margin-bottom: 30px;
-        }
-
-        .nav-scroll-container {
-            display: flex;
-            overflow-x: auto;
-            padding: 15px 5px;
-            gap: 10px;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-
-        .nav-scroll-container::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-
-        .nav-button {
-            flex: 0 0 auto;
-            padding: 14px 20px;
-            border-radius: 50px;
-            background: #f0f2f5;
-            color: #555;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-decoration: none;
-            text-align: center;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            white-space: nowrap;
-            min-width: 120px;
-        }
-
-        .nav-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .nav-button.active {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border-color: #2d87f0;
-            box-shadow: 0 4px 15px rgba(45, 135, 240, 0.3);
-        }
-
-        /* メインコンテンツ */
-        .step-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .step-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 4px solid #4facfe;
-            font-weight: 700;
-        }
-
-        /* 画像セクション */
-        .image-section {
-            position: relative;
-            margin-bottom: 25px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .step-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            aspect-ratio: 4/3;
-            object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .step-image:hover {
-            transform: scale(1.02);
-        }
-
-        .image-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 12px;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .image-label::before {
-            content: "🔍 ";
-            margin-right: 5px;
-        }
-
-        /* 情報セクション */
-        .info-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .info-card {
-            padding: 22px;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            line-height: 1.7;
-        }
-
-        .info-card.ok {
-            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
-            border-left: 8px solid #2ecc71;
-        }
-
-        .info-card.note {
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            border-left: 8px solid #3498db;
-        }
-
-        .info-card.danger {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            border-left: 8px solid #e74c3c;
-            animation: pulse 2s infinite;
-        }
-
-        .info-card.final {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-left: 8px solid #9b59b6;
-            color: white;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        .card-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* 画像拡大オーバーレイ */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .overlay.active {
-            display: flex;
-        }
-
-        .overlay-image-container {
-            max-width: 90%;
-            max-height: 80%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .overlay-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-
-        .mobile-rotate .overlay-image {
-            transform: rotate(90deg);
-            max-height: 85vw;
-            max-width: 85vh;
-        }
-
-        .overlay-caption {
-            color: white;
-            margin-top: 20px;
-            font-size: 1.3rem;
-            text-align: center;
-            padding: 0 20px;
-            max-width: 800px;
-        }
-
-        .close-hint {
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        /* フッター */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 25px;
-            color: #7f8c8d;
-            font-size: 0.95rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-
-        /* PC用のスタイル */
-        @media (min-width: 768px) {
-            .container {
-                padding: 0 30px;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .nav-scroll-container {
-                overflow-x: visible;
-                justify-content: center;
-                flex-wrap: wrap;
-                padding: 20px;
-                gap: 15px;
-            }
-            
-            .nav-button {
-                min-width: 140px;
-                font-size: 1.2rem;
-                padding: 16px 25px;
-            }
-            
-            .step-content {
-                padding: 40px;
-            }
-            
-            .step-title {
-                font-size: 2rem;
-            }
-            
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            }
-            
-            .info-card {
-                font-size: 1.15rem;
-                padding: 25px;
-            }
-            
-            .card-title {
-                font-size: 1.4rem;
-            }
-            
-            .image-label {
-                font-size: 1.1rem;
-                padding: 15px;
-            }
-        }
-
-        /* スマホ用の調整 */
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .container {
-                padding: 0 15px;
-            }
-            
-            .step-content {
-                padding: 20px;
-            }
-            
-            .step-title {
-                font-size: 1.5rem;
-            }
-            
-            .nav-button {
-                min-width: 110px;
-                padding: 12px 16px;
-                font-size: 1rem;
-            }
-            
-            .info-card {
-                padding: 18px;
-                font-size: 1rem;
-            }
-        }
-
-        /* ユーティリティ */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0,0,0,0);
-            border: 0;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>👀みてつくるシート🚗</title>
+<style>
+body{margin:0;font-family:sans-serif;background:#f2f2f2}
+.container{max-width:960px;margin:0 auto;padding:12px}
+h1{text-align:center;font-size:28px;margin:12px 0}
+.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.nav button{flex:0 0 auto;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:999px;border:none;background:#ddd}
+.nav button.active{background:#4caf50;color:#fff}
+.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px}
+.card.ok{background:#e8f5e9}
+.card.danger{background:#fff3e0}
+.card.final{background:#e3f2fd}
+.photo-wrap{position:relative}
+.photo-wrap img{width:100%;border-radius:12px;touch-action:manipulation}
+.photo-wrap span{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:12px;font-size:14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;touch-action:none}
+.overlay img{max-width:100%;max-height:100%;touch-action:none}
+.close{position:absolute;top:16px;right:16px;font-size:28px;color:#fff;background:#000;border:none;border-radius:50%;width:44px;height:44px}
+@media(min-width:768px){
+.nav{overflow-x:visible}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>👀みてつくるシート🚗</h1>
-            <p class="subtitle">リモコンカー作り・写真で確認シート</p>
-        </header>
-
-        <nav class="nav-section" aria-label="工程ナビゲーション">
-            <div class="nav-scroll-container" id="navContainer">
-                <!-- ナビボタンはJavaScriptで生成 -->
-            </div>
-        </nav>
-
-        <main id="mainContent">
-            <!-- 工程コンテンツはJavaScriptで生成 -->
-        </main>
-
-        <footer>
-            <p>写真をタップすると拡大表示できます</p>
-            <p>順番に確認しながら、安全に作りましょう！</p>
-        </footer>
-    </div>
-
-    <!-- 画像拡大オーバーレイ -->
-    <div class="overlay" id="imageOverlay" role="dialog" aria-labelledby="overlayCaption" aria-modal="true">
-        <div class="overlay-image-container">
-            <img class="overlay-image" id="expandedImage" src="" alt="">
-        </div>
-        <div class="overlay-caption" id="overlayCaption"></div>
-        <p class="close-hint">画面をタップして閉じる</p>
-    </div>
-
-    <script>
-        // 工程データ
-        const steps = [
-            { 
-                nav: "① でんち", 
-                title: "① でんち（BOX）", 
-                img: "images/battery_box.jpg",
-                ok: "電池の向きOK！", 
-                note: "＋と－を確認します。"
-            },
-            { 
-                nav: "② せん", 
-                title: "② 電池につける電線", 
-                img: "images/wire_magnet.jpg",
-                ok: "線がつながった！", 
-                note: "磁石がしっかり付いているか確認。外れていないか見ます。"
-            },
-            { 
-                nav: "③ スイッチ", 
-                title: "③ 前後切り替えスイッチ", 
-                img: "images/switch_complete.jpg",
-                ok: "前後が切り替わる！", 
-                note: "左右SWを押して切り替わるか確認。向きを確認します。"
-            },
-            { 
-                nav: "④ まわる", 
-                title: "④ モーターは回る？", 
-                img: "images/motor_test.jpg",
-                ok: "回れば OK（又は、LEDチェッカーで調べる）", 
-                note: "指を近づけないよう注意。回らない（つかない）場合は配線を確認。"
-            },
-            { 
-                nav: "⑤ みため", 
-                title: "⑤ 見た目完成（実験中）", 
-                img: "images/car_complete.jpg",
-                ok: "つなぎ方をためそう！", 
-                note: "前後が逆なら入れ替えてみよう。",
-                danger: true
-            },
-            { 
-                nav: "⑥ かんせい", 
-                title: "⑥ ほんとうの完成！", 
-                img: "images/complete.jpg",
-                ok: "前後に動いたら大成功！", 
-                note: "安全に走らせよう。",
-                final: true
-            }
-        ];
-
-        // 状態管理
-        let currentStepIndex = 0;
-        let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-        // DOM要素の取得
-        const navContainer = document.getElementById('navContainer');
-        const mainContent = document.getElementById('mainContent');
-        const imageOverlay = document.getElementById('imageOverlay');
-        const expandedImage = document.getElementById('expandedImage');
-        const overlayCaption = document.getElementById('overlayCaption');
-
-        // 初期化
-        document.addEventListener('DOMContentLoaded', initApp);
-
-        function initApp() {
-            renderNavigation();
-            renderStepContent(currentStepIndex);
-            setupEventListeners();
-        }
-
-        // ナビゲーションのレンダリング
-        function renderNavigation() {
-            navContainer.innerHTML = '';
-            
-            steps.forEach((step, index) => {
-                const button = document.createElement('button');
-                button.className = 'nav-button';
-                button.textContent = step.nav;
-                button.setAttribute('aria-label', `${step.nav}の工程へ移動`);
-                button.setAttribute('aria-current', index === currentStepIndex ? 'page' : 'false');
-                
-                if (index === currentStepIndex) {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', () => {
-                    currentStepIndex = index;
-                    renderNavigation();
-                    renderStepContent(currentStepIndex);
-                    // スムーズスクロール
-                    mainContent.scrollIntoView({ behavior: 'smooth' });
-                });
-                
-                navContainer.appendChild(button);
-            });
-        }
-
-        // 工程コンテンツのレンダリング
-        function renderStepContent(index) {
-            const step = steps[index];
-            
-            let dangerCard = '';
-            if (step.danger) {
-                dangerCard = `
-                    <div class="info-card danger">
-                        <div class="card-title">⚠️ ちゅうい！</div>
-                        <div>動いている車に指や物を近づけないようにしよう。安全に実験しましょう！</div>
-                    </div>
-                `;
-            }
-            
-            let finalCard = '';
-            if (step.final) {
-                finalCard = `
-                    <div class="info-card final">
-                        <div class="card-title">🎉 かんせい！</div>
-                        <div>リモコンカーが完成しました！おめでとうございます！</div>
-                    </div>
-                `;
-            }
-            
-            mainContent.innerHTML = `
-                <section class="step-content" aria-labelledby="stepTitle${index}">
-                    <h2 class="step-title" id="stepTitle${index}">${step.title}</h2>
-                    
-                    <div class="image-section">
-                        <img src="${step.img}" 
-                             alt="${step.title}の写真" 
-                             class="step-image" 
-                             data-index="${index}"
-                             loading="lazy">
-                        <div class="image-label">タップで拡大</div>
-                    </div>
-                    
-                    <div class="info-grid">
-                        <div class="info-card ok">
-                            <div class="card-title">✅ できているポイント</div>
-                            <div>${step.ok}</div>
-                        </div>
-                        
-                        <div class="info-card note">
-                            <div class="card-title">💡 ちゅうい・ヒント</div>
-                            <div>${step.note}</div>
-                        </div>
-                        
-                        ${dangerCard}
-                        ${finalCard}
-                    </div>
-                </section>
-            `;
-            
-            // 画像クリックイベントの設定
-            const imageElement = mainContent.querySelector('.step-image');
-            imageElement.addEventListener('click', () => openImageOverlay(step.img, step.title));
-        }
-
-        // 画像拡大オーバーレイを開く
-        function openImageOverlay(imageSrc, caption) {
-            expandedImage.src = imageSrc;
-            expandedImage.alt = `${caption}の拡大写真`;
-            overlayCaption.textContent = caption;
-            
-            // モバイルの場合は横向き表示用クラスを追加
-            if (isMobile && window.innerWidth < window.innerHeight) {
-                imageOverlay.classList.add('mobile-rotate');
-            } else {
-                imageOverlay.classList.remove('mobile-rotate');
-            }
-            
-            imageOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // フォーカスをオーバーレイに移動
-            imageOverlay.focus();
-        }
-
-        // 画像拡大オーバーレイを閉じる
-        function closeImageOverlay() {
-            imageOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-            expandedImage.src = '';
-            
-            // 必ずトップに戻る
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // イベントリスナーの設定
-        function setupEventListeners() {
-            // オーバーレイクリックで閉じる
-            imageOverlay.addEventListener('click', closeImageOverlay);
-            
-            // ESCキーで閉じる
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && imageOverlay.classList.contains('active')) {
-                    closeImageOverlay();
-                }
-            });
-            
-            // 画面回転時の処理
-            window.addEventListener('resize', () => {
-                if (imageOverlay.classList.contains('active')) {
-                    if (isMobile && window.innerWidth < window.innerHeight) {
-                        imageOverlay.classList.add('mobile-rotate');
-                    } else {
-                        imageOverlay.classList.remove('mobile-rotate');
-                    }
-                }
-            });
-            
-            // タッチイベントの制限（スワイプ防止）
-            let touchStartY = 0;
-            
-            imageOverlay.addEventListener('touchstart', (e) => {
-                touchStartY = e.touches[0].clientY;
-            }, { passive: true });
-            
-            imageOverlay.addEventListener('touchmove', (e) => {
-                // スワイプによる写真切り替えを防止
-                e.preventDefault();
-            }, { passive: false });
-            
-            imageOverlay.addEventListener('touchend', (e) => {
-                // 縦スワイプだけは許可（スクロール可能にするため）
-                const touchEndY = e.changedTouches[0].clientY;
-                if (Math.abs(touchEndY - touchStartY) > 10) {
-                    e.stopPropagation();
-                }
-            }, { passive: true });
-        }
-
-        // アクセシビリティ向上のため、オーバーレイが開いたときにフォーカスをトラップ
-        imageOverlay.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && imageOverlay.classList.contains('active')) {
-                e.preventDefault();
-            }
-        });
-    </script>
+<div class="container">
+<h1>👀みてつくるシート🚗</h1>
+<div class="nav" id="nav"></div>
+<div id="content"></div>
+</div>
+<script>
+const steps=[
+{nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"電池の向きOK！",note:"＋と－を確認します。"},
+{nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"線がつながった！",note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
+{nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"前後が切り替わる！",note:"左右SWを押して切り替わるか確認。向きを確認します。"},
+{nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"回れば OK（又は、LEDチェッカーで調べる）",note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。"},
+{nav:"⑤ みため",title:"⑤ 見た目完成（実験中）",img:"images/car_complete.jpg",ok:"つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。",danger:true},
+{nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"前後に動いたら大成功！",note:"安全に走らせよう。",final:true}
+];
+const nav=document.getElementById("nav");
+const content=document.getElementById("content");
+let current=0;
+steps.forEach((s,i)=>{
+const b=document.createElement("button");
+b.textContent=s.nav;
+b.addEventListener("pointerdown",()=>show(i));
+nav.appendChild(b);
+});
+function show(i){
+current=i;
+[...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
+const s=steps[i];
+content.innerHTML="";
+const card=document.createElement("div");
+card.className="card"+(s.danger?" danger":s.final?" final":" ok");
+const h=document.createElement("h2");
+h.textContent=s.title;
+const p1=document.createElement("p");
+p1.textContent=s.ok;
+const p2=document.createElement("p");
+p2.textContent=s.note;
+const wrap=document.createElement("div");
+wrap.className="photo-wrap";
+const img=document.createElement("img");
+img.src=s.img;
+const lab=document.createElement("span");
+lab.textContent="タップで拡大";
+wrap.appendChild(img);
+wrap.appendChild(lab);
+img.addEventListener("pointerdown",()=>openOverlay(s.img));
+card.append(h,wrap,p1,p2);
+content.appendChild(card);
+}
+function openOverlay(src){
+document.body.style.overflow="hidden";
+const overlay=document.createElement("div");
+overlay.className="overlay";
+const img=document.createElement("img");
+img.src=src;
+let scale=1,posX=0,posY=0;
+const pointers={};
+let lastDist=0,lastCenter=null;
+const isMobile=window.innerHeight>window.innerWidth;
+function updateTransform(){
+if(isMobile){
+img.style.transform=`translate(${posX}px,${posY}px) scale(${scale}) rotate(90deg)`;
+}else{
+img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
+}
+}
+img.addEventListener("pointerdown",e=>{e.stopPropagation();pointers[e.pointerId]=e});
+img.addEventListener("pointermove",e=>{
+e.stopPropagation();
+if(!(e.pointerId in pointers))return;
+pointers[e.pointerId]=e;
+const ids=Object.keys(pointers);
+if(ids.length===2){
+const a=pointers[ids[0]],b=pointers[ids[1]];
+const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;
+const dist=Math.hypot(dx,dy);
+const cx=(a.clientX+b.clientX)/2,cy=(a.clientY+b.clientY)/2;
+if(lastDist){
+scale=Math.min(5,Math.max(1,scale*dist/lastDist));
+posX+=cx-lastCenter.x;
+posY+=cy-lastCenter.y;
+}
+lastDist=dist;
+lastCenter={x:cx,y:cy};
+updateTransform();
+}
+if(ids.length===1){
+if(scale<=1.01)return;
+posX+=e.movementX;
+posY+=e.movementY;
+updateTransform();
+}
+});
+function onUp(e){
+delete pointers[e.pointerId];
+lastDist=0;
+lastCenter=null;
+}
+img.addEventListener("pointerup",e=>{e.stopPropagation();onUp(e)});
+img.addEventListener("pointercancel",e=>{e.stopPropagation();onUp(e)});
+const close=document.createElement("button");
+close.className="close";
+close.textContent="×";
+close.addEventListener("pointerdown",()=>closeOverlay());
+overlay.addEventListener("pointerdown",e=>{if(e.target!==overlay)return;closeOverlay()});
+function closeOverlay(){
+document.body.style.overflow="";
+overlay.remove();
+}
+overlay.appendChild(img);
+overlay.appendChild(close);
+document.body.appendChild(overlay);
+updateTransform();
+}
+show(0);
+</script>
 </body>
 </html>
