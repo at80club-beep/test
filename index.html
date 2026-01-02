@@ -5,65 +5,186 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>👀みてつくるシート🚗</title>
 <style>
-/* 基本のリセットとフォント */
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; background:#f5f5f5;color:#333;max-width:960px;margin:0 auto}
+/* 全体設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+}
 
-/* ヘッダー：背景を鮮やかな緑に、デザインを画像に合わせる */
-.header{background:#4CAF50;color:#fff;padding:1.5rem 1rem;position:sticky;top:0;z-index:1000}
-.header-content{display:flex;justify-content: flex-start;align-items:center}
-.header-title-area {display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; padding-left: 10px;}
-h1{font-size:2rem; margin:0; display: flex; align-items: center; gap: 5px; letter-spacing: 2px;}
-.header-subtitle {font-size: 1.2rem; margin-top: 5px; font-weight: bold;}
+/* ヘッダー：左寄せデザイン */
+.header {
+    background: #4CAF50; /* 画像のような鮮やかな緑 */
+    color: #fff;
+    padding: 1rem 1.2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-title-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 左寄せに設定 */
+}
+h1 {
+    font-size: 1.6rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1px;
+}
+.header-subtitle {
+    font-size: 1rem;
+    margin-top: 4px;
+    opacity: 0.9;
+}
 
-/* 写真ボタン：右上の丸いボタン */
-.reference-btn{background:#fff;color:#4CAF50;border:none;border-radius:25px;padding:.5rem 1rem;cursor:pointer; font-weight: bold; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
-
-/* ナビゲーション：画像のような丸角と色使い */
-.nav-container{background:#fff;padding:1rem .5rem;border-bottom:2px solid #ddd}
-.nav-scroll{display:flex;gap:.8rem;overflow-x:auto; padding-bottom: 5px;}
-.nav-btn{
-    padding:1rem;
-    background:#2196F3; /* 基本の青色 */
-    color:#fff;
-    border:none;
-    border-radius:1.5rem; /* 角を丸く */
-    font-size:1.3rem;
+/* 写真ボタン：右上の白い丸ボタン */
+.reference-btn {
+    background: #fff;
+    color: #4CAF50;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
     font-weight: bold;
-    cursor:pointer;
-    min-width:140px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+/* ナビゲーション：画像のデザインを再現 */
+.nav-container {
+    background: #fff;
+    padding: 1rem 0.8rem;
+    border-bottom: 2px solid #ddd;
+}
+.nav-scroll {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+.nav-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+.nav-scroll::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.nav-btn {
+    padding: 0.8rem 1.2rem;
+    background: #2196F3; /* 通常時は青 */
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem; /* 画像のような大きな丸み */
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 130px;
     white-space: nowrap;
     box-shadow: 0 4px 0 #1565C0; /* 立体感 */
-    transition: 0.1s;
+    transition: all 0.1s;
 }
-.nav-btn.active{
-    background:#FF9800; /* オレンジ色 */
+.nav-btn.active {
+    background: #FF9800; /* 選択時はオレンジ */
     box-shadow: 0 4px 0 #E65100;
+}
+.nav-btn:active {
     transform: translateY(2px);
+    box-shadow: 0 2px 0 #1565C0;
 }
 
 /* メインコンテンツ */
-.content{padding:1rem}
-.card{background:#fff;border-radius:1.5rem;padding:1.5rem;margin-bottom:1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
-.step-title{font-size:1.5rem;color:#1565C0;margin-bottom:1rem; border-left: 5px solid #2196F3; padding-left: 10px;}
+.content {
+    padding: 1rem;
+}
+.card {
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.step-title {
+    font-size: 1.4rem;
+    color: #1565C0;
+    margin-bottom: 1.2rem;
+    border-left: 6px solid #2196F3;
+    padding-left: 12px;
+}
 
-.photo-container{margin:1rem 0;border-radius:1rem;background:#eee;min-height:250px;display:flex;align-items:center;justify-content:center; overflow: hidden; position: relative;}
-.step-img{width:100%;height:auto;display:block;cursor:pointer}
-.tap-label{background:rgba(0,0,0,.6);color:#fff;padding:.5rem 1rem;border-radius:2rem;font-size:.9rem;position:absolute;bottom:1rem;right:1rem}
+/* 写真表示エリア */
+.photo-container {
+    margin: 1rem 0;
+    border-radius: 1rem;
+    background: #f0f0f0;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+.step-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+}
+.tap-label {
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
 
-.ok-box{background:#E8F5E9;padding:1.2rem;margin:1rem 0;border-radius:.8rem; border: 2px dashed #4CAF50; font-weight: bold; font-size: 1.1rem;}
-.note-box{background:#FFF3E0;padding:1.2rem;margin:1rem 0;border-radius:.8rem; color: #E65100;}
+/* チェック・注意ボックス */
+.ok-box {
+    background: #E8F5E9;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.8rem;
+    border: 2px dashed #4CAF50;
+    font-weight: bold;
+    color: #2E7D32;
+}
+.note-box {
+    background: #FFF3E0;
+    padding: 1rem;
+    margin-top: 0.8rem;
+    border-radius: 0.8rem;
+    color: #E65100;
+    font-size: 0.95rem;
+}
 
-/* オーバーレイ等（既存のスクリプト用） */
-.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:2000;display:none}
-.overlay.active{display:flex;align-items:center;justify-content:center}
-.overlay-img{max-width:90%;max-height:90%;}
-.close-btn{position:fixed;top:1rem;right:1rem;background:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.5rem;cursor:pointer; z-index: 2100;}
-
-@media(max-width:480px){
-    h1{font-size:1.5rem}
-    .header-subtitle{font-size: 0.9rem;}
-    .nav-btn{min-width: 110px; font-size: 1.1rem;}
+/* モバイル調整 */
+@media (max-width: 480px) {
+    h1 { font-size: 1.3rem; }
+    .header-subtitle { font-size: 0.85rem; }
+    .nav-btn { min-width: 110px; font-size: 1.1rem; padding: 0.7rem; }
 }
 </style>
 </head>
@@ -71,12 +192,12 @@ h1{font-size:2rem; margin:0; display: flex; align-items: center; gap: 5px; lette
 
 <div class="header">
     <div class="header-content">
-        <div style="width: 60px;"></div> <div class="header-title-area">
+        <div class="header-title-area">
             <h1>👀 みてつくるシート 🚗</h1>
             <p class="header-subtitle">リモコンカーの作り方を写真で確認</p>
         </div>
         <button class="reference-btn" id="referenceBtn">
-            <span style="font-size: 1.2rem;">📚</span> 写真
+            <span style="font-size: 1rem;">📚</span> 写真
         </button>
     </div>
 </div>
@@ -88,19 +209,20 @@ h1{font-size:2rem; margin:0; display: flex; align-items: center; gap: 5px; lette
 <main class="content" id="content"></main>
 
 <script>
-// データとロジック（画像に基づく構造）
+// ステップ情報
 const steps = [
-    {nav:"① でんち",title:"① でんち（BOX）",img:"images/battery_box.jpg",ok:"✅ 電池の向きOK！",note:"＋と－を確認します。"},
-    {nav:"② せん",title:"② 電池につける電線",img:"images/wire_magnet.jpg",ok:"✅ 線がつながった！",note:"磁石がしっかり付いているか確認。"},
-    {nav:"③ スイッチ",title:"③ 前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"✅ 前後が切り替わる！",note:"左右SWを押して切り替わるか確認。"},
-    {nav:"④ まわる",title:"④ モーターは回る？",img:"images/motor_test.jpg",ok:"✅ 回れば OK！",note:"指を近づけないよう注意してください。"},
-    {nav:"⑤ みため",title:"⑤ 見た目完成",img:"images/car_complete.jpg",ok:"✅ つなぎ方をためそう！",note:"前後が逆なら入れ替えてみよう。"},
-    {nav:"⑥ かんせい",title:"⑥ ほんとうの完成！",img:"images/complete.jpg",ok:"🎉 大成功！",note:"安全に走らせよう。"}
+    {nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"✅ 電池の向きOK！", note:"＋と－を確認します。"},
+    {nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"✅ 線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。"},
+    {nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"✅ 前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。"},
+    {nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"✅ 回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない場合は配線を確認。"},
+    {nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"✅ つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。"},
+    {nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"🎉 前後に動いたら大成功！", note:"安全に走らせよう。"}
 ];
 
 const nav = document.getElementById('nav');
 const content = document.getElementById('content');
 
+// ナビゲーションの生成
 steps.forEach((step, index) => {
     const button = document.createElement('button');
     button.className = 'nav-btn';
@@ -109,6 +231,7 @@ steps.forEach((step, index) => {
     nav.appendChild(button);
 });
 
+// ステップの表示切り替え
 function showStep(index) {
     document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
         btn.classList.toggle('active', idx === index);
@@ -119,19 +242,22 @@ function showStep(index) {
         <div class="card">
             <div class="step-title">${step.title}</div>
             <div class="photo-container">
-                <div style="color:#999">【ここに写真が表示されます】</div>
+                <img src="${step.img}" class="step-img" onerror="this.style.display='none'; this.parentNode.insertAdjacentHTML('afterbegin', '<span style=color:#999>写真（${step.img}）</span>')">
                 <div class="tap-label">タップで拡大</div>
             </div>
             <div class="ok-box">${step.ok}</div>
-            <div class="note-box"><strong>ヒント:</strong> ${step.note}</div>
+            <div class="note-box"><strong>注意点:</strong> ${step.note}</div>
         </div>
     `;
-    // スムーズなスクロール
+    
+    // 選択したボタンを中央付近にスクロール
     const activeBtn = document.querySelectorAll('.nav-btn')[index];
     activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }
 
+// 初期表示
 showStep(0);
 </script>
+
 </body>
 </html>
