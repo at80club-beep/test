@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>👀みてつくるシート🚗</title>
 <style>
-/* すべてのCSSはインラインで記述 */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシック", sans-serif; background: #f5f7fa; color: #333; max-width: 960px; margin: 0 auto; min-height: 100vh; font-size: 16px; line-height: 1.6; }
 
@@ -14,7 +13,7 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
   background: linear-gradient(135deg, #4CAF50, #2E7D32); 
   color: white; 
   text-align: center; 
-  padding: 1.2rem; 
+  padding: 1rem; 
   position: sticky; 
   top: 0; 
   z-index: 100; 
@@ -23,11 +22,11 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
   cursor: default; 
 }
 .header h1 { 
-  font-size: 1.8rem; 
+  font-size: 1.6rem; 
   margin-bottom: 0.3rem; 
   transition: opacity 0.2s ease;
 }
-.header p { font-size: 1rem; opacity: 0.95; }
+.header p { font-size: 0.95rem; opacity: 0.95; }
 
 /* 進捗バー */
 .progress-container { 
@@ -43,10 +42,10 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
   border-radius: 0 4px 4px 0; 
 }
 
-/* ナビゲーション */
+/* ナビゲーション - タッチフレンドリーに拡大 */
 .nav-container { width: 100%; overflow-x: auto; background: white; padding: 10px; border-bottom: 2px solid #e0e0e0; -webkit-overflow-scrolling: touch; }
 .nav-scroll { display: inline-flex; gap: 8px; min-width: max-content; }
-.nav-btn { flex-shrink: 0; padding: 15px 18px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 12px; background: #e8f5e9; color: #2E7D32; min-width: 100px; min-height: 70px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; touch-action: manipulation; }
+.nav-btn { flex-shrink: 0; padding: 12px 16px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 12px; background: #e8f5e9; color: #2E7D32; min-width: 100px; min-height: 60px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; touch-action: manipulation; }
 .nav-btn:hover, .nav-btn:focus { background: #c8e6c9; transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
 .nav-btn.active { background: #FF9800; color: white; box-shadow: 0 0 0 2px white, 0 0 0 4px #FF9800; }
 .nav-btn.completed::before { content: "✅ "; }
@@ -142,25 +141,27 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
 
 /* 画像読み込みエラーメッセージ */
 .image-error-message {
-  padding: 40px 20px;
+  padding: 50px 20px;
   text-align: center;
   color: #666;
   background: #f8f9fa;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 2px dashed #ccc;
 }
 .image-error-message .error-icon {
   font-size: 3rem;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: block;
 }
 .image-error-message .error-text {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #f44336;
 }
 .image-error-message .fallback-text {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #999;
+  margin-top: 15px;
 }
 
 /* 子ども用完了エリア */
@@ -182,7 +183,7 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
   gap: 12px; 
 }
 
-/* 子ども用大型ボタン */
+/* 子ども用大型ボタン - 拡大 */
 .big-kids-button { 
   background: linear-gradient(135deg, #4CAF50, #2E7D32); 
   color: white; 
@@ -888,11 +889,139 @@ body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "游ゴシッ�
 </div>
 
 <script>
-// ================= ステップデータ（Base64埋め込み準備対応） =================
-// 画像パスは以下のいずれかの形式で指定可能：
-// 1. 相対パス: "images/battery_box.jpg"
-// 2. Base64データ: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ..."
-// 3. 将来的に外部URL: "https://example.com/image.jpg"
+// ================= 画像読み込みエラーハンドリング機能 =================
+class FireTabletImageLoader {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  // 大文字小文字のバリエーションを試す
+  getCaseVariations(path) {
+    if (!path || typeof path !== 'string') return [path];
+    
+    const variations = [path];
+    const lastDot = path.lastIndexOf('.');
+    
+    if (lastDot === -1) return variations;
+    
+    const base = path.substring(0, lastDot);
+    const ext = path.substring(lastDot).toLowerCase();
+    
+    // 一般的な画像拡張子のバリエーション
+    if (ext === '.jpg' || ext === '.jpeg') {
+      variations.push(
+        base + '.JPG',
+        base + '.JPEG',
+        base + '.Jpg',
+        base + '.jpeg',
+        base + '.Jpg',
+        base + '.JpeG'
+      );
+    } else if (ext === '.png') {
+      variations.push(
+        base + '.PNG',
+        base + '.Png',
+        base + '.pNg'
+      );
+    } else if (ext === '.gif') {
+      variations.push(
+        base + '.GIF',
+        base + '.Gif',
+        base + '.gIf'
+      );
+    }
+    
+    return [...new Set(variations)]; // 重複を削除
+  }
+
+  // 画像を安全に読み込む
+  async loadImage(src, altText = '') {
+    // キャッシュチェック
+    if (this.cache.has(src)) {
+      return this.cache.get(src);
+    }
+
+    // Base64または外部URLの場合は直接読み込み
+    if (src.startsWith('data:') || src.startsWith('http')) {
+      return this.loadDirect(src, altText);
+    }
+
+    // ローカルファイルの場合は大文字小文字バリエーションを試す
+    return this.loadWithCaseVariations(src, altText);
+  }
+
+  async loadDirect(src, altText) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        this.cache.set(src, img);
+        resolve(img);
+      };
+      img.onerror = () => {
+        resolve(this.createErrorElement('画像読み込みエラー', altText, src));
+      };
+      img.src = src;
+      img.alt = altText;
+    });
+  }
+
+  async loadWithCaseVariations(originalSrc, altText) {
+    const variations = this.getCaseVariations(originalSrc);
+    
+    for (const src of variations) {
+      try {
+        if (this.cache.has(src)) {
+          return this.cache.get(src);
+        }
+        
+        const result = await this.tryLoadSingle(src, altText);
+        if (result && !(result instanceof HTMLElement && result.classList.contains('image-error-message'))) {
+          this.cache.set(originalSrc, result);
+          this.cache.set(src, result);
+          return result;
+        }
+      } catch (error) {
+        console.debug(`Failed to load: ${src}`, error);
+      }
+    }
+    
+    return this.createErrorElement('画像が見つかりません', altText, originalSrc);
+  }
+
+  tryLoadSingle(src, altText) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+      img.alt = altText;
+      
+      // タイムアウト設定（Fireタブレット用）
+      setTimeout(() => {
+        if (!img.complete) {
+          resolve(null);
+        }
+      }, 2000);
+    });
+  }
+
+  createErrorElement(message, altText, src = '') {
+    const container = document.createElement('div');
+    container.className = 'image-error-message';
+    container.innerHTML = `
+      <div class="error-icon">⚠️</div>
+      <div class="error-text">${message}</div>
+      ${altText ? `<div class="fallback-text">代替テキスト: ${altText}</div>` : ''}
+      ${src ? `<div style="margin-top: 10px; font-size: 0.8rem; color: #888; word-break: break-all;">
+        パス: ${src}<br>
+        Fireタブレットではファイル名の大文字小文字を確認してください
+      </div>` : ''}
+    `;
+    return container;
+  }
+}
+
+// ================= ステップデータ（元のまま） =================
 const steps = [
   { 
     nav: "① でんち", 
@@ -937,8 +1066,12 @@ const steps = [
       ],
       explanation: `
         <div style="background:#E8F5E9; padding:20px; border-radius:12px; margin-top:20px; border:2px solid #4CAF50;">
-          <!-- 解説内容は省略（元のコードと同じ） -->
-          磁石の幅5mmをしっかり絶縁するために、約20mmの銅テープが必要です！
+          <!-- 説明は簡略化 -->
+          <h3 style="color:#1B5E20; text-align:center;">磁石の幅5mmをしっかり包むには約20mmのテープが必要です！</h3>
+          <p style="margin-top:15px; line-height:1.6;">
+            実際の工作では、磁石の幅方向にテープを巻く必要があります。<br>
+            磁石の幅5mm + 絶縁部分 + 重ねしろ = 約20mmが適切な長さです。
+          </p>
         </div>
       `
     }
@@ -997,119 +1130,12 @@ const steps = [
   }
 ];
 
-// ================= 画像読み込みエラーハンドリング機能 =================
-class ImageLoader {
-  constructor() {
-    this.attemptedPaths = new Set();
-  }
-
-  // 大文字小文字のバリエーションを生成
-  getCaseVariations(path) {
-    const variations = [path];
-    const ext = path.substring(path.lastIndexOf('.'));
-    const base = path.substring(0, path.lastIndexOf('.'));
-    
-    if (ext.toLowerCase() === '.jpg' || ext.toLowerCase() === '.jpeg') {
-      variations.push(base + '.JPG', base + '.JPEG', base + '.Jpg', base + '.jpeg');
-    } else if (ext.toLowerCase() === '.png') {
-      variations.push(base + '.PNG', base + '.Png');
-    } else if (ext.toLowerCase() === '.gif') {
-      variations.push(base + '.GIF', base + '.Gif');
-    }
-    
-    return variations;
-  }
-
-  // 画像読み込みを試行
-  loadImage(src, altText, maxRetries = 3) {
-    return new Promise((resolve) => {
-      if (!src || src.trim() === '') {
-        resolve(this.createErrorElement('画像パスが空です', altText));
-        return;
-      }
-
-      // Base64または外部URLの場合はそのまま読み込み
-      if (src.startsWith('data:') || src.startsWith('http')) {
-        this.loadImageDirect(src, altText, resolve);
-        return;
-      }
-
-      // ローカルファイルの場合は大文字小文字のバリエーションを試す
-      this.loadLocalImageWithRetry(src, altText, maxRetries, resolve);
-    });
-  }
-
-  loadImageDirect(src, altText, resolve) {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(this.createErrorElement('画像の読み込みに失敗しました', altText));
-    img.src = src;
-    img.alt = altText;
-  }
-
-  async loadLocalImageWithRetry(src, altText, maxRetries, resolve) {
-    const variations = this.getCaseVariations(src);
-    let attempts = 0;
-    
-    const tryLoad = (index) => {
-      if (index >= variations.length || attempts >= maxRetries) {
-        resolve(this.createErrorElement('画像ファイルが見つかりません', altText));
-        return;
-      }
-
-      const testSrc = variations[index];
-      
-      // すでに試したパスはスキップ
-      if (this.attemptedPaths.has(testSrc)) {
-        tryLoad(index + 1);
-        return;
-      }
-
-      this.attemptedPaths.add(testSrc);
-      attempts++;
-
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => {
-        console.warn(`画像読み込み失敗: ${testSrc}`);
-        tryLoad(index + 1);
-      };
-      img.src = testSrc;
-      img.alt = altText;
-    };
-
-    tryLoad(0);
-  }
-
-  createErrorElement(message, altText) {
-    const container = document.createElement('div');
-    container.className = 'image-error-message';
-    container.innerHTML = `
-      <div class="error-icon">⚠️</div>
-      <div class="error-text">${message}</div>
-      <div class="fallback-text">代替テキスト: ${altText}</div>
-      <div style="margin-top: 15px; font-size: 0.8rem; color: #888;">
-        Fireタブレットでは画像ファイル名の<br>大文字小文字が一致するか確認してください
-      </div>
-    `;
-    return container;
-  }
-}
-
-const imageLoader = new ImageLoader();
-
-// ================= 既存のコード（画像読み込み部分を修正） =================
+// ================= グローバル変数 =================
 let completedCounts = [0, 0, 0, 0, 0, 0];
 let currentStep = 0;
 let titleHoldTimer = null;
 let currentQuizAnswer = null;
 let quizCompleted = false;
-
-const navButtons = document.getElementById('navButtons');
-const content = document.getElementById('content');
-const rotationWarning = document.getElementById('rotationWarning');
-const progressBar = document.getElementById('progressBar');
-const headerTitle = document.querySelector('.header h1');
 
 // 拡大写真の状態管理（元のコードと同じ）
 let currentOverlay = null;
@@ -1128,31 +1154,48 @@ let zoomState = {
   startPosY: 0
 };
 
-// ================= 修正したcreatePhotoElement関数 =================
+const navButtons = document.getElementById('navButtons');
+const content = document.getElementById('content');
+const rotationWarning = document.getElementById('rotationWarning');
+const progressBar = document.getElementById('progressBar');
+const headerTitle = document.querySelector('.header h1');
+
+// 画像ローダーインスタンス
+const imageLoader = new FireTabletImageLoader();
+
+// ================= 改良した関数 =================
+
+// 改良版：画像要素を作成（非同期）
 async function createPhotoElement(imgSrc, altText) {
   const container = document.createElement('div');
   container.className = 'photo-container';
-  container.onclick = () => {
-    openOverlay(imgSrc);
-    return false;
-  };
+  
+  if (!imgSrc || imgSrc.trim() === '') {
+    return container;
+  }
 
   try {
-    const imgElement = await imageLoader.loadImage(imgSrc, altText);
+    const imgResult = await imageLoader.loadImage(imgSrc, altText);
     
-    if (imgElement instanceof HTMLImageElement) {
+    if (imgResult instanceof HTMLImageElement) {
       // 正常に読み込めた場合
-      imgElement.className = 'step-image';
-      imgElement.loading = 'lazy';
-      container.appendChild(imgElement);
+      imgResult.className = 'step-image';
+      imgResult.loading = 'lazy';
+      container.appendChild(imgResult);
       
       const tapLabel = document.createElement('div');
       tapLabel.className = 'tap-label';
       tapLabel.textContent = 'タップで拡大';
       container.appendChild(tapLabel);
-    } else {
-      // エラー表示の場合
-      container.appendChild(imgElement);
+      
+      // クリックイベント設定
+      container.onclick = () => {
+        openOverlay(imgSrc);
+        return false;
+      };
+    } else if (imgResult instanceof HTMLElement) {
+      // エラーメッセージの場合
+      container.appendChild(imgResult);
       container.style.cursor = 'default';
       container.onclick = null;
     }
@@ -1161,7 +1204,7 @@ async function createPhotoElement(imgSrc, altText) {
     container.innerHTML = `
       <div class="image-error-message">
         <div class="error-icon">❌</div>
-        <div class="error-text">予期せぬエラーが発生しました</div>
+        <div class="error-text">読み込みエラーが発生しました</div>
       </div>
     `;
   }
@@ -1169,29 +1212,20 @@ async function createPhotoElement(imgSrc, altText) {
   return container;
 }
 
-// ================= 修正したrenderStepView関数（非同期対応） =================
+// 改良版：ステップビューをレンダリング（非同期）
 async function renderStepView(s) {
   const stepIndex = currentStep;
   
-  let photoHtml = '';
-  let photoCount = 0;
+  // 画像の非同期読み込み
+  let photo1Element = null;
+  let photo2Element = null;
   
-  // 画像1を読み込み
   if (s.img1 && s.img1.trim() !== '') {
-    const photo1 = await createPhotoElement(s.img1, s.title + 'の写真');
-    if (photo1) {
-      photoHtml += photo1.outerHTML;
-      photoCount++;
-    }
+    photo1Element = await createPhotoElement(s.img1, s.title + 'の写真');
   }
   
-  // 画像2を読み込み
   if (s.img2 && s.img2.trim() !== '') {
-    const photo2 = await createPhotoElement(s.img2, s.title + 'の写真（詳細）');
-    if (photo2) {
-      photoHtml += photo2.outerHTML;
-      photoCount++;
-    }
+    photo2Element = await createPhotoElement(s.img2, s.title + 'の写真（詳細）');
   }
 
   let actionClass = 'action-section';
@@ -1200,6 +1234,17 @@ async function renderStepView(s) {
   if (!s.hasQuiz) {
     quizCompleted = false;
   }
+
+  // 写真HTMLを組み立て
+  let photoHtml = '';
+  if (photo1Element) {
+    photoHtml += photo1Element.outerHTML;
+  }
+  if (photo2Element) {
+    photoHtml += photo2Element.outerHTML;
+  }
+  
+  const photoCount = (photo1Element ? 1 : 0) + (photo2Element ? 1 : 0);
 
   content.innerHTML = `
     <div class="step-card">
@@ -1243,48 +1288,289 @@ async function renderStepView(s) {
     </div>`;
 }
 
-// ================= その他の関数（元のコードと同じ） =================
-// 以下の関数は元のコードから変更なしで使用:
-// - renderQuizSection()
-// - selectQuizOption()
-// - checkQuizAnswer()
-// - proceedAfterQuiz()
-// - openOverlay()
-// - initZoomControls()
-// - applyBoundary()
-// - updateTransform()
-// - resetZoomState()
-// - zoomIn()
-// - zoomOut()
-// - resetZoom()
-// - closeOverlay()
-// - saveProgress()
-// - loadProgress()
-// - kidComplete()
-// - celebrateAllComplete()
-// - updateProgressDisplay()
-// - initTitleLongPressFeature()
-// - startTitleLongPress()
-// - clearTitleLongPress()
-// - executeMinusOneFunction()
-// - resetAllProgress()
-// - goToNextStep()
-// - createDetailLines()
-// - showTimeGuide()
-// - showKeyPoint()
-// - renderKidsCompleteArea()
-// - renderAllCompleteMessage()
-// - renderPhotoGuide()
-// - render()
-// - renderNavButtons()
-// - renderAlbumView()
-// - initOrientationLock()
-// - checkOrientation()
+// ================= 残りの関数（元のコードから変更なし） =================
 
-// 元のコードから必要な関数をすべてコピーして貼り付け
-// ただし、上記で修正した関数は新しいバージョンを使用
+// 各工程の目安時間
+const stepTimes = {
+  0: 20, 1: 30, 2: 30, 3: 20, 4: 40, 5: 30
+};
 
-// ================= 初期化 =================
+function saveProgress() {
+  localStorage.setItem('simple_progress', JSON.stringify({
+    counts: completedCounts,
+    lastStep: currentStep,
+    timestamp: Date.now(),
+    quizCompleted: quizCompleted
+  }));
+}
+
+function loadProgress() {
+  const saved = JSON.parse(localStorage.getItem('simple_progress'));
+  if (saved && saved.counts) {
+    completedCounts = saved.counts;
+    currentStep = saved.lastStep || 0;
+    quizCompleted = saved.quizCompleted || false;
+  }
+}
+
+function kidComplete(stepIndex) {
+  if (completedCounts[stepIndex] < 4) {
+    completedCounts[stepIndex]++;
+    
+    if ('vibrate' in navigator) navigator.vibrate(100);
+    
+    saveProgress();
+    updateProgressDisplay();
+    render();
+    
+    if (completedCounts[stepIndex] === 4) {
+      celebrateAllComplete(stepIndex);
+    }
+  }
+}
+
+function celebrateAllComplete(stepIndex) {
+  const message = document.querySelector('.all-complete-message');
+  if (message) {
+    message.style.animation = 'celebrate 0.5s ease';
+    setTimeout(() => {
+      message.style.animation = 'gentlePulse 2s infinite';
+    }, 500);
+  }
+  
+  if ('vibrate' in navigator) {
+    navigator.vibrate([100, 50, 100, 50, 100]);
+  }
+}
+
+function updateProgressDisplay() {
+  const totalSteps = steps.filter(s => !s.isAlbum).length;
+  let totalCompleted = 0;
+  
+  for (let i = 0; i < totalSteps; i++) {
+    if (completedCounts[i] === 4) totalCompleted++;
+  }
+  
+  const percentage = Math.round((totalCompleted / totalSteps) * 100) || 0;
+  progressBar.style.width = percentage + '%';
+  
+  const navBtns = document.querySelectorAll('.nav-btn');
+  navBtns.forEach((btn, index) => {
+    const isCompleted = completedCounts[index] === 4;
+    const isCurrent = index === currentStep;
+    const hasQuiz = steps[index].hasQuiz;
+    
+    btn.className = `nav-btn ${isCurrent ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${hasQuiz ? 'quiz-step' : ''}`;
+  });
+}
+
+function initTitleLongPressFeature() {
+  headerTitle.addEventListener('mousedown', startTitleLongPress);
+  headerTitle.addEventListener('touchstart', startTitleLongPress);
+  
+  headerTitle.addEventListener('mouseup', clearTitleLongPress);
+  headerTitle.addEventListener('mouseleave', clearTitleLongPress);
+  headerTitle.addEventListener('touchend', clearTitleLongPress);
+  headerTitle.addEventListener('touchmove', clearTitleLongPress);
+}
+
+function startTitleLongPress(e) {
+  clearTitleLongPress();
+  
+  titleHoldTimer = setTimeout(() => {
+    executeMinusOneFunction();
+  }, 1000);
+}
+
+function clearTitleLongPress() {
+  if (titleHoldTimer) {
+    clearTimeout(titleHoldTimer);
+    titleHoldTimer = null;
+  }
+}
+
+function executeMinusOneFunction() {
+  if (completedCounts[currentStep] > 0) {
+    completedCounts[currentStep]--;
+    saveProgress();
+    updateProgressDisplay();
+    render();
+    
+    headerTitle.style.opacity = '0.5';
+    setTimeout(() => {
+      headerTitle.style.opacity = '1';
+    }, 200);
+    
+    if ('vibrate' in navigator) navigator.vibrate(100);
+  } else {
+    if ('vibrate' in navigator) navigator.vibrate([50, 100, 50]);
+  }
+}
+
+function resetAllProgress() {
+  if (confirm('全ての進捗をリセットしますか？\nこれまでの完了記録が全て消えます。')) {
+    completedCounts = [0, 0, 0, 0, 0, 0];
+    currentStep = 0;
+    quizCompleted = false;
+    saveProgress();
+    render();
+  }
+}
+
+function goToNextStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    quizCompleted = false;
+    render();
+    if ('vibrate' in navigator) navigator.vibrate(50);
+  }
+}
+
+function createDetailLines(detailAction) {
+  const lines = detailAction.split('<br>').map(line => line.trim());
+  return lines.map(line => {
+    const icon = line.includes('🔍') ? '🔍' : '💡';
+    const text = line.replace('🔍', '').replace('💡', '').trim();
+    return `
+      <div class="detail-line">
+        <span class="detail-icon">${icon}</span>
+        <span class="detail-text">${text}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function showTimeGuide(stepIndex) {
+  if (steps[stepIndex].isAlbum) return '';
+  const time = stepTimes[stepIndex] || 5;
+  return `<div class="time-guide">⏱ 目安: ${time}分</div>`;
+}
+
+function showKeyPoint(stepIndex) {
+  if (steps[stepIndex].isAlbum || !steps[stepIndex].keyPoint) return '';
+  return `
+    <div class="key-point">
+      <span class="key-icon">⭐</span>
+      <strong>最重要ポイント：${steps[stepIndex].keyPoint}</strong>
+    </div>
+  `;
+}
+
+function renderKidsCompleteArea(stepIndex) {
+  if (steps[stepIndex].isAlbum) return '';
+  
+  const count = completedCounts[stepIndex];
+  const percentage = Math.round((count / 4) * 100);
+  const isAllComplete = count === 4;
+  
+  return `
+    <div class="kids-complete-area">
+      <div class="kids-title">
+        <span>🎯</span>
+        <span>できたら押そう！</span>
+        <span>🎯</span>
+      </div>
+      
+      <button class="big-kids-button" onclick="kidComplete(${stepIndex})" ${isAllComplete ? 'disabled style="opacity:0.7"' : ''}>
+        <span class="big-emoji">✅</span>
+        <span class="big-text">できました！</span>
+      </button>
+      
+      <div class="completion-counter">
+        <div class="counter-display">
+          ${count === 4 ? '🎉 全員完了！' : `${count}/4人 完了`}
+        </div>
+        <div class="counter-bar">
+          <div class="counter-fill" style="width: ${percentage}%"></div>
+        </div>
+        <p style="color: #666; margin-top: 5px; font-size: 0.9rem;">
+          ${count === 0 ? 'まだ誰も押していません' : 
+            count < 4 ? `あと${4 - count}人で全員完了！` : 
+            'みんなよくできました！'}
+        </p>
+      </div>
+      
+      ${isAllComplete ? renderAllCompleteMessage(stepIndex) : ''}
+    </div>
+  `;
+}
+
+function renderAllCompleteMessage(stepIndex) {
+  const nextStep = stepIndex + 1;
+  if (nextStep >= steps.length) return '';
+  
+  const nextStepName = steps[nextStep].isAlbum ? '記念写真' : steps[nextStep].nav;
+  
+  return `
+    <div class="all-complete-message">
+      <h3>
+        <span>🎉</span>
+        ワンチーム成功！
+        <span>🎉</span>
+      </h3>
+      <p>みんなよく頑張りました！指導員の合図で次に進みましょう</p>
+      <button class="next-step-btn" onclick="goToNextStep()">
+        <span>▶️</span>
+        次へ：${nextStepName}
+      </button>
+    </div>
+  `;
+}
+
+function renderPhotoGuide() {
+  return `
+    <div class="photo-guide-area">
+      <h3 class="guide-title">
+        <span>📱</span>
+        撮影の手順
+        <span>📱</span>
+      </h3>
+      
+      <div class="guide-step">
+        <div class="step-icon">1</div>
+        <div class="step-content">
+          <strong>スマホ・タブレットのカメラアプリを開く</strong>
+          <p>ホーム画面の「カメラ」アイコンをタップ</p>
+        </div>
+      </div>
+      
+      <div class="guide-step">
+        <div class="step-icon">2</div>
+        <div class="step-content">
+          <strong>作品を撮影する</strong>
+          <p>みんなで作品を持って、記念写真を撮りましょう！</p>
+          <div class="photo-tips">
+            ✅ 明るい場所で撮る<br>
+            ✅ 作品全体が入るように<br>
+            ✅ 笑顔で「はい、チーズ！」
+          </div>
+        </div>
+      </div>
+      
+      <div class="guide-step">
+        <div class="step-icon">3</div>
+        <div class="step-content">
+          <strong>写真を活用する</strong>
+          <div class="usage-options">
+            <div class="usage-option">
+              <span class="usage-icon">👨‍👩‍👧</span>
+              <span class="usage-text">保護者と共有</span>
+            </div>
+            <div class="usage-option">
+              <span class="usage-icon">🏫</span>
+              <span class="usage-text">クラスの記録</span>
+            </div>
+            <div class="usage-option">
+              <span class="usage-icon">💾</span>
+              <span class="usage-text">思い出として保存</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 async function render() {
   updateProgressDisplay();
   renderNavButtons();
@@ -1297,6 +1583,572 @@ async function render() {
   }
 }
 
+function renderNavButtons() {
+  navButtons.innerHTML = '';
+  
+  steps.forEach((s, i) => {
+    const b = document.createElement('button');
+    const isCompleted = completedCounts[i] === 4;
+    const isCurrent = i === currentStep;
+    const hasQuiz = s.hasQuiz;
+    
+    b.className = `nav-btn ${isCurrent ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${hasQuiz ? 'quiz-step' : ''}`;
+    b.textContent = s.nav;
+    
+    if (hasQuiz && !quizCompleted && i > currentStep) {
+      b.disabled = true;
+      b.style.opacity = '0.5';
+      b.title = '先にクイズをクリアしてください';
+    }
+    
+    b.onclick = () => { 
+      currentStep = i; 
+      render(); 
+      if ('vibrate' in navigator) navigator.vibrate(20);
+    };
+    
+    navButtons.appendChild(b);
+  });
+}
+
+function renderAlbumView(s) {
+  content.innerHTML = `
+    <div class="step-card">
+      <div class="step-title">${s.title}</div>
+      
+      <div class="action-section">
+        <div class="main-action">
+          <span class="emoji">📷</span>
+          <span class="text">完成した作品を写真に残そう！</span>
+        </div>
+        <div class="detail-action">
+          <div class="detail-line">
+            <span class="detail-icon">💡</span>
+            <span class="detail-text">${s.albumMessage}</span>
+          </div>
+        </div>
+        <details class="hint-details">
+          <summary>💡 記念写真のアイデア</summary>
+          <div class="hint-content">
+            • 作品だけを撮る<br>
+            • 作品を持って写る<br>
+            • 友達と一緒に撮る<br>
+            • 動いているところを撮る<br>
+            • いろんな角度から撮る
+          </div>
+        </details>
+      </div>
+      
+      ${renderPhotoGuide()}
+      
+      <div class="teacher-note">
+        <strong>👨‍🏫 指導員用メモ：</strong><br>
+        1. 「では記念写真を撮ります！カメラの準備をしてください」と声かけ<br>
+        2. 「3、2、1、はい、チーズ！」と合図<br>
+        3. 作品を持った子どもの写真を数枚撮影<br>
+        4. 必要に応じて個別にも撮影<br>
+        5. 撮った写真はスマホの「写真」アプリに自動保存されます
+      </div>
+    </div>
+  `;
+}
+
+// ================= クイズ機能（元のコードと同じ） =================
+function renderQuizSection(step) {
+  if (!step.hasQuiz || !step.quizData) return '';
+  
+  return `
+    <div class="quiz-section" id="quizSection">
+      <div class="quiz-question">
+        ${step.quizData.question}
+      </div>
+      
+      <div class="quiz-options" id="quizOptions">
+        ${step.quizData.options.map((option, index) => `
+          <div class="quiz-option" onclick="selectQuizOption(${index})" data-correct="${option.correct}">
+            <div class="option-marker">${String.fromCharCode(65 + index)}</div>
+            <div class="option-content">
+              <div class="option-text">${option.text}</div>
+              <div class="option-hint">${option.hint}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="quiz-controls">
+        <button class="quiz-btn" onclick="checkQuizAnswer()" id="checkBtn" disabled>
+          <span>✅</span> 答えを確認
+        </button>
+      </div>
+      
+      <div class="quiz-feedback" id="quizFeedback">
+        <div class="feedback-header">
+          <span>💡</span>
+          <span>解説</span>
+        </div>
+        <div class="feedback-explanation">
+          ${step.quizData.explanation}
+        </div>
+        <div class="quiz-controls">
+          <button class="quiz-btn secondary" onclick="proceedAfterQuiz()" id="proceedBtn">
+            <span>▶️</span> 次のステップへ進む
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function selectQuizOption(optionIndex) {
+  if (quizCompleted) return;
+  
+  const options = document.querySelectorAll('.quiz-option');
+  const checkBtn = document.getElementById('checkBtn');
+  
+  options.forEach((option, index) => {
+    option.classList.remove('selected');
+    if (index === optionIndex) {
+      option.classList.add('selected');
+    }
+  });
+  
+  currentQuizAnswer = optionIndex;
+  checkBtn.disabled = false;
+  
+  if ('vibrate' in navigator) navigator.vibrate(30);
+}
+
+function checkQuizAnswer() {
+  if (currentQuizAnswer === null) return;
+  
+  const step = steps[currentStep];
+  const correctIndex = step.quizData.options.findIndex(opt => opt.correct);
+  const options = document.querySelectorAll('.quiz-option');
+  const feedback = document.getElementById('quizFeedback');
+  const checkBtn = document.getElementById('checkBtn');
+  const proceedBtn = document.getElementById('proceedBtn');
+  
+  options.forEach((option, index) => {
+    const isCorrect = step.quizData.options[index].correct;
+    if (isCorrect) {
+      option.classList.add('correct');
+    } else if (index === currentQuizAnswer) {
+      option.classList.add('incorrect');
+    }
+    option.classList.remove('selected');
+  });
+  
+  feedback.classList.add('show');
+  
+  const isCorrect = step.quizData.options[currentQuizAnswer].correct;
+  
+  if (isCorrect) {
+    quizCompleted = true;
+    checkBtn.style.display = 'none';
+    proceedBtn.style.display = 'flex';
+    
+    const quizSection = document.getElementById('quizSection');
+    const clearMessage = document.createElement('div');
+    clearMessage.className = 'mission-clear';
+    clearMessage.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
+      <h3 style="color: #1B5E20; margin-bottom: 10px;">クイズクリア！</h3>
+      <p>よくできました！理屈を理解できています。</p>
+      <div class="correct-badge">
+        ✅ 理解度チェック完了
+      </div>
+    `;
+    quizSection.appendChild(clearMessage);
+    
+    if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+  } else {
+    checkBtn.textContent = 'もう一度考える';
+    checkBtn.disabled = true;
+    currentQuizAnswer = null;
+    
+    if ('vibrate' in navigator) navigator.vibrate([50, 100, 50]);
+  }
+}
+
+function proceedAfterQuiz() {
+  if (quizCompleted) {
+    goToNextStep();
+  }
+}
+
+// ================= 拡大写真機能（元のコードと同じ） =================
+function openOverlay(src) {
+  closeOverlay();
+  
+  currentOverlay = document.createElement('div');
+  currentOverlay.className = 'overlay';
+  currentOverlay.setAttribute('role', 'dialog');
+  currentOverlay.setAttribute('aria-modal', 'true');
+  currentOverlay.setAttribute('aria-label', '拡大画像');
+  
+  resetZoomState();
+  
+  currentOverlay.innerHTML = `
+    <div class="zoom-indicator" id="zoomIndicator">100%</div>
+    <div class="overlay-content">
+      <div class="overlay-image-container">
+        <img src="${src}" class="overlay-image" alt="作業の参考写真（拡大表示）" 
+             onload="initZoomControls(this)">
+      </div>
+    </div>
+    <div class="overlay-controls">
+      <button class="overlay-btn" onclick="zoomOut()" aria-label="縮小">
+        <span>➖</span> 縮小
+      </button>
+      <button class="overlay-btn" onclick="resetZoom()" aria-label="リセット">
+        <span>🔄</span> リセット
+      </button>
+      <button class="overlay-btn" onclick="zoomIn()" aria-label="拡大">
+        <span>➕</span> 拡大
+      </button>
+    </div>
+    <button class="close-overlay-btn" onclick="closeOverlay()" aria-label="閉じる">
+      ×<br><small>とじる</small>
+    </button>
+  `;
+
+  document.body.appendChild(currentOverlay);
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  
+  setTimeout(() => {
+    currentOverlay.classList.add('active');
+    const closeBtn = currentOverlay.querySelector('.close-overlay-btn');
+    if (closeBtn) closeBtn.focus();
+  }, 10);
+  
+  currentOverlay.addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('.overlay-content')) {
+      closeOverlay();
+    }
+  });
+  
+  overlayKeydownHandler = function(e) {
+    if (e.key === 'Escape') {
+      closeOverlay();
+    } else if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomIn();
+    } else if (e.key === '-') {
+      e.preventDefault();
+      zoomOut();
+    } else if (e.key === '0') {
+      e.preventDefault();
+      resetZoom();
+    }
+  };
+  document.addEventListener('keydown', overlayKeydownHandler);
+  
+  return false;
+}
+
+function initZoomControls(imgElement) {
+  if (!currentOverlay) return;
+  
+  const container = imgElement.parentElement;
+  const indicator = document.getElementById('zoomIndicator');
+  
+  let lastTap = 0;
+  imgElement.addEventListener('touchstart', function(e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    
+    if (tapLength < 300 && tapLength > 0 && e.touches.length === 1) {
+      e.preventDefault();
+      if (zoomState.scale === 1) {
+        const touch = e.touches[0];
+        const rect = imgElement.getBoundingClientRect();
+        const tapX = touch.clientX - rect.left;
+        const tapY = touch.clientY - rect.top;
+        
+        const newScale = 2;
+        zoomState.posX = tapX / newScale - tapX / zoomState.scale + zoomState.posX;
+        zoomState.posY = tapY / newScale - tapY / zoomState.scale + zoomState.posY;
+        zoomState.scale = newScale;
+      } else {
+        resetZoom(imgElement, indicator);
+      }
+      
+      updateTransform(imgElement, indicator);
+    }
+    lastTap = currentTime;
+  });
+  
+  container.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const rect = imgElement.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const newScale = Math.max(1, Math.min(5, zoomState.scale * delta));
+    
+    zoomState.posX = mouseX / newScale - mouseX / zoomState.scale + zoomState.posX;
+    zoomState.posY = mouseY / newScale - mouseY / zoomState.scale + zoomState.posY;
+    zoomState.scale = newScale;
+    
+    updateTransform(imgElement, indicator);
+  }, { passive: false });
+  
+  container.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    
+    if (e.touches.length === 1) {
+      zoomState.isDragging = true;
+      zoomState.isPinching = false;
+      
+      const touch = e.touches[0];
+      zoomState.startX = touch.clientX;
+      zoomState.startY = touch.clientY;
+      zoomState.startPosX = zoomState.posX;
+      zoomState.startPosY = zoomState.posY;
+      
+      imgElement.classList.add('dragging');
+    } else if (e.touches.length === 2) {
+      zoomState.isDragging = false;
+      zoomState.isPinching = true;
+      
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      
+      zoomState.startDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      zoomState.startScale = zoomState.scale;
+      
+      const centerX = (touch1.clientX + touch2.clientX) / 2;
+      const centerY = (touch1.clientY + touch2.clientY) / 2;
+      const rect = imgElement.getBoundingClientRect();
+      
+      zoomState.pinchCenterX = centerX - rect.left;
+      zoomState.pinchCenterY = centerY - rect.top;
+    }
+  });
+  
+  container.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    
+    if (zoomState.isDragging && e.touches.length === 1) {
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - zoomState.startX;
+      const deltaY = touch.clientY - zoomState.startY;
+      
+      if (zoomState.scale > 1) {
+        zoomState.posX = zoomState.startPosX + deltaX / zoomState.scale;
+        zoomState.posY = zoomState.startPosY + deltaY / zoomState.scale;
+        applyBoundary(imgElement);
+        updateTransform(imgElement, indicator);
+      }
+    } else if (zoomState.isPinching && e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      
+      const currentDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      if (zoomState.startDistance > 0) {
+        const scale = zoomState.startScale * (currentDistance / zoomState.startDistance);
+        const newScale = Math.max(1, Math.min(5, scale));
+        
+        if (zoomState.pinchCenterX !== undefined) {
+          const centerX = zoomState.pinchCenterX;
+          const centerY = zoomState.pinchCenterY;
+          
+          zoomState.posX = centerX / newScale - centerX / zoomState.scale + zoomState.posX;
+          zoomState.posY = centerY / newScale - centerY / zoomState.scale + zoomState.posY;
+        }
+        
+        zoomState.scale = newScale;
+        applyBoundary(imgElement);
+        updateTransform(imgElement, indicator);
+      }
+    }
+  });
+  
+  container.addEventListener('touchend', function(e) {
+    zoomState.isDragging = false;
+    zoomState.isPinching = false;
+    imgElement.classList.remove('dragging');
+  });
+}
+
+function applyBoundary(imgElement) {
+  if (zoomState.scale <= 1) {
+    zoomState.posX = 0;
+    zoomState.posY = 0;
+    return;
+  }
+  
+  const container = imgElement.parentElement;
+  const imgWidth = imgElement.naturalWidth || imgElement.width;
+  const imgHeight = imgElement.naturalHeight || imgElement.height;
+  
+  if (!imgWidth || !imgHeight) return;
+  
+  const scaledWidth = imgWidth * zoomState.scale;
+  const scaledHeight = imgHeight * zoomState.scale;
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
+  
+  if (scaledWidth > containerWidth) {
+    const maxX = (scaledWidth - containerWidth) / (2 * zoomState.scale);
+    zoomState.posX = Math.max(-maxX, Math.min(maxX, zoomState.posX));
+  } else {
+    zoomState.posX = 0;
+  }
+  
+  if (scaledHeight > containerHeight) {
+    const maxY = (scaledHeight - containerHeight) / (2 * zoomState.scale);
+    zoomState.posY = Math.max(-maxY, Math.min(maxY, zoomState.posY));
+  } else {
+    zoomState.posY = 0;
+  }
+}
+
+function updateTransform(imgElement, indicator) {
+  imgElement.style.transform = `translate(${zoomState.posX * zoomState.scale}px, ${zoomState.posY * zoomState.scale}px) scale(${zoomState.scale})`;
+  
+  if (indicator) {
+    const percentage = Math.round(zoomState.scale * 100);
+    indicator.textContent = `${percentage}%`;
+    indicator.style.display = 'block';
+    
+    clearTimeout(indicator.hideTimeout);
+    indicator.hideTimeout = setTimeout(() => {
+      indicator.style.display = 'none';
+    }, 2000);
+  }
+}
+
+function resetZoomState() {
+  zoomState = {
+    scale: 1,
+    posX: 0,
+    posY: 0,
+    isDragging: false,
+    isPinching: false,
+    startX: 0,
+    startY: 0,
+    startDistance: 0,
+    startScale: 1,
+    startPosX: 0,
+    startPosY: 0
+  };
+}
+
+function zoomIn() {
+  const imgElement = document.querySelector('.overlay-image');
+  const indicator = document.getElementById('zoomIndicator');
+  if (!imgElement) return;
+  
+  const newScale = Math.min(5, zoomState.scale * 1.3);
+  
+  const container = imgElement.parentElement;
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
+  
+  const centerX = -zoomState.posX * zoomState.scale + containerWidth / 2;
+  const centerY = -zoomState.posY * zoomState.scale + containerHeight / 2;
+  
+  zoomState.posX = centerX / newScale - centerX / zoomState.scale + zoomState.posX;
+  zoomState.posY = centerY / newScale - centerY / zoomState.scale + zoomState.posY;
+  zoomState.scale = newScale;
+  
+  applyBoundary(imgElement);
+  updateTransform(imgElement, indicator);
+}
+
+function zoomOut() {
+  const imgElement = document.querySelector('.overlay-image');
+  const indicator = document.getElementById('zoomIndicator');
+  if (!imgElement) return;
+  
+  const newScale = Math.max(1, zoomState.scale * 0.7);
+  
+  const container = imgElement.parentElement;
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
+  
+  const centerX = -zoomState.posX * zoomState.scale + containerWidth / 2;
+  const centerY = -zoomState.posY * zoomState.scale + containerHeight / 2;
+  
+  zoomState.posX = centerX / newScale - centerX / zoomState.scale + zoomState.posX;
+  zoomState.posY = centerY / newScale - centerY / zoomState.scale + zoomState.posY;
+  zoomState.scale = newScale;
+  
+  applyBoundary(imgElement);
+  updateTransform(imgElement, indicator);
+}
+
+function resetZoom(imgElement = null, indicator = null) {
+  const targetImg = imgElement || document.querySelector('.overlay-image');
+  const targetIndicator = indicator || document.getElementById('zoomIndicator');
+  if (!targetImg) return;
+  
+  resetZoomState();
+  targetImg.style.transform = 'translate(0px, 0px) scale(1)';
+  
+  if (targetIndicator) {
+    targetIndicator.textContent = '100%';
+    targetIndicator.style.display = 'block';
+    
+    clearTimeout(targetIndicator.hideTimeout);
+    targetIndicator.hideTimeout = setTimeout(() => {
+      targetIndicator.style.display = 'none';
+    }, 2000);
+  }
+}
+
+function closeOverlay() {
+  if (!currentOverlay) return;
+  
+  currentOverlay.classList.remove('active');
+  
+  setTimeout(() => {
+    if (currentOverlay && currentOverlay.parentNode) {
+      currentOverlay.parentNode.removeChild(currentOverlay);
+    }
+    currentOverlay = null;
+    
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    
+    if (overlayKeydownHandler) {
+      document.removeEventListener('keydown', overlayKeydownHandler);
+      overlayKeydownHandler = null;
+    }
+  }, 300);
+}
+
+function initOrientationLock() {
+  window.addEventListener('orientationchange', checkOrientation);
+  window.addEventListener('resize', checkOrientation);
+  checkOrientation();
+}
+
+function checkOrientation() {
+  const isPortrait = window.innerHeight > window.innerWidth;
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  if (isMobile && !isPortrait) {
+    rotationWarning.classList.add('active');
+  } else {
+    rotationWarning.classList.remove('active');
+  }
+}
+
+// ================= 初期化 =================
 window.addEventListener('DOMContentLoaded', () => {
   initOrientationLock();
   initTitleLongPressFeature();
@@ -1310,7 +2162,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-console.log('👨‍🏫 工作指導アプリ - Fireタブレットオフライン対応版 起動完了');
+console.log('👨‍🏫 工作指導アプリ - Fireタブレット完全オフライン対応版 起動完了');
 </script>
 </body>
 </html>
